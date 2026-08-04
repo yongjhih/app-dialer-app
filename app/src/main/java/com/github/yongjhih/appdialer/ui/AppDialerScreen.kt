@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -164,7 +165,7 @@ fun AppDialerScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
-                        icon = BackspaceIcon,
+                        icon = Icons.AutoMirrored.Filled.Backspace,
                         subtitleIcon = if (settingsTriggerKey == "X") Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
