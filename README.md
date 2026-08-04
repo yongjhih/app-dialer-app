@@ -7,7 +7,11 @@
 <p align="center">
   <b>Sleek, Lightning-Fast CJK T9 Numeric App Launcher for Android</b>
   <br />
-  <i>重溫傳統 T9 撥號體驗 ‧ 支援中文拼音與日文羅馬字音譯搜尋 ‧ Jetpack Compose 黑金奢華設計</i>
+  <i>T9 Keypad Experience ‧ Multilingual CJK Transliteration ‧ Obsidian Gold Jetpack Compose UI</i>
+</p>
+
+<p align="center">
+  <a href="README.md"><b>🇬🇧 English</b></a> | <a href="README_zh.md"><b>🇹🇼 繁體中文</b></a>
 </p>
 
 <p align="center">
@@ -19,9 +23,11 @@
 
 ---
 
-## 🌟 簡介 (Introduction)
+## 🌟 Introduction
 
-**AppDialer** 是一款專為 Android 設計的極速 **T9 數字鍵盤 App 快速啟動器**。借鑑經典實體手機 T9 撥號盤的直覺體驗，結合現代化的 **Material 3 奢華黑金 (Obsidian Gold)** 設計語言與原生 **CJK 漢語拼音 / 羅馬字音譯比對引擎**，讓您無需切換輸入法，只需敲擊幾下數字鍵，即可在毫秒間搜尋並開啟任何 App！
+**AppDialer** is a ultra-fast, lightweight **T9 Numeric Keypad App Launcher for Android**. Inspired by the tactile efficiency of physical feature phone T9 dialpads, AppDialer combines modern **Material 3 Obsidian Gold** design aesthetics with native **CJK (Chinese Pinyin & Japanese Romaji) transliteration search algorithms**. 
+
+Launch any app on your phone in milliseconds with just a few numeric key taps—no input method switching required!
 
 <p align="center">
   <img src="docs/app-dialer-app-screenshot.png" width="360" alt="AppDialer Screenshot" />
@@ -29,100 +35,100 @@
 
 ---
 
-## ✨ 核心特色 (Key Features)
+## ✨ Key Features
 
-### ⚡ 1. T9 數字鍵盤極速搜尋 (T9 Numeric Keypad)
-- 標準 3x3 撥號盤佈局 (`2: ABC` ~ `9: WXYZ`)，單手操作無壓力。
-- 輕量高效，隨叫隨到，懸浮於桌面之上。
+### ⚡ 1. T9 Numeric Keypad Launching
+- Classic 3x3 numeric dialpad (`2: ABC` ~ `9: WXYZ`) designed for seamless single-handed operation.
+- Floating overlay card anchored right above your home screen dock.
 
-### 🌏 2. 多國語言 CJK 音譯搜尋 (CJK Transliteration Search)
-基於 Android 原生 **ICU Transliterator** 引擎（零增加 APK 體積）：
-- **中文（繁體 / 簡體）**：支援漢語拼音首字母與全拼匹配。
-  - 輸入 `38` ➔ 匹配 **「地圖」** (Di Tu `38`)
-  - 輸入 `95` ➔ 匹配 **「相機」** (Xiang Ji `95`)
-- **日文（平假名 / 片假名）**：支援 Romaji 羅馬字匹配。
-  - 輸入 `56` ➔ 匹配 **「カメラ」** (Kamera `56`)
-  - 輸入 `78` ➔ 匹配 **「設定」** (Settei `78`)
-- **英文與數字**：傳統 T9 字母組合全解析與直接匹配。
+### 🌏 2. Multilingual CJK Transliteration Search
+Powered natively by Android ICU `android.icu.text.Transliterator` (zero APK size overhead):
+- **Chinese (Traditional & Simplified)**: Matches Pinyin initials and full Pinyin.
+  - Press `38` ➔ Matches **「地圖」** (Di Tu `38`)
+  - Press `95` ➔ Matches **「相機」** (Xiang Ji `95`)
+- **Japanese (Hiragana & Katakana)**: Matches Hepburn Romaji.
+  - Press `56` ➔ Matches **「カメラ」** (Kamera `56`)
+  - Press `78` ➔ Matches **「設定」** (Settei `78`)
+- **English & Digits**: Direct letter parsing and exact matching.
 
-### 🎯 3. 智慧 Fuzzy 模糊比對與高亮提示 (Fuzzy Search & Highlighting)
-- 支援非連續字元匹配 (Subsequence Matching) 與前綴加權評分演算法。
-- 在 App 搜尋結果中**精準高亮顯示命中的字元**。
+### 🎯 3. Smart Fuzzy Search & Character Highlighting
+- Subsequence matching with prefix bonus scoring.
+- Highlights matched characters directly in search result app labels.
 
-### 🚀 4. 近期 App 智慧排序 (Recent Apps Ranking)
-- 自動記錄歷史開啟頻率與近期使用記錄，常用 App 優先浮出首位。
+### 🚀 4. Recent Apps Smart Prioritization
+- Automatically tracks app launch history and ranks frequently used apps first.
 
-### 🎨 5. 黑金奢華 Obsidian Gold 視覺設計 (Obsidian Gold Design Tokens)
-- 純粹曜石黑 (`#121214`) 搭配琥珀金 (`#FFD700`) 高亮與微立體鍵盤卡片。
-- 撥號盤懸浮透明視窗與獨立實體色設定頁面，展現高質感現代美學。
+### 🎨 5. Premium Obsidian & Amber Gold Aesthetics
+- Deep Obsidian background (`#121214`) paired with Amber Gold accents (`#FFD700`).
+- Floating translucent activity overlay with solid dark Settings view.
 
-### ⚙️ 6. 靈活鍵盤自訂與手感回饋 (Keypad Customization & Haptics)
-- **`X` 鍵手感**：短按倒退刪除單一字元，長按一鍵清空全部輸入。
-- **設定選單靈活配置**：可隨意指定長按開啟設定的按鍵（預設為 `9` 號鍵，也可自訂為 `X` 或 `2`~`8` 鍵）。
-- **觸感回饋**：內建按鍵 Tap 與 Long-press 觸感震動 (Haptic Feedback)。
-
----
-
-## 🛠️ 技術棧與架構 (Tech Stack & Architecture)
-
-- **語言**: 100% Kotlin
-- **UI 框架**: Jetpack Compose + Material 3
-- **音譯引擎**: `android.icu.text.Transliterator` (Android API 29+ 原生框架支援)
-- **相容性**: Android API 21+ (Android 5.0 Lollipop ~ Android 16)
-- **非同步與狀態**: Kotlin Coroutines, StateFlow, Compose `mutableStateOf`
-- **資料持久化**: SharedPreferences (`RecentAppsManager`)
+### ⚙️ 6. Customizable Keypad & Haptic Ergonomics
+- **`X` Clear Button**: Tap to backspace 1 character, long-press to clear all.
+- **Configurable Settings Trigger**: Customize which button long-press opens Settings (default `9`, customizable to `X` or `2`~`8`).
+- **Haptic Feedback**: Tactile vibration on keyboard taps and long presses.
 
 ---
 
-## 🚀 開始使用 (Getting Started)
+## 🛠️ Tech Stack & Architecture
 
-### 前置需求 (Prerequisites)
-- Android Studio Ladybug (或更新版本)
+- **Language**: 100% Kotlin
+- **UI Framework**: Jetpack Compose + Material 3 Design Tokens
+- **Transliteration**: `android.icu.text.Transliterator` (API 29+ System Framework)
+- **Compatibility**: Android API 21+ (Android 5.0 Lollipop to Android 16)
+- **Concurrency & State**: Kotlin Coroutines, StateFlow, Compose `mutableStateOf`
+- **Data Storage**: SharedPreferences (`RecentAppsManager`)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Android Studio Ladybug (or newer)
 - JDK 17+
 - Android SDK 34+
 
-### 編譯與安裝 (Build & Run)
+### Build & Run
 
-1. **Clone 專案庫**:
+1. **Clone repository**:
    ```bash
    git clone https://github.com/yongjhih/AppDialer.git
    cd AppDialer
    ```
 
-2. **編譯 Debug APK**:
+2. **Build Debug APK**:
    ```bash
    ./gradlew assembleDebug
    ```
 
-3. **執行單元測試**:
+3. **Run Unit Tests**:
    ```bash
    ./gradlew test
    ```
 
-4. **安裝至連接的 Android 裝置 / 模擬器**:
+4. **Install on connected device**:
    ```bash
    ./gradlew installDebug
    ```
 
 ---
 
-## ⚙️ 設定說明 (Settings)
+## ⚙️ Settings Options
 
-進入 App Dialer 設定頁面（預設長按 `9` 號鍵）可進行以下配置：
+Access Settings by long-pressing the configured trigger key (default key `9`):
 
-| 設定項目 | 說明 |
+| Setting | Description |
 | :--- | :--- |
-| **Long-Press Settings Key** | 自訂長按開啟設定選單的撥號鍵 (`X`, `2`~`9`) |
-| **Fuzzy Search (模糊搜尋)** | 允許字元間隔匹配（預設開啟） |
-| **Haptic Feedback** | 撥號鍵盤敲擊震動回饋 |
-| **Background Dim Amount** | 撥號盤開啟時的背景遮罩淡化比例 |
-| **Close Dialer after Launch** | 點擊啟動 App 後自動關閉撥號盤 |
+| **Long-Press Settings Key** | Select which keypad button long-press opens settings (`X`, `2`~`9`) |
+| **Fuzzy Search** | Allow non-contiguous character matching (Enabled by default) |
+| **Haptic Feedback** | Tactile vibration on keypad touch |
+| **Background Dim Amount** | Background overlay dim ratio when dialer is open |
+| **Close Dialer after Launch** | Automatically dismiss AppDialer upon app launch |
 
 ---
 
-## 📄 授權條款 (License)
+## 📄 License
 
-本專案採用 **MIT License** 授權，詳情請參閱 [LICENSE](LICENSE) 檔案。
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ```
 Copyright (c) 2026 Yongjhih Chen
@@ -133,3 +139,9 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software...
 ```
+
+---
+
+## 🇹🇼 繁體中文說明 (Traditional Chinese)
+
+請參閱專用中文說明文件：[README_zh.md](README_zh.md)
