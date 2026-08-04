@@ -23,6 +23,11 @@ fun String.toT9Initials(): String = split(Regex("[^a-zA-Z0-9]+"))
     .mapNotNull { word -> word.firstOrNull()?.toT9()?.takeIf { it != ' ' } }
     .joinToString("")
 
+fun String.toT9Words(): List<String> = split(Regex("[^a-zA-Z0-9]+"))
+    .filter { it.isNotEmpty() }
+    .map { word -> word.toT9() }
+    .filter { it.isNotEmpty() }
+
 fun String.toCjkT9Full(): String {
     val latin = CjkTransliterator.toLatin(this)
     return latin.toT9()
