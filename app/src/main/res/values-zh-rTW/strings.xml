@@ -61,7 +61,7 @@
     <string name="open_app_details_title">開啟系統應用程式資訊</string>
     <string name="open_app_details_subtitle">管理權限、通知與電池最佳化設定</string>
     <string name="app_version_title">版本號</string>
-    <string name="app_version_format">%1$s（建置 %2$d）</string>
+    <string name="app_version_format">%1$s（%2$d）</string>
 
     <!-- Dialer Screen -->
     <string name="no_matching_apps">找不到符合的 App</string>
