@@ -9,6 +9,12 @@ object RecentAppsManager {
     private const val KEY_FUZZY_SEARCH = "fuzzy_search"
     private const val KEY_ZHUYIN_MODE = "zhuyin_mode"
     private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
+
+    private const val KEY_POS_LETTERS = "pos_letters"
+    private const val KEY_POS_NUMBER = "pos_number"
+    private const val KEY_POS_ZHUYIN = "pos_zhuyin"
+    private const val KEY_POS_FUNCTION = "pos_function"
+
     private const val MAX_RECENT_APPS = 20
 
     private fun getPrefs(context: Context): SharedPreferences {
@@ -56,4 +62,17 @@ object RecentAppsManager {
     fun setSettingsTriggerKey(context: Context, key: String) {
         getPrefs(context).edit().putString(KEY_SETTINGS_TRIGGER_KEY, key).apply()
     }
+
+    // Element Position Configs
+    fun getLettersPosition(context: Context): String = getPrefs(context).getString(KEY_POS_LETTERS, "Center") ?: "Center"
+    fun setLettersPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_LETTERS, pos).apply()
+
+    fun getNumberPosition(context: Context): String = getPrefs(context).getString(KEY_POS_NUMBER, "TopRight") ?: "TopRight"
+    fun setNumberPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_NUMBER, pos).apply()
+
+    fun getZhuyinPosition(context: Context): String = getPrefs(context).getString(KEY_POS_ZHUYIN, "BottomLeft") ?: "BottomLeft"
+    fun setZhuyinPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_ZHUYIN, pos).apply()
+
+    fun getFunctionPosition(context: Context): String = getPrefs(context).getString(KEY_POS_FUNCTION, "BottomRight") ?: "BottomRight"
+    fun setFunctionPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_FUNCTION, pos).apply()
 }

@@ -55,6 +55,14 @@ import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
 import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 
+fun parseAlignment(pos: String): Alignment = when (pos) {
+    "TopLeft" -> Alignment.TopStart
+    "TopRight" -> Alignment.TopEnd
+    "BottomLeft" -> Alignment.BottomStart
+    "BottomRight" -> Alignment.BottomEnd
+    else -> Alignment.Center
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppDialerScreen(
@@ -62,6 +70,10 @@ fun AppDialerScreen(
     searchQuery: String = "",
     settingsTriggerKey: String = "9",
     isZhuyinEnabled: Boolean = false,
+    lettersPos: String = "Center",
+    numberPos: String = "TopRight",
+    zhuyinPos: String = "BottomLeft",
+    functionPos: String = "BottomRight",
     onDigitPressed: (String) -> Unit,
     onDeleteOneDigit: () -> Unit,
     onClearAllDigits: () -> Unit,
@@ -153,6 +165,10 @@ fun AppDialerScreen(
                     KeypadButton(
                         icon = Icons.Default.Close,
                         subtitleIcon = if (settingsTriggerKey == "X") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = onDeleteOneDigit,
                         onLongClick = if (settingsTriggerKey == "X") onOpenDialerSettings else onClearAllDigits,
                         modifier = Modifier.weight(1f, fill = true)
@@ -162,6 +178,10 @@ fun AppDialerScreen(
                         letters = "ABC",
                         zhuyin = if (isZhuyinEnabled) "ㄅㄆㄇㄈ" else null,
                         subtitleIcon = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("2") },
                         onLongClick = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -171,6 +191,10 @@ fun AppDialerScreen(
                         letters = "DEF",
                         zhuyin = if (isZhuyinEnabled) "ㄉㄊㄋㄌ" else null,
                         subtitleIcon = if (settingsTriggerKey == "3") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("3") },
                         onLongClick = if (settingsTriggerKey == "3") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -189,6 +213,10 @@ fun AppDialerScreen(
                         letters = "GHI",
                         zhuyin = if (isZhuyinEnabled) "ㄍㄎㄏ" else null,
                         subtitleIcon = if (settingsTriggerKey == "4") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("4") },
                         onLongClick = if (settingsTriggerKey == "4") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -198,6 +226,10 @@ fun AppDialerScreen(
                         letters = "JKL",
                         zhuyin = if (isZhuyinEnabled) "ㄐㄑㄒ" else null,
                         subtitleIcon = if (settingsTriggerKey == "5") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("5") },
                         onLongClick = if (settingsTriggerKey == "5") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -207,6 +239,10 @@ fun AppDialerScreen(
                         letters = "MNO",
                         zhuyin = if (isZhuyinEnabled) "ㄓㄔㄕㄖ" else null,
                         subtitleIcon = if (settingsTriggerKey == "6") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("6") },
                         onLongClick = if (settingsTriggerKey == "6") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -225,6 +261,10 @@ fun AppDialerScreen(
                         letters = "PQRS",
                         zhuyin = if (isZhuyinEnabled) "ㄗㄘㄙ" else null,
                         subtitleIcon = if (settingsTriggerKey == "7") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("7") },
                         onLongClick = if (settingsTriggerKey == "7") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -234,6 +274,10 @@ fun AppDialerScreen(
                         letters = "TUV",
                         zhuyin = if (isZhuyinEnabled) "ㄚㄛㄜㄝ" else null,
                         subtitleIcon = if (settingsTriggerKey == "8") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("8") },
                         onLongClick = if (settingsTriggerKey == "8") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -243,6 +287,10 @@ fun AppDialerScreen(
                         letters = "WXYZ",
                         zhuyin = if (isZhuyinEnabled) "ㄞㄟㄠㄡ" else null,
                         subtitleIcon = if (settingsTriggerKey == "9") Icons.Default.Settings else null,
+                        numberPos = numberPos,
+                        lettersPos = lettersPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onClick = { onDigitPressed("9") },
                         onLongClick = if (settingsTriggerKey == "9") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
@@ -323,6 +371,10 @@ fun KeypadButton(
     letters: String? = null,
     zhuyin: String? = null,
     subtitleIcon: ImageVector? = null,
+    numberPos: String = "TopRight",
+    lettersPos: String = "Center",
+    zhuyinPos: String = "BottomLeft",
+    functionPos: String = "BottomRight",
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -354,57 +406,67 @@ fun KeypadButton(
                 .fillMaxSize()
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
-            // 1. Top-Right Corner Badge: Number
-            if (!number.isNullOrEmpty()) {
-                Text(
-                    text = number,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.align(Alignment.TopEnd)
-                )
-            }
-
-            // 2. Center Main Content: Letters or Icon
+            // 1. Function Icon (Clear X or Settings Gear)
             if (icon != null) {
+                val align = parseAlignment(functionPos)
+                val isCenter = align == Alignment.Center
                 Icon(
                     imageVector = icon,
                     contentDescription = "Clear",
                     tint = colorScheme.onSurface,
                     modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.Center)
+                        .size(if (isCenter) 22.dp else 12.dp)
+                        .align(align)
                 )
-            } else if (!letters.isNullOrEmpty()) {
-                Text(
-                    text = letters,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            // 3. Bottom-Left Corner Badge: Zhuyin
-            if (!zhuyin.isNullOrEmpty()) {
-                Text(
-                    text = zhuyin,
-                    fontSize = 8.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.primary.copy(alpha = 0.9f),
-                    modifier = Modifier.align(Alignment.BottomStart)
-                )
-            }
-
-            // 4. Bottom-Right Corner Badge: Settings Subtitle Icon
-            if (subtitleIcon != null) {
+            } else if (subtitleIcon != null) {
+                val align = parseAlignment(functionPos)
+                val isCenter = align == Alignment.Center
                 Icon(
                     imageVector = subtitleIcon,
                     contentDescription = "Settings",
                     tint = colorScheme.keypadButtonTextSecondary,
                     modifier = Modifier
-                        .size(10.dp)
-                        .align(Alignment.BottomEnd)
+                        .size(if (isCenter) 20.dp else 10.dp)
+                        .align(align)
+                )
+            }
+
+            // 2. Number Badge
+            if (!number.isNullOrEmpty()) {
+                val align = parseAlignment(numberPos)
+                val isCenter = align == Alignment.Center
+                Text(
+                    text = number,
+                    fontSize = if (isCenter) 18.sp else 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCenter) colorScheme.onSurface else colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(align)
+                )
+            }
+
+            // 3. Letters Badge (ABC)
+            if (!letters.isNullOrEmpty()) {
+                val align = parseAlignment(lettersPos)
+                val isCenter = align == Alignment.Center
+                Text(
+                    text = letters,
+                    fontSize = if (isCenter) 16.sp else 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCenter) colorScheme.onSurface else colorScheme.keypadButtonTextSecondary,
+                    modifier = Modifier.align(align)
+                )
+            }
+
+            // 4. Zhuyin Badge (ㄅㄆㄇㄈ)
+            if (!zhuyin.isNullOrEmpty()) {
+                val align = parseAlignment(zhuyinPos)
+                val isCenter = align == Alignment.Center
+                Text(
+                    text = zhuyin,
+                    fontSize = if (isCenter) 14.sp else 8.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isCenter) colorScheme.primary else colorScheme.primary.copy(alpha = 0.9f),
+                    modifier = Modifier.align(align)
                 )
             }
         }

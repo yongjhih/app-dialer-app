@@ -44,6 +44,11 @@ class MainActivity : ComponentActivity() {
     private var settingsTriggerKey by mutableStateOf("9")
     private var isZhuyinEnabled by mutableStateOf(false)
 
+    private var lettersPos by mutableStateOf("Center")
+    private var numberPos by mutableStateOf("TopRight")
+    private var zhuyinPos by mutableStateOf("BottomLeft")
+    private var functionPos by mutableStateOf("BottomRight")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Must run before super so launch transition doesn't flash an opaque frame.
         disablePendingTransition()
@@ -51,6 +56,11 @@ class MainActivity : ComponentActivity() {
 
         settingsTriggerKey = RecentAppsManager.getSettingsTriggerKey(this)
         isZhuyinEnabled = RecentAppsManager.isZhuyinModeEnabled(this)
+
+        lettersPos = RecentAppsManager.getLettersPosition(this)
+        numberPos = RecentAppsManager.getNumberPosition(this)
+        zhuyinPos = RecentAppsManager.getZhuyinPosition(this)
+        functionPos = RecentAppsManager.getFunctionPosition(this)
 
         applyTransparentWindow()
 
@@ -84,6 +94,10 @@ class MainActivity : ComponentActivity() {
                         searchQuery = searchQuery,
                         settingsTriggerKey = settingsTriggerKey,
                         isZhuyinEnabled = isZhuyinEnabled,
+                        lettersPos = lettersPos,
+                        numberPos = numberPos,
+                        zhuyinPos = zhuyinPos,
+                        functionPos = functionPos,
                         onDigitPressed = { digit ->
                             searchQuery += digit
                             filterApps()
@@ -123,6 +137,26 @@ class MainActivity : ComponentActivity() {
                         onSettingsTriggerKeyChange = { key ->
                             RecentAppsManager.setSettingsTriggerKey(this@MainActivity, key)
                             settingsTriggerKey = key
+                        },
+                        lettersPos = lettersPos,
+                        onLettersPosChange = { pos ->
+                            RecentAppsManager.setLettersPosition(this@MainActivity, pos)
+                            lettersPos = pos
+                        },
+                        numberPos = numberPos,
+                        onNumberPosChange = { pos ->
+                            RecentAppsManager.setNumberPosition(this@MainActivity, pos)
+                            numberPos = pos
+                        },
+                        zhuyinPos = zhuyinPos,
+                        onZhuyinPosChange = { pos ->
+                            RecentAppsManager.setZhuyinPosition(this@MainActivity, pos)
+                            zhuyinPos = pos
+                        },
+                        functionPos = functionPos,
+                        onFunctionPosChange = { pos ->
+                            RecentAppsManager.setFunctionPosition(this@MainActivity, pos)
+                            functionPos = pos
                         }
                     )
                 }

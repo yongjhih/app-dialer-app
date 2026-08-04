@@ -58,7 +58,15 @@ fun AppDialerSettingsScreen(
     isZhuyinModeEnabled: Boolean = false,
     onZhuyinModeToggle: (Boolean) -> Unit = {},
     settingsTriggerKey: String = "9",
-    onSettingsTriggerKeyChange: (String) -> Unit = {}
+    onSettingsTriggerKeyChange: (String) -> Unit = {},
+    lettersPos: String = "Center",
+    onLettersPosChange: (String) -> Unit = {},
+    numberPos: String = "TopRight",
+    onNumberPosChange: (String) -> Unit = {},
+    zhuyinPos: String = "BottomLeft",
+    onZhuyinPosChange: (String) -> Unit = {},
+    functionPos: String = "BottomRight",
+    onFunctionPosChange: (String) -> Unit = {}
 ) {
     var hapticFeedbackEnabled by remember { mutableStateOf(true) }
     var autoCloseOnLaunch by remember { mutableStateOf(true) }
@@ -67,6 +75,12 @@ fun AppDialerSettingsScreen(
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
     var zhuyinMode by remember(isZhuyinModeEnabled) { mutableStateOf(isZhuyinModeEnabled) }
     var selectedTriggerKey by remember(settingsTriggerKey) { mutableStateOf(settingsTriggerKey) }
+
+    var selectedLettersPos by remember(lettersPos) { mutableStateOf(lettersPos) }
+    var selectedNumberPos by remember(numberPos) { mutableStateOf(numberPos) }
+    var selectedZhuyinPos by remember(zhuyinPos) { mutableStateOf(zhuyinPos) }
+    var selectedFunctionPos by remember(functionPos) { mutableStateOf(functionPos) }
+
     var bgDimAmount by remember { mutableFloatStateOf(0.4f) }
 
     val colorScheme = MaterialTheme.colorScheme
@@ -110,8 +124,44 @@ fun AppDialerSettingsScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                // Section 1: Appearance & Keypad Customization
-                SettingsCategoryHeader(title = "Appearance & Keypad", icon = Icons.Default.Settings)
+                // Section 1: Keypad Layout & Position Customization
+                SettingsCategoryHeader(title = "Keypad Element Layout (按鍵元素位置配置)", icon = Icons.Default.Settings)
+
+                SettingsPositionSelectorItem(
+                    title = "Letters Position (ABC 字母位置)",
+                    selectedPosition = selectedLettersPos,
+                    onPositionSelected = {
+                        selectedLettersPos = it
+                        onLettersPosChange(it)
+                    }
+                )
+
+                SettingsPositionSelectorItem(
+                    title = "Number Position (數字位置)",
+                    selectedPosition = selectedNumberPos,
+                    onPositionSelected = {
+                        selectedNumberPos = it
+                        onNumberPosChange(it)
+                    }
+                )
+
+                SettingsPositionSelectorItem(
+                    title = "Zhuyin Position (注音位置)",
+                    selectedPosition = selectedZhuyinPos,
+                    onPositionSelected = {
+                        selectedZhuyinPos = it
+                        onZhuyinPosChange(it)
+                    }
+                )
+
+                SettingsPositionSelectorItem(
+                    title = "Function Icon Position (功能圖示位置)",
+                    selectedPosition = selectedFunctionPos,
+                    onPositionSelected = {
+                        selectedFunctionPos = it
+                        onFunctionPosChange(it)
+                    }
+                )
 
                 SettingsKeySelectorItem(
                     title = "Long-Press Settings Key (長按開啟設定按鈕)",
@@ -211,6 +261,70 @@ fun AppDialerSettingsScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+fun SettingsPositionSelectorItem(
+    title: String,
+    selectedPosition: String,
+    onPositionSelected: (String) -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val options = listOf(
+        "Center" to "中央",
+        "TopLeft" to "左上",
+        "TopRight" to "右上",
+        "BottomLeft" to "左下",
+        "BottomRight" to "右下"
+    )
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        color = colorScheme.settingsContainerBackground,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                options.forEach { (key, label) ->
+                    val isSelected = (key == selectedPosition)
+                    Surface(
+                        modifier = Modifier
+                            .clickable { onPositionSelected(key) },
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) colorScheme.primary else colorScheme.surfaceVariant
+                    ) {
+                        Text(
+                            text = label,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSelected) Color.Black else colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
 fun SettingsKeySelectorItem(
     title: String,
     subtitle: String,
@@ -234,7 +348,7 @@ fun SettingsKeySelectorItem(
         ) {
             Text(
                 text = title,
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
@@ -244,7 +358,7 @@ fun SettingsKeySelectorItem(
                 color = colorScheme.outline
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -324,7 +438,7 @@ fun SettingsSwitchItem(
             Column(modifier = Modifier.weight(1f, fill = true)) {
                 Text(
                     text = title,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = colorScheme.onSurface
                 )
@@ -370,7 +484,7 @@ fun SettingsSliderItem(
             ) {
                 Text(
                     text = title,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = true)
@@ -415,7 +529,7 @@ fun SettingsClickableItem(
         ) {
             Text(
                 text = title,
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface
             )
