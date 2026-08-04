@@ -395,7 +395,7 @@ fun InteractiveKeyLayoutPicker(
                 "Letters" to "ABC (字母)",
                 "Number" to "12 (數字)",
                 "Zhuyin" to "ㄅㄆㄇ (注音)",
-                "Function" to "⚙ / X (功能圖示)",
+                "Function" to "⚙ Settings Icon (設定圖示)",
                 "None" to "無 (清空)"
             )
 

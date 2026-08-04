@@ -157,7 +157,7 @@ fun AppDialerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 3x3 Keypad Grid
-                // Row 1: X / 12 ABC (ㄅㄆㄇㄈ) / 3 DEF (ㄉㄊㄋㄌ)
+                // Row 1: X (Clear icon fixed in center) / 12 ABC (ㄅㄆㄇㄈ) / 3 DEF (ㄉㄊㄋㄌ)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -406,19 +406,20 @@ fun KeypadButton(
                 .fillMaxSize()
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
-            // 1. Function Icon (Clear X or Settings Gear)
+            // 1. Clear Icon X (Always fixed in Center of Key 1)
             if (icon != null) {
-                val align = parseAlignment(functionPos)
-                val isCenter = align == Alignment.Center
                 Icon(
                     imageVector = icon,
                     contentDescription = "Clear",
                     tint = colorScheme.onSurface,
                     modifier = Modifier
-                        .size(if (isCenter) 22.dp else 12.dp)
-                        .align(align)
+                        .size(20.dp)
+                        .align(Alignment.Center)
                 )
-            } else if (subtitleIcon != null) {
+            }
+
+            // 2. Settings Gear Icon (Positioned at functionPos)
+            if (subtitleIcon != null) {
                 val align = parseAlignment(functionPos)
                 val isCenter = align == Alignment.Center
                 Icon(
@@ -431,7 +432,7 @@ fun KeypadButton(
                 )
             }
 
-            // 2. Number Badge
+            // 3. Number Badge
             if (!number.isNullOrEmpty()) {
                 val align = parseAlignment(numberPos)
                 val isCenter = align == Alignment.Center
@@ -444,7 +445,7 @@ fun KeypadButton(
                 )
             }
 
-            // 3. Letters Badge (ABC)
+            // 4. Letters Badge (ABC)
             if (!letters.isNullOrEmpty()) {
                 val align = parseAlignment(lettersPos)
                 val isCenter = align == Alignment.Center
@@ -457,7 +458,7 @@ fun KeypadButton(
                 )
             }
 
-            // 4. Zhuyin Badge (ㄅㄆㄇㄈ)
+            // 5. Zhuyin Badge (ㄅㄆㄇㄈ)
             if (!zhuyin.isNullOrEmpty()) {
                 val align = parseAlignment(zhuyinPos)
                 val isCenter = align == Alignment.Center
