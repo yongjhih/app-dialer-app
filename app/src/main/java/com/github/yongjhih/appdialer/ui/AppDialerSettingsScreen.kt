@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -553,7 +554,7 @@ fun VisualKeypadTriggerSelector(
             Text(
                 text = title,
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 color = colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -597,12 +598,21 @@ fun VisualKeypadTriggerSelector(
                                         .padding(4.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = key,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) Color.Black else colorScheme.onSurface
-                                    )
+                                    if (key == "X") {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.Backspace,
+                                            contentDescription = "Backspace",
+                                            tint = if (isSelected) Color.Black else colorScheme.onSurface,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    } else {
+                                        Text(
+                                            text = key,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isSelected) Color.Black else colorScheme.onSurface
+                                        )
+                                    }
 
                                     if (isSelected) {
                                         Icon(

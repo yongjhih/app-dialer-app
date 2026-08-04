@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -159,13 +158,13 @@ fun AppDialerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 3x3 Keypad Grid
-                // Row 1: X (Clear icon fixed in center) / 12 ABC (ㄅㄆㄇㄈ) / 3 DEF (ㄉㄊㄋㄌ)
+                // Row 1: Backspace (<x) / 12 ABC (ㄅㄆㄇㄈ) / 3 DEF (ㄉㄊㄋㄌ)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
-                        icon = Icons.Default.Close,
+                        icon = BackspaceIcon,
                         subtitleIcon = if (settingsTriggerKey == "X") Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
@@ -408,11 +407,11 @@ fun KeypadButton(
                 .fillMaxSize()
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
-            // 1. Clear Icon X (Always fixed in Center of Key 1)
+            // 1. Backspace Icon <x (Always fixed in Center of Key 1)
             if (icon != null) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = "Clear",
+                    contentDescription = "Backspace",
                     tint = colorScheme.onSurface,
                     modifier = Modifier
                         .size(20.dp)
