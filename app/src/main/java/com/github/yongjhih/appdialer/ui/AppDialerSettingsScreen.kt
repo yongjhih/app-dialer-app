@@ -54,6 +54,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.R
+import com.github.yongjhih.appdialer.BuildConfig
+import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
@@ -72,7 +74,7 @@ fun AppDialerSettingsScreen(
     onZhuyinModeToggle: (Boolean) -> Unit = {},
     isDisablePinyinOnZhuyinEnabled: Boolean = false,
     onDisablePinyinOnZhuyinToggle: (Boolean) -> Unit = {},
-    settingsTriggerKey: String = "9",
+    settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     onSettingsTriggerKeyChange: (String) -> Unit = {},
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
     onLettersPosChange: (KeyLabelPosition) -> Unit = {},
@@ -97,7 +99,7 @@ fun AppDialerSettingsScreen(
     var selectedZhuyinPos by remember(zhuyinPos) { mutableStateOf(zhuyinPos) }
     var selectedFunctionPos by remember(functionPos) { mutableStateOf(functionPos) }
 
-    var bgDimAmount by remember { mutableFloatStateOf(0.4f) }
+    var bgDimAmount by remember { mutableFloatStateOf(AppDefaults.BACKGROUND_DIM_AMOUNT) }
 
     val colorScheme = MaterialTheme.colorScheme
 
@@ -283,7 +285,11 @@ fun AppDialerSettingsScreen(
 
                 SettingsClickableItem(
                     title = stringResource(R.string.app_version_title),
-                    subtitle = "1.0.0 (Build 1)",
+                    subtitle = stringResource(
+                        R.string.app_version_format,
+                        BuildConfig.VERSION_NAME,
+                        BuildConfig.VERSION_CODE
+                    ),
                     onClick = {}
                 )
             }
@@ -392,7 +398,7 @@ fun InteractiveKeyLayoutPicker(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Reset",
+                        contentDescription = stringResource(R.string.reset),
                         tint = colorScheme.primary,
                         modifier = Modifier.size(14.dp)
                     )
@@ -598,7 +604,7 @@ fun VisualKeypadTriggerSelector(
                                     if (key == "X") {
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Filled.Backspace,
-                                            contentDescription = "Backspace",
+                                            contentDescription = stringResource(R.string.backspace),
                                             tint = if (isSelected) Color.Black else colorScheme.onSurface,
                                             modifier = Modifier.size(18.dp)
                                         )
@@ -614,7 +620,7 @@ fun VisualKeypadTriggerSelector(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Settings,
-                                            contentDescription = "Settings Key",
+                                            contentDescription = stringResource(R.string.settings_key),
                                             tint = Color.Black,
                                             modifier = Modifier
                                                 .size(15.dp)

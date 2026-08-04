@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition
+import com.github.yongjhih.appdialer.model.AppDefaults
 
 object RecentAppsManager {
     private const val PREF_NAME = "app_dialer_recent_apps"
@@ -67,7 +68,8 @@ object RecentAppsManager {
     }
 
     fun getSettingsTriggerKey(context: Context): String {
-        return getPrefs(context).getString(KEY_SETTINGS_TRIGGER_KEY, "9") ?: "9"
+        return getPrefs(context).getString(KEY_SETTINGS_TRIGGER_KEY, AppDefaults.SETTINGS_TRIGGER_KEY)
+            ?: AppDefaults.SETTINGS_TRIGGER_KEY
     }
 
     fun setSettingsTriggerKey(context: Context, key: String) {

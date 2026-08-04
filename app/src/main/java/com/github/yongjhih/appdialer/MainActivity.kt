@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.yongjhih.appdialer.model.AppModel
+import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.ui.AppDialerScreen
 import com.github.yongjhih.appdialer.ui.AppDialerSettingsScreen
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
     private var filteredApps by mutableStateOf<List<AppModel>>(emptyList())
     private var searchQuery by mutableStateOf("")
     private var currentScreen by mutableStateOf(Screen.DIALER)
-    private var settingsTriggerKey by mutableStateOf("9")
+    private var settingsTriggerKey by mutableStateOf(AppDefaults.SETTINGS_TRIGGER_KEY)
     private var isZhuyinEnabled by mutableStateOf(false)
     private var isDisablePinyinOnZhuyinEnabled by mutableStateOf(false)
 
@@ -195,7 +196,7 @@ class MainActivity : ComponentActivity() {
         // Dim behind the floating card (matches theme backgroundDimAmount).
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.attributes = window.attributes.apply {
-            dimAmount = 0.4f
+            dimAmount = AppDefaults.BACKGROUND_DIM_AMOUNT
             format = PixelFormat.TRANSLUCENT
         }
 
@@ -262,10 +263,10 @@ class MainActivity : ComponentActivity() {
                 startActivity(launchIntent)
                 finish()
             } else {
-                Toast.makeText(this, "Cannot launch ${app.label}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.cannot_launch_app, app.label), Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Toast.makeText(this, "Error launching app: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_launching_app, e.message.orEmpty()), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -273,12 +274,12 @@ class MainActivity : ComponentActivity() {
         try {
             val intent = Intent(
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.parse("package:${app.packageName}")
+                Uri.parse(AppDefaults.PACKAGE_URI_SCHEME + app.packageName)
             )
             startActivity(intent)
             finish()
         } catch (e: Exception) {
-            Toast.makeText(this, "Cannot open settings for ${app.label}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.cannot_open_app_settings, app.label), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -286,11 +287,11 @@ class MainActivity : ComponentActivity() {
         try {
             val intent = Intent(
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.parse("package:$packageName")
+                Uri.parse(AppDefaults.PACKAGE_URI_SCHEME + packageName)
             )
             startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(this, "Cannot open settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.cannot_open_settings, Toast.LENGTH_SHORT).show()
         }
     }
 }

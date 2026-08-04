@@ -33,7 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures.compose = true
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }

@@ -4,6 +4,10 @@
     <!-- Settings Screen Header -->
     <string name="settings_title">App Dialer 設定</string>
     <string name="back">返回</string>
+    <string name="backspace">退格</string>
+    <string name="settings">設定</string>
+    <string name="reset">重設</string>
+    <string name="settings_key">設定鍵</string>
 
     <!-- Category Headers -->
     <string name="category_keypad_layout">視覺化按鍵佈局配置</string>
@@ -57,7 +61,12 @@
     <string name="open_app_details_title">開啟系統應用程式資訊</string>
     <string name="open_app_details_subtitle">管理權限、通知與電池最佳化設定</string>
     <string name="app_version_title">版本號</string>
+    <string name="app_version_format">%1$s（建置 %2$d）</string>
 
     <!-- Dialer Screen -->
     <string name="no_matching_apps">找不到符合的 App</string>
+    <string name="cannot_launch_app">無法啟動「%1$s」</string>
+    <string name="error_launching_app">啟動應用程式時發生錯誤：%1$s</string>
+    <string name="cannot_open_app_settings">無法開啟「%1$s」的設定</string>
+    <string name="cannot_open_settings">無法開啟設定</string>
 </resources>

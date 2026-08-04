@@ -4,6 +4,10 @@
     <!-- Settings Screen Header -->
     <string name="settings_title">App Dialer Settings</string>
     <string name="back">Back</string>
+    <string name="backspace">Backspace</string>
+    <string name="settings">Settings</string>
+    <string name="reset">Reset</string>
+    <string name="settings_key">Settings key</string>
 
     <!-- Category Headers -->
     <string name="category_keypad_layout">Keypad Visual Layout</string>
@@ -57,7 +61,12 @@
     <string name="open_app_details_title">Open App System Details</string>
     <string name="open_app_details_subtitle">Manage permissions, notifications, and battery</string>
     <string name="app_version_title">App Version</string>
+    <string name="app_version_format">%1$s (Build %2$d)</string>
 
     <!-- Dialer Screen -->
     <string name="no_matching_apps">No matching apps</string>
+    <string name="cannot_launch_app">Cannot launch %1$s</string>
+    <string name="error_launching_app">Error launching app: %1$s</string>
+    <string name="cannot_open_app_settings">Cannot open settings for %1$s</string>
+    <string name="cannot_open_settings">Cannot open settings</string>
 </resources>

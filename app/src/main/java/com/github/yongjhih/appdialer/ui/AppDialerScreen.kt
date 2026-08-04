@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.R
 import com.github.yongjhih.appdialer.model.AppModel
+import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
@@ -65,7 +66,7 @@ fun KeyLabelPosition.toAlignment(): Alignment = alignment
 fun AppDialerScreen(
     apps: List<AppModel>,
     searchQuery: String = "",
-    settingsTriggerKey: String = "9",
+    settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     isZhuyinEnabled: Boolean = false,
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
     numberPos: KeyLabelPosition = DefaultKeyLayout.number,
@@ -405,7 +406,7 @@ fun KeypadButton(
             if (icon != null) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = "Backspace",
+                    contentDescription = stringResource(R.string.backspace),
                     tint = colorScheme.onSurface,
                     modifier = Modifier
                         .size(20.dp)
@@ -418,7 +419,7 @@ fun KeypadButton(
                 val align = if (functionPos == KeyLabelPosition.CENTER) Alignment.BottomEnd else functionPos.toAlignment()
                 Icon(
                     imageVector = subtitleIcon,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.settings),
                     tint = colorScheme.primary.copy(alpha = 0.95f),
                     modifier = Modifier
                         .size(14.dp)
@@ -482,7 +483,7 @@ fun AppDialerScreenPreview() {
         AppDialerScreen(
             apps = sampleApps,
             searchQuery = "",
-            settingsTriggerKey = "9",
+            settingsTriggerKey = AppDefaults.SETTINGS_TRIGGER_KEY,
             isZhuyinEnabled = true,
             onDigitPressed = {},
             onDeleteOneDigit = {},
