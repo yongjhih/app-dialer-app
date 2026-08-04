@@ -61,6 +61,7 @@ fun AppDialerScreen(
     apps: List<AppModel>,
     searchQuery: String = "",
     settingsTriggerKey: String = "9",
+    isZhuyinEnabled: Boolean = false,
     onDigitPressed: (String) -> Unit,
     onDeleteOneDigit: () -> Unit,
     onClearAllDigits: () -> Unit,
@@ -144,7 +145,7 @@ fun AppDialerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 3x3 Keypad Grid
-                // Row 1: X / 12 ABC / 3 DEF
+                // Row 1: X / 12 ABC (ㄅㄆㄇㄈ) / 3 DEF (ㄉㄊㄋㄌ)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -159,6 +160,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "12",
                         letters = "ABC",
+                        zhuyin = if (isZhuyinEnabled) "ㄅㄆㄇㄈ" else null,
                         subtitleIcon = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("2") },
                         onLongClick = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") onOpenDialerSettings else null,
@@ -167,6 +169,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "3",
                         letters = "DEF",
+                        zhuyin = if (isZhuyinEnabled) "ㄉㄊㄋㄌ" else null,
                         subtitleIcon = if (settingsTriggerKey == "3") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("3") },
                         onLongClick = if (settingsTriggerKey == "3") onOpenDialerSettings else null,
@@ -176,7 +179,7 @@ fun AppDialerScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Row 2: 4 GHI / 5 JKL / 6 MNO
+                // Row 2: 4 GHI (ㄍㄎㄏ) / 5 JKL (ㄐㄑㄒ) / 6 MNO (ㄓㄔㄕㄖ)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -184,6 +187,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "4",
                         letters = "GHI",
+                        zhuyin = if (isZhuyinEnabled) "ㄍㄎㄏ" else null,
                         subtitleIcon = if (settingsTriggerKey == "4") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("4") },
                         onLongClick = if (settingsTriggerKey == "4") onOpenDialerSettings else null,
@@ -192,6 +196,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "5",
                         letters = "JKL",
+                        zhuyin = if (isZhuyinEnabled) "ㄐㄑㄒ" else null,
                         subtitleIcon = if (settingsTriggerKey == "5") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("5") },
                         onLongClick = if (settingsTriggerKey == "5") onOpenDialerSettings else null,
@@ -200,6 +205,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "6",
                         letters = "MNO",
+                        zhuyin = if (isZhuyinEnabled) "ㄓㄔㄕㄖ" else null,
                         subtitleIcon = if (settingsTriggerKey == "6") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("6") },
                         onLongClick = if (settingsTriggerKey == "6") onOpenDialerSettings else null,
@@ -209,7 +215,7 @@ fun AppDialerScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Row 3: 7 PQRS / 8 TUV / 9 WXYZ
+                // Row 3: 7 PQRS (ㄗㄘㄙ) / 8 TUV (ㄚㄛㄜㄝ) / 9 WXYZ (ㄞㄟㄠㄡ)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -217,6 +223,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "7",
                         letters = "PQRS",
+                        zhuyin = if (isZhuyinEnabled) "ㄗㄘㄙ" else null,
                         subtitleIcon = if (settingsTriggerKey == "7") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("7") },
                         onLongClick = if (settingsTriggerKey == "7") onOpenDialerSettings else null,
@@ -225,6 +232,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "8",
                         letters = "TUV",
+                        zhuyin = if (isZhuyinEnabled) "ㄚㄛㄜㄝ" else null,
                         subtitleIcon = if (settingsTriggerKey == "8") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("8") },
                         onLongClick = if (settingsTriggerKey == "8") onOpenDialerSettings else null,
@@ -233,6 +241,7 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "9",
                         letters = "WXYZ",
+                        zhuyin = if (isZhuyinEnabled) "ㄞㄟㄠㄡ" else null,
                         subtitleIcon = if (settingsTriggerKey == "9") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("9") },
                         onLongClick = if (settingsTriggerKey == "9") onOpenDialerSettings else null,
@@ -312,6 +321,7 @@ fun KeypadButton(
     number: String? = null,
     icon: ImageVector? = null,
     letters: String? = null,
+    zhuyin: String? = null,
     subtitleIcon: ImageVector? = null,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
@@ -322,7 +332,7 @@ fun KeypadButton(
 
     Surface(
         modifier = modifier
-            .height(56.dp)
+            .height(58.dp)
             .combinedClickable(
                 onClick = {
                     view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
@@ -354,34 +364,47 @@ fun KeypadButton(
             } else if (!number.isNullOrEmpty()) {
                 Text(
                     text = number,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface
                 )
             }
 
-            if (!letters.isNullOrEmpty() || subtitleIcon != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+            if (!letters.isNullOrEmpty() || subtitleIcon != null || !zhuyin.isNullOrEmpty()) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (!letters.isNullOrEmpty()) {
-                        Text(
-                            text = letters,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.keypadButtonTextSecondary
-                        )
-                    }
-                    if (subtitleIcon != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         if (!letters.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = letters,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorScheme.keypadButtonTextSecondary
+                            )
                         }
-                        Icon(
-                            imageVector = subtitleIcon,
-                            contentDescription = "Settings",
-                            tint = colorScheme.keypadButtonTextSecondary,
-                            modifier = Modifier.size(10.dp)
+                        if (subtitleIcon != null) {
+                            if (!letters.isNullOrEmpty()) {
+                                Spacer(modifier = Modifier.width(3.dp))
+                            }
+                            Icon(
+                                imageVector = subtitleIcon,
+                                contentDescription = "Settings",
+                                tint = colorScheme.keypadButtonTextSecondary,
+                                modifier = Modifier.size(10.dp)
+                            )
+                        }
+                    }
+
+                    if (!zhuyin.isNullOrEmpty()) {
+                        Text(
+                            text = zhuyin,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.primary.copy(alpha = 0.9f)
                         )
                     }
                 }
@@ -405,6 +428,7 @@ fun AppDialerScreenPreview() {
             apps = sampleApps,
             searchQuery = "",
             settingsTriggerKey = "9",
+            isZhuyinEnabled = true,
             onDigitPressed = {},
             onDeleteOneDigit = {},
             onClearAllDigits = {},
@@ -423,6 +447,7 @@ fun KeypadButtonPreview() {
         KeypadButton(
             number = "9",
             letters = "WXYZ",
+            zhuyin = "ㄞㄟㄠㄡ",
             subtitleIcon = Icons.Default.Settings,
             onClick = {}
         )

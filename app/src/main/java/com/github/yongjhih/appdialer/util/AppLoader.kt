@@ -43,7 +43,8 @@ object AppLoader {
                     t9Initials = label.toT9Initials(),
                     t9Words = label.toT9Words(),
                     t9CjkFull = label.toCjkT9Full(),
-                    t9CjkInitials = label.toCjkT9Initials()
+                    t9CjkInitials = label.toCjkT9Initials(),
+                    t9ZhuyinInitials = label.toZhuyinT9Initials()
                 )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }

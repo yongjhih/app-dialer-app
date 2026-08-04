@@ -7,6 +7,7 @@ object RecentAppsManager {
     private const val PREF_NAME = "app_dialer_recent_apps"
     private const val KEY_RECENT_PACKAGES = "recent_packages"
     private const val KEY_FUZZY_SEARCH = "fuzzy_search"
+    private const val KEY_ZHUYIN_MODE = "zhuyin_mode"
     private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
     private const val MAX_RECENT_APPS = 20
 
@@ -38,6 +39,14 @@ object RecentAppsManager {
 
     fun setFuzzySearchEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_FUZZY_SEARCH, enabled).apply()
+    }
+
+    fun isZhuyinModeEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_ZHUYIN_MODE, false)
+    }
+
+    fun setZhuyinModeEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_ZHUYIN_MODE, enabled).apply()
     }
 
     fun getSettingsTriggerKey(context: Context): String {

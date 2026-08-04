@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private var searchQuery by mutableStateOf("")
     private var currentScreen by mutableStateOf(Screen.DIALER)
     private var settingsTriggerKey by mutableStateOf("9")
+    private var isZhuyinEnabled by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Must run before super so launch transition doesn't flash an opaque frame.
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         settingsTriggerKey = RecentAppsManager.getSettingsTriggerKey(this)
+        isZhuyinEnabled = RecentAppsManager.isZhuyinModeEnabled(this)
 
         applyTransparentWindow()
 
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
                         apps = filteredApps,
                         searchQuery = searchQuery,
                         settingsTriggerKey = settingsTriggerKey,
+                        isZhuyinEnabled = isZhuyinEnabled,
                         onDigitPressed = { digit ->
                             searchQuery += digit
                             filterApps()
@@ -108,6 +111,12 @@ class MainActivity : ComponentActivity() {
                         isFuzzySearchEnabled = RecentAppsManager.isFuzzySearchEnabled(this@MainActivity),
                         onFuzzySearchToggle = { enabled ->
                             RecentAppsManager.setFuzzySearchEnabled(this@MainActivity, enabled)
+                            filterApps()
+                        },
+                        isZhuyinModeEnabled = isZhuyinEnabled,
+                        onZhuyinModeToggle = { enabled ->
+                            RecentAppsManager.setZhuyinModeEnabled(this@MainActivity, enabled)
+                            isZhuyinEnabled = enabled
                             filterApps()
                         },
                         settingsTriggerKey = settingsTriggerKey,
@@ -185,10 +194,12 @@ class MainActivity : ComponentActivity() {
     private fun filterApps() {
         val recentPackages = RecentAppsManager.getRecentApps(this)
         val isFuzzy = RecentAppsManager.isFuzzySearchEnabled(this)
+        val isZhuyin = RecentAppsManager.isZhuyinModeEnabled(this)
         filteredApps = allApps.filterAndScore(
             query = searchQuery,
             recentPackageNames = recentPackages,
-            isFuzzyEnabled = isFuzzy
+            isFuzzyEnabled = isFuzzy,
+            isZhuyinEnabled = isZhuyin
         )
     }
 

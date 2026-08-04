@@ -55,6 +55,8 @@ fun AppDialerSettingsScreen(
     onOpenSystemAppSettings: () -> Unit = {},
     isFuzzySearchEnabled: Boolean = true,
     onFuzzySearchToggle: (Boolean) -> Unit = {},
+    isZhuyinModeEnabled: Boolean = false,
+    onZhuyinModeToggle: (Boolean) -> Unit = {},
     settingsTriggerKey: String = "9",
     onSettingsTriggerKeyChange: (String) -> Unit = {}
 ) {
@@ -63,6 +65,7 @@ fun AppDialerSettingsScreen(
     var includeSystemApps by remember { mutableStateOf(false) }
     var autoLaunchSingleMatch by remember { mutableStateOf(false) }
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
+    var zhuyinMode by remember(isZhuyinModeEnabled) { mutableStateOf(isZhuyinModeEnabled) }
     var selectedTriggerKey by remember(settingsTriggerKey) { mutableStateOf(settingsTriggerKey) }
     var bgDimAmount by remember { mutableFloatStateOf(0.4f) }
 
@@ -138,6 +141,16 @@ fun AppDialerSettingsScreen(
 
                 // Section 2: Search Preferences
                 SettingsCategoryHeader(title = "Search & Indexing", icon = Icons.Default.Search)
+
+                SettingsSwitchItem(
+                    title = "Zhuyin Search (ㄅㄆㄇ注音搜尋)",
+                    subtitle = "Display ㄅㄆㄇㄈ on keypad and match Chinese via Zhuyin (預設關閉)",
+                    checked = zhuyinMode,
+                    onCheckedChange = {
+                        zhuyinMode = it
+                        onZhuyinModeToggle(it)
+                    }
+                )
 
                 SettingsSwitchItem(
                     title = "Fuzzy Search (模糊搜尋)",

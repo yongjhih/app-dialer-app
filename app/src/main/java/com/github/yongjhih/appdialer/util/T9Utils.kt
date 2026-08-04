@@ -40,14 +40,40 @@ fun String.toCjkT9Initials(): String {
     return latin.toT9Initials()
 }
 
+fun Char.pinyinInitialToZhuyinT9(): Char = when (this.lowercaseChar()) {
+    'b', 'p', 'm', 'f' -> '2'
+    'd', 't', 'n', 'l' -> '3'
+    'g', 'k', 'h' -> '4'
+    'j', 'q', 'x' -> '5'
+    'r' -> '6'
+    'z', 'c', 's' -> '7'
+    'a', 'o', 'e' -> '8'
+    'w', 'y' -> '9'
+    in '0'..'9' -> this
+    else -> ' '
+}
+
+fun String.toZhuyinT9Initials(): String {
+    val latin = CjkTransliterator.toLatin(this)
+    val words = latin.split(Regex("[^a-zA-Z0-9]+")).filter { it.isNotEmpty() }
+    return words.mapNotNull { word ->
+        val lower = word.lowercase(Locale.getDefault())
+        when {
+            lower.startsWith("zh") || lower.startsWith("ch") || lower.startsWith("sh") -> '6'
+            else -> lower.firstOrNull()?.pinyinInitialToZhuyinT9()?.takeIf { it != ' ' }
+        }
+    }.joinToString("")
+}
+
 /**
  * Filter and score apps with support for recent apps ordering, character highlight indexing,
- * fuzzy T9 matching, and CJK (Chinese & Japanese) Pinyin/Romaji transliteration matching.
+ * fuzzy T9 matching, and CJK (Chinese & Japanese) Pinyin/Romaji/Zhuyin transliteration matching.
  */
 fun List<AppModel>.filterAndScore(
     query: String,
     recentPackageNames: List<String> = emptyList(),
-    isFuzzyEnabled: Boolean = false
+    isFuzzyEnabled: Boolean = false,
+    isZhuyinEnabled: Boolean = false
 ): List<AppModel> = query.trim().let { q ->
     if (q.isEmpty()) {
         val recentOrderMap = recentPackageNames.withIndex().associate { it.value to it.index }
@@ -58,7 +84,7 @@ fun List<AppModel>.filterAndScore(
     } else {
         asSequence()
             .mapNotNull { app ->
-                app.calculateMatch(q, isFuzzyEnabled)?.let { (score, indices) ->
+                app.calculateMatch(q, isFuzzyEnabled, isZhuyinEnabled)?.let { (score, indices) ->
                     app.copy(matchScore = score, matchedIndices = indices)
                 }
             }
@@ -70,7 +96,11 @@ fun List<AppModel>.filterAndScore(
     }
 }
 
-private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pair<Int, List<Int>>? {
+private fun AppModel.calculateMatch(
+    query: String,
+    isFuzzyEnabled: Boolean,
+    isZhuyinEnabled: Boolean
+): Pair<Int, List<Int>>? {
     val cleanQuery = query.trim()
     if (cleanQuery.isEmpty()) return Pair(0, emptyList())
 
@@ -104,8 +134,19 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
         return Pair(score, indices)
     }
 
-    // 3. CJK Transliteration Initials Match (e.g. "地圖" -> DT "38", "相機" -> XJ "95", "カメラ" -> KM "56", "設定" -> ST "78")
-    if (t9CjkInitials.isNotEmpty()) {
+    // 3. Zhuyin (Bopomofo) Initials Match (when Zhuyin mode is ON)
+    if (isZhuyinEnabled && t9ZhuyinInitials.isNotEmpty()) {
+        val zhuyinInitIdx = t9ZhuyinInitials.indexOf(cleanQuery)
+        if (zhuyinInitIdx != -1) {
+            val matchedChars = (zhuyinInitIdx until (zhuyinInitIdx + cleanQuery.length))
+                .filter { it < label.length }
+            val score = if (zhuyinInitIdx == 0) 960 else (860 - zhuyinInitIdx)
+            return Pair(score, matchedChars)
+        }
+    }
+
+    // 4. CJK Pinyin / Romaji Transliteration Initials Match
+    if (!isZhuyinEnabled && t9CjkInitials.isNotEmpty()) {
         val cjkInitIdx = t9CjkInitials.indexOf(cleanQuery)
         if (cjkInitIdx != -1) {
             val matchedChars = (cjkInitIdx until (cjkInitIdx + cleanQuery.length))
@@ -115,7 +156,7 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
         }
     }
 
-    // 4. CJK Transliteration Full Match (e.g. "カメラ" -> Kamera "526372")
+    // 5. CJK Transliteration Full Match
     if (t9CjkFull.isNotEmpty()) {
         val cjkFullIdx = t9CjkFull.indexOf(cleanQuery)
         if (cjkFullIdx != -1) {
@@ -125,7 +166,7 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
         }
     }
 
-    // 5. Fuzzy match (Non-contiguous character matching)
+    // 6. Fuzzy match (Non-contiguous character matching)
     if (isFuzzyEnabled) {
         val matchedIndices = mutableListOf<Int>()
         var queryIdx = 0

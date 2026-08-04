@@ -8,6 +8,7 @@ import com.github.yongjhih.appdialer.util.toCjkT9Initials
 import com.github.yongjhih.appdialer.util.toT9
 import com.github.yongjhih.appdialer.util.toT9Initials
 import com.github.yongjhih.appdialer.util.toT9Words
+import com.github.yongjhih.appdialer.util.toZhuyinT9Initials
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -106,6 +107,31 @@ class T9UtilsTest {
     }
 
     @Test
+    fun testZhuyinT9Matching() {
+        val dummyDrawable = ColorDrawable()
+        val apps = listOf(
+            createApp("地圖", dummyDrawable, t9ZhuyinInitials = "33"),
+            createApp("相機", dummyDrawable, t9ZhuyinInitials = "55"),
+            createApp("設定", dummyDrawable, t9ZhuyinInitials = "63")
+        )
+
+        // Query "33" (ㄉㄊ) -> 地圖
+        val res1 = apps.filterAndScore("33", isZhuyinEnabled = true)
+        assertTrue(res1.isNotEmpty())
+        assertEquals("地圖", res1[0].label)
+
+        // Query "55" (ㄒㄐ) -> 相機
+        val res2 = apps.filterAndScore("55", isZhuyinEnabled = true)
+        assertTrue(res2.isNotEmpty())
+        assertEquals("相機", res2[0].label)
+
+        // Query "63" (ㄕㄉ) -> 設定
+        val res3 = apps.filterAndScore("63", isZhuyinEnabled = true)
+        assertTrue(res3.isNotEmpty())
+        assertEquals("設定", res3[0].label)
+    }
+
+    @Test
     fun testRecentAppsOrderWhenQueryEmpty() {
         val dummyDrawable = ColorDrawable()
         val apps = listOf(
@@ -143,7 +169,8 @@ class T9UtilsTest {
         label: String,
         icon: ColorDrawable,
         t9CjkInitials: String = "",
-        t9CjkFull: String = ""
+        t9CjkFull: String = "",
+        t9ZhuyinInitials: String = ""
     ): AppModel {
         return AppModel(
             label = label,
@@ -154,7 +181,8 @@ class T9UtilsTest {
             t9Initials = label.toT9Initials(),
             t9Words = label.toT9Words(),
             t9CjkInitials = t9CjkInitials,
-            t9CjkFull = t9CjkFull
+            t9CjkFull = t9CjkFull,
+            t9ZhuyinInitials = t9ZhuyinInitials
         )
     }
 }
