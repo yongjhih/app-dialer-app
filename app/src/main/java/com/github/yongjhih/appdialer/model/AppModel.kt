@@ -10,6 +10,6 @@ data class AppModel(
     val t9Full: String,
     val t9Initials: String,
     val t9Words: List<String>,
-    val matchScore: Int = 0
+    val matchScore: Int = 0,
+    val matchedIndices: List<Int> = emptyList()
 )
-

@@ -31,14 +31,26 @@ fun String.toT9Initials(): String = split(Regex("[^a-zA-Z0-9]+"))
     .joinToString("")
 
 /**
- * Pure functional extension on List<AppModel> to score and filter apps based on T9 search query.
+ * Filter and score apps with support for recent apps ordering, character highlight indexing, and fuzzy T9 matching.
  */
-fun List<AppModel>.filterAndScore(query: String): List<AppModel> = query.trim().let { q ->
+fun List<AppModel>.filterAndScore(
+    query: String,
+    recentPackageNames: List<String> = emptyList(),
+    isFuzzyEnabled: Boolean = false
+): List<AppModel> = query.trim().let { q ->
     if (q.isEmpty()) {
-        sortedBy { it.label.lowercase(Locale.getDefault()) }
+        val recentOrderMap = recentPackageNames.withIndex().associate { it.value to it.index }
+        sortedWith(
+            compareBy<AppModel> { app -> recentOrderMap[app.packageName] ?: Int.MAX_VALUE }
+                .thenBy { it.label.lowercase(Locale.getDefault()) }
+        ).map { it.copy(matchScore = 0, matchedIndices = emptyList()) }
     } else {
         asSequence()
-            .mapNotNull { app -> app.calculateScore(q)?.let { score -> app.copy(matchScore = score) } }
+            .mapNotNull { app ->
+                app.calculateMatch(q, isFuzzyEnabled)?.let { (score, indices) ->
+                    app.copy(matchScore = score, matchedIndices = indices)
+                }
+            }
             .sortedWith(
                 compareByDescending<AppModel> { it.matchScore }
                     .thenBy { it.label.lowercase(Locale.getDefault()) }
@@ -47,33 +59,62 @@ fun List<AppModel>.filterAndScore(query: String): List<AppModel> = query.trim().
     }
 }
 
-private fun AppModel.calculateScore(query: String): Int? {
-    val initialsScore = when {
-        t9Initials.startsWith(query) -> 1000 - t9Initials.length
-        t9Initials.contains(query) -> 800 - t9Initials.indexOf(query)
-        else -> 0
+private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pair<Int, List<Int>>? {
+    val cleanQuery = query.trim()
+    if (cleanQuery.isEmpty()) return Pair(0, emptyList())
+
+    val labelT9Str = label.map { it.toT9() }.joinToString("")
+
+    // 1. Contiguous T9 substring match (Highest priority)
+    val fullIndex = labelT9Str.indexOf(cleanQuery)
+    if (fullIndex != -1) {
+        val indices = (fullIndex until fullIndex + cleanQuery.length).toList()
+        val score = if (fullIndex == 0) 1000 else (800 - fullIndex)
+        return Pair(score, indices)
     }
 
-    val wordScore = t9Words.withIndex()
-        .mapNotNull { (index, wordT9) ->
-            when {
-                wordT9.startsWith(query) -> if (index == 0) 900 else 850
-                wordT9.contains(query) -> 700 - wordT9.indexOf(query)
-                else -> null
+    // 2. Initials match
+    val initialIndices = mutableListOf<Int>()
+    val initialT9s = mutableListOf<Char>()
+    for (i in label.indices) {
+        if (i == 0 || (label[i - 1] in " ._-" && label[i] !in " ._-")) {
+            val t9 = label[i].toT9()
+            if (t9 != ' ') {
+                initialIndices.add(i)
+                initialT9s.add(t9)
             }
         }
-        .maxOrNull() ?: 0
+    }
+    val initialT9Str = initialT9s.joinToString("")
+    val initialIdx = initialT9Str.indexOf(cleanQuery)
+    if (initialIdx != -1 && initialIdx + cleanQuery.length <= initialIndices.size) {
+        val indices = initialIndices.subList(initialIdx, initialIdx + cleanQuery.length)
+        val score = if (initialIdx == 0) 900 else (750 - initialIdx)
+        return Pair(score, indices)
+    }
 
-    val fullIndex = t9Full.indexOf(query)
-    val fullScore = if (fullIndex != -1) {
-        if (fullIndex == 0) 950 else 600 - fullIndex
-    } else 0
+    // 3. Fuzzy match (Non-contiguous character matching)
+    if (isFuzzyEnabled) {
+        val matchedIndices = mutableListOf<Int>()
+        var queryIdx = 0
+        for (i in label.indices) {
+            val charT9 = label[i].toT9()
+            if (charT9 != ' ' && charT9 == cleanQuery[queryIdx]) {
+                matchedIndices.add(i)
+                queryIdx++
+                if (queryIdx == cleanQuery.length) break
+            }
+        }
 
-    val rawIndex = label.lowercase(Locale.getDefault()).indexOf(query)
-    val rawScore = if (rawIndex != -1) {
-        if (rawIndex == 0) 920 else 500 - rawIndex
-    } else 0
+        if (queryIdx == cleanQuery.length) {
+            val firstIdx = matchedIndices.first()
+            val lastIdx = matchedIndices.last()
+            val totalSpan = lastIdx - firstIdx + 1
+            val gapLength = totalSpan - cleanQuery.length
+            val score = (400 - gapLength * 10 - firstIdx).coerceAtLeast(1)
+            return Pair(score, matchedIndices)
+        }
+    }
 
-    val maxScore = maxOf(initialsScore, wordScore, fullScore, rawScore)
-    return maxScore.takeIf { it > 0 }
+    return null
 }

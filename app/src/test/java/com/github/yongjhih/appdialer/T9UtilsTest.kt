@@ -59,6 +59,7 @@ class T9UtilsTest {
         val result1 = apps.filterAndScore("968")
         assertTrue(result1.isNotEmpty())
         assertEquals("YouTube", result1[0].label)
+        assertEquals(listOf(0, 1, 2), result1[0].matchedIndices)
 
         // Query "46" -> Google Maps (Initials G M = 4 6)
         val result2 = apps.filterAndScore("46")
@@ -69,6 +70,40 @@ class T9UtilsTest {
         val result3 = apps.filterAndScore("247")
         assertTrue(result3.isNotEmpty())
         assertEquals("Chrome", result3[0].label)
+    }
+
+    @Test
+    fun testRecentAppsOrderWhenQueryEmpty() {
+        val dummyDrawable = ColorDrawable()
+        val apps = listOf(
+            createApp("Chrome", dummyDrawable),
+            createApp("Google Maps", dummyDrawable),
+            createApp("YouTube", dummyDrawable)
+        )
+        val recentPackages = listOf(
+            "com.example.youtube",
+            "com.example.googlemaps"
+        )
+
+        val result = apps.filterAndScore("", recentPackageNames = recentPackages)
+        assertEquals("YouTube", result[0].label)
+        assertEquals("Google Maps", result[1].label)
+        assertEquals("Chrome", result[2].label)
+    }
+
+    @Test
+    fun testFuzzySearch() {
+        val dummyDrawable = ColorDrawable()
+        val apps = listOf(
+            createApp("Calculator", dummyDrawable),
+            createApp("Settings", dummyDrawable)
+        )
+
+        // "2" (C) "7" (r) -> Calculator (C...r)
+        val result = apps.filterAndScore("27", isFuzzyEnabled = true)
+        assertTrue(result.isNotEmpty())
+        assertEquals("Calculator", result[0].label)
+        assertEquals(listOf(0, 9), result[0].matchedIndices)
     }
 
     private fun createApp(label: String, icon: ColorDrawable): AppModel {
