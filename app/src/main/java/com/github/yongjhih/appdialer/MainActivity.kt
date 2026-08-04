@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -40,26 +41,25 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         disablePendingTransition()
+        super.onCreate(savedInstanceState)
+
+        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
+        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
+        window.decorView.background = null
+        window.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        window.setGravity(Gravity.BOTTOM)
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
-        window.setBackgroundDrawableResource(android.R.color.transparent)
-        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
-        window.decorView.background = null
-
-        super.onCreate(savedInstanceState)
-
         findViewById<View>(android.R.id.content)?.background = null
         findViewById<View>(android.R.id.content)?.setBackgroundColor(AndroidColor.TRANSPARENT)
-
-        window.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
 
         setContent {
             AppDialerTheme {

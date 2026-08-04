@@ -1,19 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme for translucent overlay activity -->
-    <style name="Theme.AppDialer" parent="@android:style/Theme.Translucent.NoTitleBar">
+    <style name="Theme.AppDialer" parent="Theme.MaterialComponents.DayNight.Dialog">
         <item name="colorPrimary">#FFD700</item>
         <item name="colorSecondary">#28282E</item>
 
-        <!-- Native Framework Translucency -->
+        <!-- Floating Dialog Translucency -->
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsFloating">true</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowElevation">0dp</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.4</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
