@@ -35,13 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
+import com.github.yongjhih.appdialer.ui.theme.settingsContainerBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +58,8 @@ fun AppDialerSettingsScreen(
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
     var bgDimAmount by remember { mutableFloatStateOf(0.4f) }
 
+    val colorScheme = MaterialTheme.colorScheme
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,7 +68,7 @@ fun AppDialerSettingsScreen(
                         text = "App Dialer Settings",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -74,16 +76,16 @@ fun AppDialerSettingsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1C1C1E)
+                    containerColor = colorScheme.surfaceVariant
                 )
             )
         },
-        containerColor = Color(0xFF121214)
+        containerColor = colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -172,6 +174,8 @@ fun AppDialerSettingsScreen(
 
 @Composable
 fun SettingsCategoryHeader(title: String, icon: ImageVector) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -181,14 +185,14 @@ fun SettingsCategoryHeader(title: String, icon: ImageVector) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color(0xFFFFD700),
+            tint = colorScheme.primary,
             modifier = Modifier.padding(end = 8.dp)
         )
         Text(
             text = title,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFFFFD700)
+            color = colorScheme.primary
         )
     }
 }
@@ -200,11 +204,13 @@ fun SettingsSwitchItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        color = Color(0xFF1E1E22),
+        color = colorScheme.settingsContainerBackground,
         shape = MaterialTheme.shapes.medium
     ) {
         Row(
@@ -219,12 +225,12 @@ fun SettingsSwitchItem(
                     text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = colorScheme.onSurface
                 )
                 Text(
                     text = subtitle,
                     fontSize = 12.sp,
-                    color = Color(0xFFA0A0A0)
+                    color = colorScheme.outline
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -243,11 +249,13 @@ fun SettingsSliderItem(
     onValueChange: (Float) -> Unit,
     valueDisplay: String
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        color = Color(0xFF1E1E22),
+        color = colorScheme.settingsContainerBackground,
         shape = MaterialTheme.shapes.medium
     ) {
         Column(
@@ -263,14 +271,14 @@ fun SettingsSliderItem(
                     text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White,
+                    color = colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = true)
                 )
                 Text(
                     text = valueDisplay,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFFD700)
+                    color = colorScheme.primary
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -289,11 +297,13 @@ fun SettingsClickableItem(
     subtitle: String,
     onClick: () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        color = Color(0xFF1E1E22),
+        color = colorScheme.settingsContainerBackground,
         shape = MaterialTheme.shapes.medium
     ) {
         Column(
@@ -306,12 +316,12 @@ fun SettingsClickableItem(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White
+                color = colorScheme.onSurface
             )
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = Color(0xFFA0A0A0)
+                color = colorScheme.outline
             )
         }
     }

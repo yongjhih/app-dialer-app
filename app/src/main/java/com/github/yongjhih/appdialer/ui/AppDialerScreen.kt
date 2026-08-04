@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
+import com.github.yongjhih.appdialer.ui.theme.cardBorder
+import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
+import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
+import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -59,11 +64,13 @@ fun AppDialerScreen(
     onOpenDialerSettings: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Full-screen transparent hit area; only the bottom Card is opaque.
-    // Do not use Material Surface here — its default would paint a solid fill.
+    val colorScheme = MaterialTheme.colorScheme
+
+    // Outer transparent container
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.Transparent)
             .combinedClickable(
                 onClick = onDismiss,
                 onLongClick = {}
@@ -81,8 +88,8 @@ fun AppDialerScreen(
                     onLongClick = {}
                 ),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xF018181C)),
-            border = BorderStroke(1.dp, Color(0x33FFFFFF)),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+            border = BorderStroke(1.dp, colorScheme.cardBorder),
             elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
         ) {
             Column(
@@ -100,7 +107,7 @@ fun AppDialerScreen(
                     if (apps.isEmpty()) {
                         Text(
                             text = "No matching apps",
-                            color = Color(0x80FFFFFF),
+                            color = colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
                     } else {
@@ -215,17 +222,20 @@ fun AppGridItem(
     onLongClick: () -> Unit
 ) {
     val imageBitmap = remember(app) { app.icon.toImageBitmap() }
+    val colorScheme = MaterialTheme.colorScheme
+    val highlightColor = colorScheme.matchedHighlight
+    val textColor = colorScheme.onSurface
 
-    val annotatedLabel = remember(app.label, app.matchedIndices) {
+    val annotatedLabel = remember(app.label, app.matchedIndices, highlightColor, textColor) {
         buildAnnotatedString {
             val matchedSet = app.matchedIndices.toSet()
             app.label.forEachIndexed { index, char ->
                 if (index in matchedSet) {
-                    withStyle(style = SpanStyle(color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)) {
+                    withStyle(style = SpanStyle(color = highlightColor, fontWeight = FontWeight.Bold)) {
                         append(char)
                     }
                 } else {
-                    withStyle(style = SpanStyle(color = Color(0xFFEEEEEE))) {
+                    withStyle(style = SpanStyle(color = textColor)) {
                         append(char)
                     }
                 }
@@ -278,6 +288,7 @@ fun KeypadButton(
     modifier: Modifier = Modifier
 ) {
     val view = LocalView.current
+    val colorScheme = MaterialTheme.colorScheme
 
     Surface(
         modifier = modifier
@@ -295,8 +306,8 @@ fun KeypadButton(
                 } else null
             ),
         shape = RoundedCornerShape(14.dp),
-        color = Color(0xFF28282E),
-        border = BorderStroke(0.5.dp, Color(0x1AFFFFFF))
+        color = colorScheme.keypadButtonBackground,
+        border = BorderStroke(0.5.dp, colorScheme.cardBorder)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -307,7 +318,7 @@ fun KeypadButton(
                 Icon(
                     imageVector = icon,
                     contentDescription = "Clear",
-                    tint = Color.White,
+                    tint = colorScheme.onSurface,
                     modifier = Modifier.size(20.dp)
                 )
             } else if (!number.isNullOrEmpty()) {
@@ -315,7 +326,7 @@ fun KeypadButton(
                     text = number,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = colorScheme.onSurface
                 )
             }
 
@@ -324,7 +335,7 @@ fun KeypadButton(
                 Icon(
                     imageVector = subtitleIcon,
                     contentDescription = "Settings",
-                    tint = Color(0xFFB0B0B8),
+                    tint = colorScheme.keypadButtonTextSecondary,
                     modifier = Modifier.size(12.dp)
                 )
             } else if (!letters.isNullOrEmpty()) {
@@ -332,7 +343,7 @@ fun KeypadButton(
                     text = letters,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFB0B0B8)
+                    color = colorScheme.keypadButtonTextSecondary
                 )
             }
         }
