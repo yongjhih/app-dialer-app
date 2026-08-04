@@ -23,6 +23,10 @@
 
 **AppDialer** 是一款專為 Android 設計的極速 **T9 數字鍵盤 App 快速啟動器**。借鑑經典實體手機 T9 撥號盤的直覺體驗，結合現代化的 **Material 3 奢華黑金 (Obsidian Gold)** 設計語言與原生 **CJK 漢語拼音 / 羅馬字音譯比對引擎**，讓您無需切換輸入法，只需敲擊幾下數字鍵，即可在毫秒間搜尋並開啟任何 App！
 
+<p align="center">
+  <img src="docs/app-dialer-app-screenshot.png" width="360" alt="AppDialer Screenshot" />
+</p>
+
 ---
 
 ## ✨ 核心特色 (Key Features)
