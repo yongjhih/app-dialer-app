@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,11 +43,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.yongjhih.appdialer.R
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.ui.theme.cardBorder
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
@@ -101,7 +102,7 @@ fun AppDialerSettingsScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = "App Dialer Settings",
+                            text = stringResource(R.string.settings_title),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorScheme.onSurface
@@ -111,7 +112,7 @@ fun AppDialerSettingsScreen(
                         IconButton(onClick = onNavigateBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = colorScheme.onSurface
                             )
                         }
@@ -131,7 +132,10 @@ fun AppDialerSettingsScreen(
                     .padding(16.dp)
             ) {
                 // Section 1: Interactive Keypad Layout Customization
-                SettingsCategoryHeader(title = "Keypad Visual Layout (視覺化按鍵佈局配置)", icon = Icons.Default.Settings)
+                SettingsCategoryHeader(
+                    title = stringResource(R.string.category_keypad_layout),
+                    icon = Icons.Default.Settings
+                )
 
                 InteractiveKeyLayoutPicker(
                     lettersPos = selectedLettersPos,
@@ -159,8 +163,8 @@ fun AppDialerSettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SettingsKeySelectorItem(
-                    title = "Long-Press Settings Key (長按開啟設定按鈕)",
-                    subtitle = "Select which keypad button long-press opens settings",
+                    title = stringResource(R.string.settings_key_trigger_title),
+                    subtitle = stringResource(R.string.settings_key_trigger_subtitle),
                     selectedKey = selectedTriggerKey,
                     onKeySelected = { key ->
                         selectedTriggerKey = key
@@ -169,14 +173,14 @@ fun AppDialerSettingsScreen(
                 )
 
                 SettingsSwitchItem(
-                    title = "Haptic Feedback",
-                    subtitle = "Vibrate keypress on dialer keypad",
+                    title = stringResource(R.string.haptic_feedback_title),
+                    subtitle = stringResource(R.string.haptic_feedback_subtitle),
                     checked = hapticFeedbackEnabled,
                     onCheckedChange = { hapticFeedbackEnabled = it }
                 )
 
                 SettingsSliderItem(
-                    title = "Background Dim Amount",
+                    title = stringResource(R.string.bg_dim_amount_title),
                     value = bgDimAmount,
                     onValueChange = { bgDimAmount = it },
                     valueDisplay = "${(bgDimAmount * 100).toInt()}%"
@@ -185,11 +189,14 @@ fun AppDialerSettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Section 2: Search Preferences
-                SettingsCategoryHeader(title = "Search & Indexing", icon = Icons.Default.Search)
+                SettingsCategoryHeader(
+                    title = stringResource(R.string.category_search_indexing),
+                    icon = Icons.Default.Search
+                )
 
                 SettingsSwitchItem(
-                    title = "Zhuyin Search (ㄅㄆㄇ注音搜尋)",
-                    subtitle = "Display ㄅㄆㄇㄈ on keypad and match Chinese via Zhuyin (預設關閉)",
+                    title = stringResource(R.string.zhuyin_search_title),
+                    subtitle = stringResource(R.string.zhuyin_search_subtitle),
                     checked = zhuyinMode,
                     onCheckedChange = {
                         zhuyinMode = it
@@ -198,8 +205,8 @@ fun AppDialerSettingsScreen(
                 )
 
                 SettingsSwitchItem(
-                    title = "Fuzzy Search (模糊搜尋)",
-                    subtitle = "Allow non-contiguous character matching (允許間隔字元匹配)",
+                    title = stringResource(R.string.fuzzy_search_title),
+                    subtitle = stringResource(R.string.fuzzy_search_subtitle),
                     checked = fuzzySearch,
                     onCheckedChange = {
                         fuzzySearch = it
@@ -208,15 +215,15 @@ fun AppDialerSettingsScreen(
                 )
 
                 SettingsSwitchItem(
-                    title = "Include System Apps",
-                    subtitle = "Show pre-installed system apps in search results",
+                    title = stringResource(R.string.include_system_apps_title),
+                    subtitle = stringResource(R.string.include_system_apps_subtitle),
                     checked = includeSystemApps,
                     onCheckedChange = { includeSystemApps = it }
                 )
 
                 SettingsSwitchItem(
-                    title = "Auto Launch Single Match",
-                    subtitle = "Automatically open app when only 1 match remains",
+                    title = stringResource(R.string.auto_launch_single_title),
+                    subtitle = stringResource(R.string.auto_launch_single_subtitle),
                     checked = autoLaunchSingleMatch,
                     onCheckedChange = { autoLaunchSingleMatch = it }
                 )
@@ -224,11 +231,14 @@ fun AppDialerSettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Section 3: Behavior
-                SettingsCategoryHeader(title = "Behavior", icon = Icons.Default.Settings)
+                SettingsCategoryHeader(
+                    title = stringResource(R.string.category_behavior),
+                    icon = Icons.Default.Settings
+                )
 
                 SettingsSwitchItem(
-                    title = "Close Dialer after Launch",
-                    subtitle = "Dismiss AppDialer automatically when an app opens",
+                    title = stringResource(R.string.close_after_launch_title),
+                    subtitle = stringResource(R.string.close_after_launch_subtitle),
                     checked = autoCloseOnLaunch,
                     onCheckedChange = { autoCloseOnLaunch = it }
                 )
@@ -236,16 +246,19 @@ fun AppDialerSettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Section 4: About & System Info
-                SettingsCategoryHeader(title = "About", icon = Icons.Default.Info)
+                SettingsCategoryHeader(
+                    title = stringResource(R.string.category_about),
+                    icon = Icons.Default.Info
+                )
 
                 SettingsClickableItem(
-                    title = "Open App System Details",
-                    subtitle = "Manage permissions, notifications, and battery",
+                    title = stringResource(R.string.open_app_details_title),
+                    subtitle = stringResource(R.string.open_app_details_subtitle),
                     onClick = onOpenSystemAppSettings
                 )
 
                 SettingsClickableItem(
-                    title = "App Version",
+                    title = stringResource(R.string.app_version_title),
                     subtitle = "1.0.0 (Build 1)",
                     onClick = {}
                 )
@@ -294,11 +307,11 @@ fun InteractiveKeyLayoutPicker(
     }
 
     val slotLabels = mapOf(
-        "TopLeft" to "左上",
-        "TopRight" to "右上",
-        "Center" to "中央",
-        "BottomLeft" to "左下",
-        "BottomRight" to "右下"
+        "TopLeft" to stringResource(R.string.slot_top_left),
+        "TopRight" to stringResource(R.string.slot_top_right),
+        "Center" to stringResource(R.string.slot_center),
+        "BottomLeft" to stringResource(R.string.slot_bottom_left),
+        "BottomRight" to stringResource(R.string.slot_bottom_right)
     )
 
     Surface(
@@ -315,7 +328,7 @@ fun InteractiveKeyLayoutPicker(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Tap any position on keycard below, then select element (點選按鍵卡片上位置以配置內容)",
+                text = stringResource(R.string.key_layout_picker_hint),
                 fontSize = 13.sp,
                 color = colorScheme.outline,
                 textAlign = TextAlign.Center
@@ -382,7 +395,7 @@ fun InteractiveKeyLayoutPicker(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "正在配置「${slotLabels[selectedSlot]}」位置內容：",
+                text = stringResource(R.string.configuring_position, slotLabels[selectedSlot] ?: ""),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.primary
@@ -392,11 +405,11 @@ fun InteractiveKeyLayoutPicker(
 
             // Element Choice Chips
             val elementChoices = listOf(
-                "Letters" to "ABC (字母)",
-                "Number" to "12 (數字)",
-                "Zhuyin" to "ㄅㄆㄇ (注音)",
-                "Function" to "⚙ Settings Icon (設定圖示)",
-                "None" to "無 (清空)"
+                "Letters" to stringResource(R.string.elem_letters),
+                "Number" to stringResource(R.string.elem_number),
+                "Zhuyin" to stringResource(R.string.elem_zhuyin),
+                "Function" to stringResource(R.string.elem_function),
+                "None" to stringResource(R.string.elem_none)
             )
 
             val currentAssignedElement = getElementAtSlot(selectedSlot)

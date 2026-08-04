@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">App Dialer</string>
+
+    <!-- Settings Screen Header -->
+    <string name="settings_title">App Dialer 設定</string>
+    <string name="back">返回</string>
+
+    <!-- Category Headers -->
+    <string name="category_keypad_layout">視覺化按鍵佈局配置</string>
+    <string name="category_search_indexing">搜尋與索引</string>
+    <string name="category_behavior">行為</string>
+    <string name="category_about">關於</string>
+
+    <!-- Interactive Key Layout Picker -->
+    <string name="key_layout_picker_hint">點選按鍵卡片上位置以配置內容</string>
+    <string name="configuring_position">正在配置「%1$s」位置內容：</string>
+
+    <!-- Slot Names -->
+    <string name="slot_top_left">左上</string>
+    <string name="slot_top_right">右上</string>
+    <string name="slot_center">中央</string>
+    <string name="slot_bottom_left">左下</string>
+    <string name="slot_bottom_right">右下</string>
+
+    <!-- Element Names -->
+    <string name="elem_letters">ABC (字母)</string>
+    <string name="elem_number">12 (數字)</string>
+    <string name="elem_zhuyin">ㄅㄆㄇ (注音)</string>
+    <string name="elem_function">⚙ Settings Icon (設定圖示)</string>
+    <string name="elem_none">無 (清空)</string>
+
+    <!-- Key Selector & Haptics -->
+    <string name="settings_key_trigger_title">長按開啟設定按鈕</string>
+    <string name="settings_key_trigger_subtitle">設定長按哪顆按鈕以開啟設定頁面</string>
+    <string name="haptic_feedback_title">觸感回饋</string>
+    <string name="haptic_feedback_subtitle">按鍵敲擊與長按時進行觸感震動</string>
+    <string name="bg_dim_amount_title">背景遮罩淡化比例</string>
+
+    <!-- Search Preferences -->
+    <string name="zhuyin_search_title">ㄅㄆㄇ 注音搜尋</string>
+    <string name="zhuyin_search_subtitle">在鍵盤上標注 ㄅㄆㄇㄈ 並支援注音匹配 (預設關閉)</string>
+    <string name="fuzzy_search_title">模糊搜尋 (Fuzzy Search)</string>
+    <string name="fuzzy_search_subtitle">允許非連續字元相符匹配</string>
+    <string name="include_system_apps_title">包含系統預裝 App</string>
+    <string name="include_system_apps_subtitle">在搜尋結果中顯示預裝系統應用程式</string>
+    <string name="auto_launch_single_title">唯一命中時自動啟動</string>
+    <string name="auto_launch_single_subtitle">當搜尋結果僅剩唯一 App 時自動啟動</string>
+
+    <!-- Behavior -->
+    <string name="close_after_launch_title">啟動 App 後自動關閉</string>
+    <string name="close_after_launch_subtitle">開啟應用程式後自動隱藏 App Dialer</string>
+
+    <!-- About -->
+    <string name="open_app_details_title">開啟系統應用程式資訊</string>
+    <string name="open_app_details_subtitle">管理權限、通知與電池最佳化設定</string>
+    <string name="app_version_title">版本號</string>
+
+    <!-- Dialer Screen -->
+    <string name="no_matching_apps">找不到符合的 App</string>
+</resources>

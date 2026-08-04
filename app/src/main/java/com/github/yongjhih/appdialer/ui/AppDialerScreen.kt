@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import com.github.yongjhih.appdialer.R
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -132,7 +134,7 @@ fun AppDialerScreen(
                 ) {
                     if (apps.isEmpty()) {
                         Text(
-                            text = "No matching apps",
+                            text = stringResource(R.string.no_matching_apps),
                             color = colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )

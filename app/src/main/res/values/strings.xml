@@ -1,3 +1,60 @@
 <resources>
     <string name="app_name">App Dialer</string>
+
+    <!-- Settings Screen Header -->
+    <string name="settings_title">App Dialer Settings</string>
+    <string name="back">Back</string>
+
+    <!-- Category Headers -->
+    <string name="category_keypad_layout">Keypad Visual Layout</string>
+    <string name="category_search_indexing">Search &amp; Indexing</string>
+    <string name="category_behavior">Behavior</string>
+    <string name="category_about">About</string>
+
+    <!-- Interactive Key Layout Picker -->
+    <string name="key_layout_picker_hint">Tap any position on keycard below, then select element</string>
+    <string name="configuring_position">Configuring position: %1$s</string>
+
+    <!-- Slot Names -->
+    <string name="slot_top_left">Top-Left</string>
+    <string name="slot_top_right">Top-Right</string>
+    <string name="slot_center">Center</string>
+    <string name="slot_bottom_left">Bottom-Left</string>
+    <string name="slot_bottom_right">Bottom-Right</string>
+
+    <!-- Element Names -->
+    <string name="elem_letters">ABC (Letters)</string>
+    <string name="elem_number">12 (Number)</string>
+    <string name="elem_zhuyin">ㄅㄆㄇ (Zhuyin)</string>
+    <string name="elem_function">⚙ Settings Icon</string>
+    <string name="elem_none">None (Empty)</string>
+
+    <!-- Key Selector & Haptics -->
+    <string name="settings_key_trigger_title">Long-Press Settings Key</string>
+    <string name="settings_key_trigger_subtitle">Select which keypad button long-press opens settings</string>
+    <string name="haptic_feedback_title">Haptic Feedback</string>
+    <string name="haptic_feedback_subtitle">Vibrate keypress on dialer keypad</string>
+    <string name="bg_dim_amount_title">Background Dim Amount</string>
+
+    <!-- Search Preferences -->
+    <string name="zhuyin_search_title">Zhuyin Search (ㄅㄆㄇ)</string>
+    <string name="zhuyin_search_subtitle">Display ㄅㄆㄇㄈ on keypad and match Chinese via Zhuyin</string>
+    <string name="fuzzy_search_title">Fuzzy Search</string>
+    <string name="fuzzy_search_subtitle">Allow non-contiguous character matching</string>
+    <string name="include_system_apps_title">Include System Apps</string>
+    <string name="include_system_apps_subtitle">Show pre-installed system apps in search results</string>
+    <string name="auto_launch_single_title">Auto Launch Single Match</string>
+    <string name="auto_launch_single_subtitle">Automatically open app when only 1 match remains</string>
+
+    <!-- Behavior -->
+    <string name="close_after_launch_title">Close Dialer after Launch</string>
+    <string name="close_after_launch_subtitle">Dismiss AppDialer automatically when an app opens</string>
+
+    <!-- About -->
+    <string name="open_app_details_title">Open App System Details</string>
+    <string name="open_app_details_subtitle">Manage permissions, notifications, and battery</string>
+    <string name="app_version_title">App Version</string>
+
+    <!-- Dialer Screen -->
+    <string name="no_matching_apps">No matching apps</string>
 </resources>
