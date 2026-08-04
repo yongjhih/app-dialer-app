@@ -14,6 +14,7 @@
     <!-- Interactive Key Layout Picker -->
     <string name="key_layout_picker_hint">點選按鍵卡片上位置以配置內容</string>
     <string name="configuring_position">正在配置「%1$s」位置內容：</string>
+    <string name="reset_layout">重置</string>
 
     <!-- Slot Names -->
     <string name="slot_top_left">左上</string>

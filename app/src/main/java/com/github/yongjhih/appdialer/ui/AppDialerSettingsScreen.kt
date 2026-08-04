@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,12 +21,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -165,7 +168,7 @@ fun AppDialerSettingsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SettingsKeySelectorItem(
+                VisualKeypadTriggerSelector(
                     title = stringResource(R.string.settings_key_trigger_title),
                     subtitle = stringResource(R.string.settings_key_trigger_subtitle),
                     selectedKey = selectedTriggerKey,
@@ -174,6 +177,8 @@ fun AppDialerSettingsScreen(
                         onSettingsTriggerKeyChange(key)
                     }
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 SettingsSwitchItem(
                     title = stringResource(R.string.haptic_feedback_title),
@@ -321,6 +326,13 @@ fun InteractiveKeyLayoutPicker(
         }
     }
 
+    fun resetToDefaults() {
+        onLettersPosChange("Center")
+        onNumberPosChange("TopRight")
+        onZhuyinPosChange("BottomLeft")
+        onFunctionPosChange("BottomRight")
+    }
+
     val slotLabels = mapOf(
         "TopLeft" to stringResource(R.string.slot_top_left),
         "TopRight" to stringResource(R.string.slot_top_right),
@@ -342,12 +354,38 @@ fun InteractiveKeyLayoutPicker(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.key_layout_picker_hint),
-                fontSize = 13.sp,
-                color = colorScheme.outline,
-                textAlign = TextAlign.Center
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.key_layout_picker_hint),
+                    fontSize = 12.sp,
+                    color = colorScheme.outline,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick = { resetToDefaults() },
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(0.5.dp, colorScheme.primary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Reset",
+                        tint = colorScheme.primary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.reset_layout),
+                        fontSize = 12.sp,
+                        color = colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(14.dp))
 
@@ -456,16 +494,19 @@ fun InteractiveKeyLayoutPicker(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsKeySelectorItem(
+fun VisualKeypadTriggerSelector(
     title: String,
     subtitle: String,
     selectedKey: String,
     onKeySelected: (String) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val availableKeys = listOf("X", "2", "3", "4", "5", "6", "7", "8", "9")
+    val keypadGrid = listOf(
+        listOf("X", "2", "3"),
+        listOf("4", "5", "6"),
+        listOf("7", "8", "9")
+    )
 
     Surface(
         modifier = Modifier
@@ -477,42 +518,75 @@ fun SettingsKeySelectorItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = title,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface
+                color = colorScheme.onSurface,
+                modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = colorScheme.outline
+                color = colorScheme.outline,
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            // 3x3 Keypad Diagram Preview Selector
+            Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(0.85f)
             ) {
-                availableKeys.forEach { key ->
-                    val isSelected = (key == selectedKey)
-                    Surface(
-                        modifier = Modifier
-                            .clickable { onKeySelected(key) },
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isSelected) colorScheme.primary else colorScheme.surfaceVariant
+                keypadGrid.forEach { rowKeys ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = key,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isSelected) Color.Black else colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                        )
+                        rowKeys.forEach { key ->
+                            val isSelected = (key == selectedKey)
+                            Surface(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .clickable { onKeySelected(key) },
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) colorScheme.primary else colorScheme.keypadButtonBackground,
+                                border = BorderStroke(
+                                    width = if (isSelected) 1.5.dp else 0.5.dp,
+                                    color = if (isSelected) colorScheme.primary else colorScheme.cardBorder
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = key,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) Color.Black else colorScheme.onSurface
+                                    )
+
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Settings,
+                                            contentDescription = "Settings Key",
+                                            tint = Color.Black,
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .align(Alignment.BottomEnd)
+                                                .padding(bottom = 3.dp, end = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
