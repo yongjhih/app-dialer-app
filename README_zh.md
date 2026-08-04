@@ -7,7 +7,7 @@
 <p align="center">
   <b>Sleek, Lightning-Fast CJK T9 Numeric App Launcher for Android</b>
   <br />
-  <i>重溫傳統 T9 撥號體驗 ‧ 支援中文拼音與日文羅馬字音譯搜尋 ‧ Jetpack Compose 黑金奢華設計</i>
+  <i>重溫傳統 T9 撥號體驗 ‧ 支援中文拼音 / 注音與日文羅馬字音譯搜尋 ‧ Jetpack Compose 黑金奢華設計</i>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 
 ## 🌟 簡介 (Introduction)
 
-**AppDialer** 是一款專為 Android 設計的極速 **T9 數字鍵盤 App 快速啟動器**。借鑑經典實體手機 T9 撥號盤的直覺體驗，結合現代化的 **Material 3 奢華黑金 (Obsidian Gold)** 設計語言與原生 **CJK 漢語拼音 / 羅馬字音譯比對引擎**，讓您無需切換輸入法，只需敲擊幾下數字鍵，即可在毫秒間搜尋並開啟任何 App！
+**AppDialer** 是一款專為 Android 設計的極速 **T9 數字鍵盤 App 快速啟動器**。借鑑經典實體手機 T9 撥號盤的直覺體驗，結合現代化的 **Material 3 奢華黑金 (Obsidian Gold)** 設計語言與原生 **CJK 漢語拼音 / ㄅㄆㄇ注音 / 羅馬字音譯比對引擎**，讓您無需切換輸入法，只需敲擊幾下數字鍵，即可在毫秒間搜尋並開啟任何 App！
 
 <p align="center">
   <img src="docs/app-dialer-app-screenshot.png" width="360" alt="AppDialer Screenshot" />
@@ -37,6 +37,7 @@
 
 ### ⚡ 1. T9 數字鍵盤極速搜尋 (T9 Numeric Keypad)
 - 標準 3x3 撥號盤佈局 (`2: ABC` ~ `9: WXYZ`)，單手操作無壓力。
+- 專屬 **清除 `X` 按鈕**（左上角第一顆鍵）：短按退格刪除 1 個字元，長按一鍵清空所有輸入。
 - 輕量高效，隨叫隨到，懸浮於桌面之上。
 
 ### 🌏 2. 多國語言 CJK 音譯與注音搜尋 (CJK & Zhuyin Search)
@@ -52,21 +53,22 @@
   - 輸入 `78` ➔ 匹配 **「設定」** (Settei `78`)
 - **英文與數字**：傳統 T9 字母組合全解析與直接匹配。
 
-### 🎯 3. 智慧 Fuzzy 模糊比對與高亮提示 (Fuzzy Search & Highlighting)
+### 🎨 3. 視覺化互動按鍵佈局選擇器 (Interactive Key Layout Picker)
+自由配置按鍵上各大元素的擺放位置：
+- **視覺化按鍵預覽卡片**：直接點擊設定頁面預覽卡片上的 5 個位置槽（`左上`、`右上`、`中央`、`左下`、`右下`）進行內容配置。
+- **5 大可配置內容**：可選擇置入 `ABC 字母`、`12 數字`、`ㄅㄆㄇ 注音`、`⚙ 設定圖示` 或 `無 (清空)`。
+- **智慧尺寸適應**：位於中央的元素自動放大為主要視覺字體，位於四角的元素自動縮小為精緻角標。
+
+### 🎯 4. 智慧 Fuzzy 模糊比對與高亮提示 (Fuzzy Search & Highlighting)
 - 支援非連續字元匹配 (Subsequence Matching) 與前綴加權評分演算法。
 - 在 App 搜尋結果中**精準高亮顯示命中的字元**。
 
-### 🚀 4. 近期 App 智慧排序 (Recent Apps Ranking)
+### 🚀 5. 近期 App 智慧排序 (Recent Apps Ranking)
 - 自動記錄歷史開啟頻率與近期使用記錄，常用 App 優先浮出首位。
 
-### 🎨 5. 黑金奢華 Obsidian Gold 視覺設計 (Obsidian Gold Design Tokens)
+### 🎨 6. 黑金奢華 Obsidian Gold 視覺設計 (Obsidian Gold Design Tokens)
 - 純粹曜石黑 (`#121214`) 搭配琥珀金 (`#FFD700`) 高亮與微立體鍵盤卡片。
 - 撥號盤懸浮透明視窗與獨立實體色設定頁面，展現高質感現代美學。
-
-### ⚙️ 6. 模組化按鍵元素位置自訂 (Modular Element Layout)
-- **自由擺放 4 大元素**：可獨立自訂 **ABC 字母**、**數字標記**、**注音符號** 與 **功能圖示 (設定齒輪/清除鍵)** 的位置。
-- **5 種可選位置**：支援`中央 (Center)`、`左上 (TopLeft)`、`右上 (TopRight)`、`左下 (BottomLeft)` 與 `右下 (BottomRight)`。
-- **自動適應縮放**：位於中央的元素自動提升為主要視覺字體，位於四角的元素自動縮小為精緻角標。
 
 ---
 
@@ -119,7 +121,9 @@
 
 | 設定項目 | 說明 |
 | :--- | :--- |
+| **視覺化按鍵佈局選擇器** | 點選卡片圖解，配置字母、數字、注音與設定 Icon 之呈現位置 |
 | **Long-Press Settings Key** | 自訂長按開啟設定選單的撥號鍵 (`X`, `2`~`9`) |
+| **Zhuyin Search (ㄅㄆㄇ注音搜尋)** | 開啟 ㄅㄆㄇ 注音 T9 搜尋與鍵盤符號標注（預設關閉） |
 | **Fuzzy Search (模糊搜尋)** | 允許字元間隔匹配（預設開啟） |
 | **Haptic Feedback** | 撥號鍵盤敲擊震動回饋 |
 | **Background Dim Amount** | 撥號盤開啟時的背景遮罩淡化比例 |

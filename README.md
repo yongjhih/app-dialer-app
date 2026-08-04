@@ -25,7 +25,7 @@
 
 ## 🌟 Introduction
 
-**AppDialer** is a ultra-fast, lightweight **T9 Numeric Keypad App Launcher for Android**. Inspired by the tactile efficiency of physical feature phone T9 dialpads, AppDialer combines modern **Material 3 Obsidian Gold** design aesthetics with native **CJK (Chinese Pinyin & Japanese Romaji) transliteration search algorithms**. 
+**AppDialer** is an ultra-fast, lightweight **T9 Numeric Keypad App Launcher for Android**. Inspired by the tactile efficiency of physical feature phone T9 dialpads, AppDialer combines modern **Material 3 Obsidian Gold** design aesthetics with native **CJK (Chinese Pinyin & Japanese Romaji) transliteration search algorithms** and **Bopomofo Zhuyin (ㄅㄆㄇ) search support**. 
 
 Launch any app on your phone in milliseconds with just a few numeric key taps—no input method switching required!
 
@@ -39,11 +39,15 @@ Launch any app on your phone in milliseconds with just a few numeric key taps—
 
 ### ⚡ 1. T9 Numeric Keypad Launching
 - Classic 3x3 numeric dialpad (`2: ABC` ~ `9: WXYZ`) designed for seamless single-handed operation.
+- Dedicated **Clear `X` Key** (top-left key): short-press to delete 1 character, long-press to clear all.
 - Floating overlay card anchored right above your home screen dock.
 
-### 🌏 2. Multilingual CJK Transliteration Search
+### 🌏 2. Multilingual CJK & Zhuyin Search Support
 Powered natively by Android ICU `android.icu.text.Transliterator` (zero APK size overhead):
-- **Chinese (Traditional & Simplified)**: Matches Pinyin initials and full Pinyin.
+- **Chinese Zhuyin / Bopomofo (ㄅㄆㄇㄈ)**: Configurable in Settings (default OFF). Renders standard 8-key Zhuyin symbols on keypad.
+  - Press `33` ➔ Matches **「地圖」** (ㄉㄊ `33`)
+  - Press `55` ➔ Matches **「相機」** (ㄒㄐ `55`)
+- **Chinese Pinyin (Traditional & Simplified)**: Default mode, matches Pinyin initials and full Pinyin.
   - Press `38` ➔ Matches **「地圖」** (Di Tu `38`)
   - Press `95` ➔ Matches **「相機」** (Xiang Ji `95`)
 - **Japanese (Hiragana & Katakana)**: Matches Hepburn Romaji.
@@ -51,21 +55,22 @@ Powered natively by Android ICU `android.icu.text.Transliterator` (zero APK size
   - Press `78` ➔ Matches **「設定」** (Settei `78`)
 - **English & Digits**: Direct letter parsing and exact matching.
 
-### 🎯 3. Smart Fuzzy Search & Character Highlighting
+### 🎨 3. Interactive Visual Key Layout Picker
+Customize where each element is rendered on your keypad buttons:
+- **Interactive Diagram**: Tap any of the 5 positions (`TopLeft`, `TopRight`, `Center`, `BottomLeft`, `BottomRight`) on a keycard preview diagram in Settings to assign elements.
+- **Customizable Elements**: `ABC Letters`, `Numbers`, `ㄅㄆㄇ Zhuyin`, `⚙ Settings Icon`, or `None (Empty)`.
+- **Dynamic Sizing**: Elements in the center automatically scale to primary labels, while corner elements render as sleek corner badges.
+
+### 🎯 4. Smart Fuzzy Search & Character Highlighting
 - Subsequence matching with prefix bonus scoring.
 - Highlights matched characters directly in search result app labels.
 
-### 🚀 4. Recent Apps Smart Prioritization
+### 🚀 5. Recent Apps Smart Prioritization
 - Automatically tracks app launch history and ranks frequently used apps first.
 
-### 🎨 5. Premium Obsidian & Amber Gold Aesthetics
+### 🎨 6. Premium Obsidian & Amber Gold Aesthetics
 - Deep Obsidian background (`#121214`) paired with Amber Gold accents (`#FFD700`).
 - Floating translucent activity overlay with solid dark Settings view.
-
-### ⚙️ 6. Customizable Keypad & Haptic Ergonomics
-- **`X` Clear Button**: Tap to backspace 1 character, long-press to clear all.
-- **Configurable Settings Trigger**: Customize which button long-press opens Settings (default `9`, customizable to `X` or `2`~`8`).
-- **Haptic Feedback**: Tactile vibration on keyboard taps and long presses.
 
 ---
 
@@ -118,8 +123,10 @@ Access Settings by long-pressing the configured trigger key (default key `9`):
 
 | Setting | Description |
 | :--- | :--- |
+| **Interactive Key Layout Picker** | Tap keycard diagram to visually place Letters, Numbers, Zhuyin, and Settings Icon |
 | **Long-Press Settings Key** | Select which keypad button long-press opens settings (`X`, `2`~`9`) |
-| **Fuzzy Search** | Allow non-contiguous character matching (Enabled by default) |
+| **Zhuyin Search (ㄅㄆㄇ注音搜尋)** | Enable Bopomofo Zhuyin T9 search and keypad symbols (Disabled by default) |
+| **Fuzzy Search (模糊搜尋)** | Allow non-contiguous character matching (Enabled by default) |
 | **Haptic Feedback** | Tactile vibration on keypad touch |
 | **Background Dim Amount** | Background overlay dim ratio when dialer is open |
 | **Close Dialer after Launch** | Automatically dismiss AppDialer upon app launch |
