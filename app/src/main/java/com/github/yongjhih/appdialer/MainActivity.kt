@@ -1,6 +1,7 @@
 package com.github.yongjhih.appdialer
 
 import android.content.Intent
+import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
@@ -43,10 +44,13 @@ class MainActivity : ComponentActivity() {
     private var settingsTriggerKey by mutableStateOf("9")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Must run before super so launch transition doesn't flash an opaque frame.
         disablePendingTransition()
         super.onCreate(savedInstanceState)
 
         settingsTriggerKey = RecentAppsManager.getSettingsTriggerKey(this)
+
+        applyTransparentWindow()
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
@@ -116,35 +120,56 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Content view exists after setContent; clear residual opaque backgrounds.
+        clearContentBackgrounds()
         loadApps()
     }
 
-    override fun onResume() {
-        super.onResume()
-        applyTransparentWindow()
+    /**
+     * Make the activity window truly translucent so home screen shows through.
+     * Without TRANSLUCENT pixel format, transparent Compose pixels often render as black.
+     */
+    private fun applyTransparentWindow() {
+        window.setFormat(PixelFormat.TRANSLUCENT)
+        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
+        window.statusBarColor = AndroidColor.TRANSPARENT
+        window.navigationBarColor = AndroidColor.TRANSPARENT
+
+        // Full-screen overlay (theme already has windowIsFloating=false).
+        window.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // Dim behind the floating card (matches theme backgroundDimAmount).
+        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.attributes = window.attributes.apply {
+            dimAmount = 0.4f
+            format = PixelFormat.TRANSLUCENT
+        }
+
+        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
+        window.decorView.background = null
+    }
+
+    private fun clearContentBackgrounds() {
+        findViewById<View>(android.R.id.content)?.let { content ->
+            content.setBackgroundColor(AndroidColor.TRANSPARENT)
+            content.background = null
+            if (content is ViewGroup) {
+                for (i in 0 until content.childCount) {
+                    content.getChildAt(i)?.let { child ->
+                        child.setBackgroundColor(AndroidColor.TRANSPARENT)
+                        child.background = null
+                    }
+                }
+            }
+        }
     }
 
     override fun finish() {
         super.finish()
         disablePendingTransition()
-    }
-
-    private fun applyTransparentWindow() {
-        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
-        window.setBackgroundDrawableResource(android.R.color.transparent)
-        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
-        window.decorView.background = null
-
-        window.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        window.setGravity(Gravity.BOTTOM)
-
-        findViewById<View>(android.R.id.content)?.apply {
-            background = null
-            setBackgroundColor(AndroidColor.TRANSPARENT)
-        }
     }
 
     private fun disablePendingTransition() {
