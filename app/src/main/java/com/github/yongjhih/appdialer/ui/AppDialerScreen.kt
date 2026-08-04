@@ -61,7 +61,8 @@ fun AppDialerScreen(
     apps: List<AppModel>,
     searchQuery: String = "",
     onDigitPressed: (String) -> Unit,
-    onClear: () -> Unit,
+    onDeleteOneDigit: () -> Unit,
+    onClearAllDigits: () -> Unit,
     onAppClick: (AppModel) -> Unit,
     onAppLongClick: (AppModel) -> Unit,
     onOpenDialerSettings: () -> Unit,
@@ -142,16 +143,15 @@ fun AppDialerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 3x3 Keypad Grid
-                // Row 1: X (Settings on long press) / 12 ABC / 3 DEF
+                // Row 1: X (Short press delete 1, Long press delete all) / 12 ABC / 3 DEF
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
                         icon = Icons.Default.Close,
-                        subtitleIcon = Icons.Default.Settings,
-                        onClick = onClear,
-                        onLongClick = onOpenDialerSettings,
+                        onClick = onDeleteOneDigit,
+                        onLongClick = onClearAllDigits,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
@@ -197,7 +197,7 @@ fun AppDialerScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Row 3: 7 PQRS / 8 TUV / 9 WXYZ
+                // Row 3: 7 PQRS / 8 TUV / 9 WXYZ (Settings on long press)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -217,7 +217,9 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "9",
                         letters = "WXYZ",
+                        subtitleIcon = Icons.Default.Settings,
                         onClick = { onDigitPressed("9") },
+                        onLongClick = onOpenDialerSettings,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -342,21 +344,31 @@ fun KeypadButton(
                 )
             }
 
-            if (subtitleIcon != null) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Icon(
-                    imageVector = subtitleIcon,
-                    contentDescription = "Settings",
-                    tint = colorScheme.keypadButtonTextSecondary,
-                    modifier = Modifier.size(12.dp)
-                )
-            } else if (!letters.isNullOrEmpty()) {
-                Text(
-                    text = letters,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.keypadButtonTextSecondary
-                )
+            if (!letters.isNullOrEmpty() || subtitleIcon != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (!letters.isNullOrEmpty()) {
+                        Text(
+                            text = letters,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.keypadButtonTextSecondary
+                        )
+                    }
+                    if (subtitleIcon != null) {
+                        if (!letters.isNullOrEmpty()) {
+                            Spacer(modifier = Modifier.width(3.dp))
+                        }
+                        Icon(
+                            imageVector = subtitleIcon,
+                            contentDescription = "Settings",
+                            tint = colorScheme.keypadButtonTextSecondary,
+                            modifier = Modifier.size(10.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -377,7 +389,8 @@ fun AppDialerScreenPreview() {
             apps = sampleApps,
             searchQuery = "",
             onDigitPressed = {},
-            onClear = {},
+            onDeleteOneDigit = {},
+            onClearAllDigits = {},
             onAppClick = {},
             onAppLongClick = {},
             onOpenDialerSettings = {},
@@ -391,8 +404,9 @@ fun AppDialerScreenPreview() {
 fun KeypadButtonPreview() {
     AppDialerTheme {
         KeypadButton(
-            number = "12",
-            letters = "ABC",
+            number = "9",
+            letters = "WXYZ",
+            subtitleIcon = Icons.Default.Settings,
             onClick = {}
         )
     }
