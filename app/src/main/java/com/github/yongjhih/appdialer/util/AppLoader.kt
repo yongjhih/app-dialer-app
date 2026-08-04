@@ -41,7 +41,9 @@ object AppLoader {
                     icon = info.loadIcon(pm),
                     t9Full = label.toT9(),
                     t9Initials = label.toT9Initials(),
-                    t9Words = label.toT9Words()
+                    t9Words = label.toT9Words(),
+                    t9CjkFull = label.toCjkT9Full(),
+                    t9CjkInitials = label.toCjkT9Initials()
                 )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }

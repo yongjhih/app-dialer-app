@@ -30,8 +30,19 @@ fun String.toT9Initials(): String = split(Regex("[^a-zA-Z0-9]+"))
     .mapNotNull { word -> word.firstOrNull()?.toT9()?.takeIf { it != ' ' } }
     .joinToString("")
 
+fun String.toCjkT9Full(): String {
+    val latin = CjkTransliterator.toLatin(this)
+    return latin.toT9()
+}
+
+fun String.toCjkT9Initials(): String {
+    val latin = CjkTransliterator.toLatin(this)
+    return latin.toT9Initials()
+}
+
 /**
- * Filter and score apps with support for recent apps ordering, character highlight indexing, and fuzzy T9 matching.
+ * Filter and score apps with support for recent apps ordering, character highlight indexing,
+ * fuzzy T9 matching, and CJK (Chinese & Japanese) Pinyin/Romaji transliteration matching.
  */
 fun List<AppModel>.filterAndScore(
     query: String,
@@ -65,7 +76,7 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
 
     val labelT9Str = label.map { it.toT9() }.joinToString("")
 
-    // 1. Contiguous T9 substring match (Highest priority)
+    // 1. Contiguous T9 substring match on Native Label (Highest priority)
     val fullIndex = labelT9Str.indexOf(cleanQuery)
     if (fullIndex != -1) {
         val indices = (fullIndex until fullIndex + cleanQuery.length).toList()
@@ -73,7 +84,7 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
         return Pair(score, indices)
     }
 
-    // 2. Initials match
+    // 2. Native Initials match
     val initialIndices = mutableListOf<Int>()
     val initialT9s = mutableListOf<Char>()
     for (i in label.indices) {
@@ -93,7 +104,28 @@ private fun AppModel.calculateMatch(query: String, isFuzzyEnabled: Boolean): Pai
         return Pair(score, indices)
     }
 
-    // 3. Fuzzy match (Non-contiguous character matching)
+    // 3. CJK Transliteration Initials Match (e.g. "地圖" -> DT "38", "相機" -> XJ "95", "カメラ" -> KM "56", "設定" -> ST "78")
+    if (t9CjkInitials.isNotEmpty()) {
+        val cjkInitIdx = t9CjkInitials.indexOf(cleanQuery)
+        if (cjkInitIdx != -1) {
+            val matchedChars = (cjkInitIdx until (cjkInitIdx + cleanQuery.length))
+                .filter { it < label.length }
+            val score = if (cjkInitIdx == 0) 950 else (850 - cjkInitIdx)
+            return Pair(score, matchedChars)
+        }
+    }
+
+    // 4. CJK Transliteration Full Match (e.g. "カメラ" -> Kamera "526372")
+    if (t9CjkFull.isNotEmpty()) {
+        val cjkFullIdx = t9CjkFull.indexOf(cleanQuery)
+        if (cjkFullIdx != -1) {
+            val matchedChars = label.indices.toList()
+            val score = if (cjkFullIdx == 0) 850 else (700 - cjkFullIdx)
+            return Pair(score, matchedChars)
+        }
+    }
+
+    // 5. Fuzzy match (Non-contiguous character matching)
     if (isFuzzyEnabled) {
         val matchedIndices = mutableListOf<Int>()
         var queryIdx = 0

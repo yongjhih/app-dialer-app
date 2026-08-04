@@ -3,6 +3,8 @@ package com.github.yongjhih.appdialer
 import android.graphics.drawable.ColorDrawable
 import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.util.filterAndScore
+import com.github.yongjhih.appdialer.util.toCjkT9Full
+import com.github.yongjhih.appdialer.util.toCjkT9Initials
 import com.github.yongjhih.appdialer.util.toT9
 import com.github.yongjhih.appdialer.util.toT9Initials
 import com.github.yongjhih.appdialer.util.toT9Words
@@ -73,6 +75,37 @@ class T9UtilsTest {
     }
 
     @Test
+    fun testCjkT9Matching() {
+        val dummyDrawable = ColorDrawable()
+        val apps = listOf(
+            createApp("地圖", dummyDrawable, t9CjkInitials = "38", t9CjkFull = "3488"),
+            createApp("相機", dummyDrawable, t9CjkInitials = "95", t9CjkFull = "9426454"),
+            createApp("カメラ", dummyDrawable, t9CjkInitials = "56", t9CjkFull = "526372"),
+            createApp("設定", dummyDrawable, t9CjkInitials = "78", t9CjkFull = "738834")
+        )
+
+        // Query "38" (D T) -> 地圖
+        val res1 = apps.filterAndScore("38")
+        assertTrue(res1.isNotEmpty())
+        assertEquals("地圖", res1[0].label)
+
+        // Query "95" (X J) -> 相機
+        val res2 = apps.filterAndScore("95")
+        assertTrue(res2.isNotEmpty())
+        assertEquals("相機", res2[0].label)
+
+        // Query "56" (K M) -> カメラ
+        val res3 = apps.filterAndScore("56")
+        assertTrue(res3.isNotEmpty())
+        assertEquals("カメラ", res3[0].label)
+
+        // Query "78" (S T) -> 設定
+        val res4 = apps.filterAndScore("78")
+        assertTrue(res4.isNotEmpty())
+        assertEquals("設定", res4[0].label)
+    }
+
+    @Test
     fun testRecentAppsOrderWhenQueryEmpty() {
         val dummyDrawable = ColorDrawable()
         val apps = listOf(
@@ -106,7 +139,12 @@ class T9UtilsTest {
         assertEquals(listOf(0, 9), result[0].matchedIndices)
     }
 
-    private fun createApp(label: String, icon: ColorDrawable): AppModel {
+    private fun createApp(
+        label: String,
+        icon: ColorDrawable,
+        t9CjkInitials: String = "",
+        t9CjkFull: String = ""
+    ): AppModel {
         return AppModel(
             label = label,
             packageName = "com.example.${label.lowercase().replace(" ", "")}",
@@ -114,7 +152,9 @@ class T9UtilsTest {
             icon = icon,
             t9Full = label.toT9(),
             t9Initials = label.toT9Initials(),
-            t9Words = label.toT9Words()
+            t9Words = label.toT9Words(),
+            t9CjkInitials = t9CjkInitials,
+            t9CjkFull = t9CjkFull
         )
     }
 }
