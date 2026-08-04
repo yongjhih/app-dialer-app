@@ -68,124 +68,130 @@ fun AppDialerSettingsScreen(
 
     val colorScheme = MaterialTheme.colorScheme
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "App Dialer Settings",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = colorScheme.onSurface
+    // Solid opaque background Surface covering the full screen
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = colorScheme.background
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "App Dialer Settings",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onSurface
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorScheme.surfaceVariant
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = colorScheme.onSurface
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.surfaceVariant
+                    )
                 )
-            )
-        },
-        containerColor = colorScheme.background
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            // Section 1: Appearance & Keypad Customization
-            SettingsCategoryHeader(title = "Appearance & Keypad", icon = Icons.Default.Settings)
+            },
+            containerColor = colorScheme.background
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                // Section 1: Appearance & Keypad Customization
+                SettingsCategoryHeader(title = "Appearance & Keypad", icon = Icons.Default.Settings)
 
-            SettingsKeySelectorItem(
-                title = "Long-Press Settings Key (長按開啟設定按鈕)",
-                subtitle = "Select which keypad button long-press opens settings",
-                selectedKey = selectedTriggerKey,
-                onKeySelected = { key ->
-                    selectedTriggerKey = key
-                    onSettingsTriggerKeyChange(key)
-                }
-            )
+                SettingsKeySelectorItem(
+                    title = "Long-Press Settings Key (長按開啟設定按鈕)",
+                    subtitle = "Select which keypad button long-press opens settings",
+                    selectedKey = selectedTriggerKey,
+                    onKeySelected = { key ->
+                        selectedTriggerKey = key
+                        onSettingsTriggerKeyChange(key)
+                    }
+                )
 
-            SettingsSwitchItem(
-                title = "Haptic Feedback",
-                subtitle = "Vibrate keypress on dialer keypad",
-                checked = hapticFeedbackEnabled,
-                onCheckedChange = { hapticFeedbackEnabled = it }
-            )
+                SettingsSwitchItem(
+                    title = "Haptic Feedback",
+                    subtitle = "Vibrate keypress on dialer keypad",
+                    checked = hapticFeedbackEnabled,
+                    onCheckedChange = { hapticFeedbackEnabled = it }
+                )
 
-            SettingsSliderItem(
-                title = "Background Dim Amount",
-                value = bgDimAmount,
-                onValueChange = { bgDimAmount = it },
-                valueDisplay = "${(bgDimAmount * 100).toInt()}%"
-            )
+                SettingsSliderItem(
+                    title = "Background Dim Amount",
+                    value = bgDimAmount,
+                    onValueChange = { bgDimAmount = it },
+                    valueDisplay = "${(bgDimAmount * 100).toInt()}%"
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Section 2: Search Preferences
-            SettingsCategoryHeader(title = "Search & Indexing", icon = Icons.Default.Search)
+                // Section 2: Search Preferences
+                SettingsCategoryHeader(title = "Search & Indexing", icon = Icons.Default.Search)
 
-            SettingsSwitchItem(
-                title = "Fuzzy Search (模糊搜尋)",
-                subtitle = "Allow non-contiguous character matching (允許間隔字元匹配)",
-                checked = fuzzySearch,
-                onCheckedChange = {
-                    fuzzySearch = it
-                    onFuzzySearchToggle(it)
-                }
-            )
+                SettingsSwitchItem(
+                    title = "Fuzzy Search (模糊搜尋)",
+                    subtitle = "Allow non-contiguous character matching (允許間隔字元匹配)",
+                    checked = fuzzySearch,
+                    onCheckedChange = {
+                        fuzzySearch = it
+                        onFuzzySearchToggle(it)
+                    }
+                )
 
-            SettingsSwitchItem(
-                title = "Include System Apps",
-                subtitle = "Show pre-installed system apps in search results",
-                checked = includeSystemApps,
-                onCheckedChange = { includeSystemApps = it }
-            )
+                SettingsSwitchItem(
+                    title = "Include System Apps",
+                    subtitle = "Show pre-installed system apps in search results",
+                    checked = includeSystemApps,
+                    onCheckedChange = { includeSystemApps = it }
+                )
 
-            SettingsSwitchItem(
-                title = "Auto Launch Single Match",
-                subtitle = "Automatically open app when only 1 match remains",
-                checked = autoLaunchSingleMatch,
-                onCheckedChange = { autoLaunchSingleMatch = it }
-            )
+                SettingsSwitchItem(
+                    title = "Auto Launch Single Match",
+                    subtitle = "Automatically open app when only 1 match remains",
+                    checked = autoLaunchSingleMatch,
+                    onCheckedChange = { autoLaunchSingleMatch = it }
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Section 3: Behavior
-            SettingsCategoryHeader(title = "Behavior", icon = Icons.Default.Settings)
+                // Section 3: Behavior
+                SettingsCategoryHeader(title = "Behavior", icon = Icons.Default.Settings)
 
-            SettingsSwitchItem(
-                title = "Close Dialer after Launch",
-                subtitle = "Dismiss AppDialer automatically when an app opens",
-                checked = autoCloseOnLaunch,
-                onCheckedChange = { autoCloseOnLaunch = it }
-            )
+                SettingsSwitchItem(
+                    title = "Close Dialer after Launch",
+                    subtitle = "Dismiss AppDialer automatically when an app opens",
+                    checked = autoCloseOnLaunch,
+                    onCheckedChange = { autoCloseOnLaunch = it }
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Section 4: About & System Info
-            SettingsCategoryHeader(title = "About", icon = Icons.Default.Info)
+                // Section 4: About & System Info
+                SettingsCategoryHeader(title = "About", icon = Icons.Default.Info)
 
-            SettingsClickableItem(
-                title = "Open App System Details",
-                subtitle = "Manage permissions, notifications, and battery",
-                onClick = onOpenSystemAppSettings
-            )
+                SettingsClickableItem(
+                    title = "Open App System Details",
+                    subtitle = "Manage permissions, notifications, and battery",
+                    onClick = onOpenSystemAppSettings
+                )
 
-            SettingsClickableItem(
-                title = "App Version",
-                subtitle = "1.0.0 (Build 1)",
-                onClick = {}
-            )
+                SettingsClickableItem(
+                    title = "App Version",
+                    subtitle = "1.0.0 (Build 1)",
+                    onClick = {}
+                )
+            }
         }
     }
 }
