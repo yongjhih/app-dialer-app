@@ -3,3 +3,4 @@
 * Maintainable codebase
 * Jitpack publishable
 * Refine README zh remove unnecessary English words
+* Add unit tests including UI espresso testing
