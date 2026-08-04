@@ -332,7 +332,7 @@ fun KeypadButton(
 
     Surface(
         modifier = modifier
-            .height(58.dp)
+            .height(60.dp)
             .combinedClickable(
                 onClick = {
                     view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
@@ -350,7 +350,9 @@ fun KeypadButton(
         border = BorderStroke(0.5.dp, colorScheme.cardBorder)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp, horizontal = 2.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -366,45 +368,47 @@ fun KeypadButton(
                     text = number,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface
+                    color = colorScheme.onSurface,
+                    maxLines = 1
                 )
             }
 
             if (!letters.isNullOrEmpty() || subtitleIcon != null || !zhuyin.isNullOrEmpty()) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(top = 1.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        if (!letters.isNullOrEmpty()) {
-                            Text(
-                                text = letters,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colorScheme.keypadButtonTextSecondary
-                            )
-                        }
-                        if (subtitleIcon != null) {
-                            if (!letters.isNullOrEmpty()) {
-                                Spacer(modifier = Modifier.width(3.dp))
-                            }
-                            Icon(
-                                imageVector = subtitleIcon,
-                                contentDescription = "Settings",
-                                tint = colorScheme.keypadButtonTextSecondary,
-                                modifier = Modifier.size(10.dp)
-                            )
-                        }
+                    if (!letters.isNullOrEmpty()) {
+                        Text(
+                            text = letters,
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.keypadButtonTextSecondary,
+                            maxLines = 1
+                        )
                     }
 
                     if (!zhuyin.isNullOrEmpty()) {
+                        if (!letters.isNullOrEmpty()) {
+                            Spacer(modifier = Modifier.width(2.dp))
+                        }
                         Text(
                             text = zhuyin,
-                            fontSize = 9.sp,
+                            fontSize = 8.5.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorScheme.primary.copy(alpha = 0.9f)
+                            color = colorScheme.primary.copy(alpha = 0.95f),
+                            maxLines = 1
+                        )
+                    }
+
+                    if (subtitleIcon != null) {
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Icon(
+                            imageVector = subtitleIcon,
+                            contentDescription = "Settings",
+                            tint = colorScheme.keypadButtonTextSecondary,
+                            modifier = Modifier.size(9.dp)
                         )
                     }
                 }
