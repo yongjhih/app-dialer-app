@@ -59,11 +59,11 @@ fun AppDialerScreen(
     onOpenDialerSettings: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Outer transparent container
+    // Full-screen transparent hit area; only the bottom Card is opaque.
+    // Do not use Material Surface here — its default would paint a solid fill.
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent)
             .combinedClickable(
                 onClick = onDismiss,
                 onLongClick = {}

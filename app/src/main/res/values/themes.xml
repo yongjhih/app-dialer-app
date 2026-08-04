@@ -1,24 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme for translucent overlay activity -->
-    <style name="Theme.AppDialer" parent="Theme.MaterialComponents.DayNight.Dialog">
+    <!--
+      Translucent floating overlay: show home screen behind a small dialer card.
+      Parent keeps Material attrs for Compose while framework translucency flags
+      make the activity window itself see-through (not solid black).
+    -->
+    <style name="Theme.AppDialer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#FFD700</item>
         <item name="colorSecondary">#28282E</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
 
-        <!-- Floating Dialog Translucency -->
+        <!-- Critical: translucent window (otherwise transparent pixels render black) -->
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowFrame">@null</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <!-- false = full-screen transparent layer; card UI is drawn in Compose -->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFrame">@null</item>
         <item name="android:windowElevation">0dp</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <!-- Avoid opaque launch preview flash (often solid black) -->
+        <item name="android:windowDisablePreview">true</item>
+
+        <!-- Soft dim behind the floating card (not a solid black fill) -->
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.4</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
+
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="29">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="28">@android:color/transparent</item>
+
+        <!-- Android 12+ splash: keep transparent so we don't flash black -->
         <item name="android:windowSplashScreenBackground" tools:targetApi="31">@android:color/transparent</item>
         <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@android:color/transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="31">@android:color/transparent</item>
     </style>
 </resources>

@@ -1,12 +1,12 @@
 package com.github.yongjhih.appdialer
 
 import android.content.Intent
+import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -15,9 +15,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.yongjhih.appdialer.model.AppModel
@@ -40,17 +42,11 @@ class MainActivity : ComponentActivity() {
     private var currentScreen by mutableStateOf(Screen.DIALER)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Must run before super so launch transition doesn't flash an opaque frame.
         disablePendingTransition()
         super.onCreate(savedInstanceState)
 
-        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
-        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
-        window.decorView.background = null
-        window.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        window.setGravity(Gravity.BOTTOM)
+        applyTransparentWindow()
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
@@ -58,10 +54,23 @@ class MainActivity : ComponentActivity() {
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        findViewById<View>(android.R.id.content)?.background = null
-        findViewById<View>(android.R.id.content)?.setBackgroundColor(AndroidColor.TRANSPARENT)
+        // Re-apply after edge-to-edge, which can reset background / bar colors.
+        applyTransparentWindow()
 
         setContent {
+            // ComposeView / parent containers often inherit an opaque theme background
+            // (black in night mode). Clear them so only the dialer card is visible.
+            val view = LocalView.current
+            SideEffect {
+                (view.parent as? View)?.let { parent ->
+                    parent.setBackgroundColor(AndroidColor.TRANSPARENT)
+                    parent.background = null
+                }
+                view.setBackgroundColor(AndroidColor.TRANSPARENT)
+                view.background = null
+                applyTransparentWindow()
+            }
+
             AppDialerTheme {
                 when (currentScreen) {
                     Screen.DIALER -> AppDialerScreen(
@@ -94,7 +103,51 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Content view exists after setContent; clear residual opaque backgrounds.
+        clearContentBackgrounds()
         loadApps()
+    }
+
+    /**
+     * Make the activity window truly translucent so home screen shows through.
+     * Without TRANSLUCENT pixel format, transparent Compose pixels often render as black.
+     */
+    private fun applyTransparentWindow() {
+        window.setFormat(PixelFormat.TRANSLUCENT)
+        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
+        window.statusBarColor = AndroidColor.TRANSPARENT
+        window.navigationBarColor = AndroidColor.TRANSPARENT
+
+        // Full-screen overlay (theme already has windowIsFloating=false).
+        window.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // Dim behind the floating card (matches theme backgroundDimAmount).
+        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.attributes = window.attributes.apply {
+            dimAmount = 0.4f
+            format = PixelFormat.TRANSLUCENT
+        }
+
+        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
+        window.decorView.background = null
+    }
+
+    private fun clearContentBackgrounds() {
+        findViewById<View>(android.R.id.content)?.let { content ->
+            content.setBackgroundColor(AndroidColor.TRANSPARENT)
+            content.background = null
+            if (content is ViewGroup) {
+                for (i in 0 until content.childCount) {
+                    content.getChildAt(i)?.let { child ->
+                        child.setBackgroundColor(AndroidColor.TRANSPARENT)
+                        child.background = null
+                    }
+                }
+            }
+        }
     }
 
     override fun finish() {
