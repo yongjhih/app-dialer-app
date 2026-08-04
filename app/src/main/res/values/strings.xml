@@ -23,11 +23,11 @@
     <string name="slot_bottom_right">Bottom-Right</string>
 
     <!-- Element Names -->
-    <string name="elem_letters">ABC (Letters)</string>
-    <string name="elem_number">12 (Number)</string>
-    <string name="elem_zhuyin">ㄅㄆㄇ (Zhuyin)</string>
+    <string name="elem_letters">ABC Letters</string>
+    <string name="elem_number">Numeric Badges</string>
+    <string name="elem_zhuyin">ㄅㄆㄇ Zhuyin</string>
     <string name="elem_function">⚙ Settings Icon</string>
-    <string name="elem_none">None (Empty)</string>
+    <string name="elem_none">None</string>
 
     <!-- Key Selector & Haptics -->
     <string name="settings_key_trigger_title">Long-Press Settings Key</string>

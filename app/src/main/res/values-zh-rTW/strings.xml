@@ -23,11 +23,11 @@
     <string name="slot_bottom_right">右下</string>
 
     <!-- Element Names -->
-    <string name="elem_letters">ABC (字母)</string>
-    <string name="elem_number">12 (數字)</string>
-    <string name="elem_zhuyin">ㄅㄆㄇ (注音)</string>
-    <string name="elem_function">⚙ Settings Icon (設定圖示)</string>
-    <string name="elem_none">無 (清空)</string>
+    <string name="elem_letters">ABC 字母</string>
+    <string name="elem_number">數字標記</string>
+    <string name="elem_zhuyin">注音符號</string>
+    <string name="elem_function">⚙ 設定圖示</string>
+    <string name="elem_none">無</string>
 
     <!-- Key Selector & Haptics -->
     <string name="settings_key_trigger_title">長按開啟設定按鈕</string>
@@ -38,10 +38,10 @@
 
     <!-- Search Preferences -->
     <string name="zhuyin_search_title">ㄅㄆㄇ 注音搜尋</string>
-    <string name="zhuyin_search_subtitle">在鍵盤上標注 ㄅㄆㄇㄈ 並支援注音匹配 (預設關閉)</string>
+    <string name="zhuyin_search_subtitle">在鍵盤上標注 ㄅㄆㄇㄈ 並支援注音匹配</string>
     <string name="disable_pinyin_on_zhuyin_title">開啟注音時關閉拼音搜尋</string>
     <string name="disable_pinyin_on_zhuyin_subtitle">開啟注音模式時停用漢語拼音音譯比對</string>
-    <string name="fuzzy_search_title">模糊搜尋 (Fuzzy Search)</string>
+    <string name="fuzzy_search_title">模糊搜尋</string>
     <string name="fuzzy_search_subtitle">允許非連續字元相符匹配</string>
     <string name="include_system_apps_title">包含系統預裝 App</string>
     <string name="include_system_apps_subtitle">在搜尋結果中顯示預裝系統應用程式</string>
