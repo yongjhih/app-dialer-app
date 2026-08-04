@@ -5,51 +5,51 @@
     android:viewportHeight="108">
 
     <!-- Row 1 -->
-    <!-- Top-Left (Yellow / Amber Accent) -->
+    <!-- Top-Left (Amber Gold Accent Key) -->
     <path
-        android:fillColor="#FFB800"
+        android:fillColor="#FFD700"
         android:pathData="M 30,26 H 38 A 4,4 0 0,1 42,30 V 38 A 4,4 0 0,1 38,42 H 30 A 4,4 0 0,1 26,38 V 30 A 4,4 0 0,1 30,26 Z" />
 
-    <!-- Top-Center (Blue) -->
+    <!-- Top-Center (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 50,26 H 58 A 4,4 0 0,1 62,30 V 38 A 4,4 0 0,1 58,42 H 50 A 4,4 0 0,1 46,38 V 30 A 4,4 0 0,1 50,26 Z" />
 
-    <!-- Top-Right (Blue) -->
+    <!-- Top-Right (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 70,26 H 78 A 4,4 0 0,1 82,30 V 38 A 4,4 0 0,1 78,42 H 70 A 4,4 0 0,1 66,38 V 30 A 4,4 0 0,1 70,26 Z" />
 
     <!-- Row 2 -->
-    <!-- Middle-Left (Blue) -->
+    <!-- Middle-Left (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 30,46 H 38 A 4,4 0 0,1 42,50 V 58 A 4,4 0 0,1 38,62 H 30 A 4,4 0 0,1 26,58 V 50 A 4,4 0 0,1 30,46 Z" />
 
-    <!-- Middle-Center (Blue) -->
+    <!-- Middle-Center (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 50,46 H 58 A 4,4 0 0,1 62,50 V 58 A 4,4 0 0,1 58,62 H 50 A 4,4 0 0,1 46,58 V 50 A 4,4 0 0,1 50,46 Z" />
 
-    <!-- Middle-Right (Blue) -->
+    <!-- Middle-Right (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 70,46 H 78 A 4,4 0 0,1 82,50 V 58 A 4,4 0 0,1 78,62 H 70 A 4,4 0 0,1 66,58 V 50 A 4,4 0 0,1 70,46 Z" />
 
     <!-- Row 3 -->
-    <!-- Bottom-Left (Blue) -->
+    <!-- Bottom-Left (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 30,66 H 38 A 4,4 0 0,1 42,70 V 78 A 4,4 0 0,1 38,82 H 30 A 4,4 0 0,1 26,78 V 70 A 4,4 0 0,1 30,66 Z" />
 
-    <!-- Bottom-Center (Blue) -->
+    <!-- Bottom-Center (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 50,66 H 58 A 4,4 0 0,1 62,70 V 78 A 4,4 0 0,1 58,82 H 50 A 4,4 0 0,1 46,78 V 70 A 4,4 0 0,1 50,66 Z" />
 
-    <!-- Bottom-Right (Blue) -->
+    <!-- Bottom-Right (Dark Charcoal Surface) -->
     <path
-        android:fillColor="#3B99FC"
+        android:fillColor="#28282E"
         android:pathData="M 70,66 H 78 A 4,4 0 0,1 82,70 V 78 A 4,4 0 0,1 78,82 H 70 A 4,4 0 0,1 66,78 V 70 A 4,4 0 0,1 70,66 Z" />
 
 </vector>
