@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import com.github.yongjhih.appdialer.R
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.yongjhih.appdialer.R
 import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.ui.theme.cardBorder
@@ -420,16 +420,15 @@ fun KeypadButton(
                 )
             }
 
-            // 2. Settings Gear Icon (Positioned at functionPos)
+            // 2. Settings Gear Icon (Positioned at functionPos, or BottomEnd if Center)
             if (subtitleIcon != null) {
-                val align = parseAlignment(functionPos)
-                val isCenter = align == Alignment.Center
+                val align = if (functionPos == "Center") Alignment.BottomEnd else parseAlignment(functionPos)
                 Icon(
                     imageVector = subtitleIcon,
                     contentDescription = "Settings",
-                    tint = colorScheme.keypadButtonTextSecondary,
+                    tint = colorScheme.primary.copy(alpha = 0.95f),
                     modifier = Modifier
-                        .size(if (isCenter) 20.dp else 10.dp)
+                        .size(14.dp)
                         .align(align)
                 )
             }

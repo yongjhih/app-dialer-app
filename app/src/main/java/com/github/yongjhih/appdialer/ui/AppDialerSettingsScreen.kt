@@ -172,6 +172,7 @@ fun AppDialerSettingsScreen(
                     title = stringResource(R.string.settings_key_trigger_title),
                     subtitle = stringResource(R.string.settings_key_trigger_subtitle),
                     selectedKey = selectedTriggerKey,
+                    functionPos = selectedFunctionPos,
                     onKeySelected = { key ->
                         selectedTriggerKey = key
                         onSettingsTriggerKeyChange(key)
@@ -499,6 +500,7 @@ fun VisualKeypadTriggerSelector(
     title: String,
     subtitle: String,
     selectedKey: String,
+    functionPos: String = "BottomRight",
     onKeySelected: (String) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -507,6 +509,9 @@ fun VisualKeypadTriggerSelector(
         listOf("4", "5", "6"),
         listOf("7", "8", "9")
     )
+
+    // Gear badge position synchronizes with functionPos (fallback to BottomEnd if Center)
+    val gearAlignment = if (functionPos == "Center") Alignment.BottomEnd else parseAlignment(functionPos)
 
     Surface(
         modifier = Modifier
@@ -553,7 +558,7 @@ fun VisualKeypadTriggerSelector(
                             Surface(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(44.dp)
+                                    .height(48.dp)
                                     .clickable { onKeySelected(key) },
                                 shape = RoundedCornerShape(10.dp),
                                 color = if (isSelected) colorScheme.primary else colorScheme.keypadButtonBackground,
@@ -563,7 +568,9 @@ fun VisualKeypadTriggerSelector(
                                 )
                             ) {
                                 Box(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(4.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -579,9 +586,8 @@ fun VisualKeypadTriggerSelector(
                                             contentDescription = "Settings Key",
                                             tint = Color.Black,
                                             modifier = Modifier
-                                                .size(10.dp)
-                                                .align(Alignment.BottomEnd)
-                                                .padding(bottom = 3.dp, end = 4.dp)
+                                                .size(15.dp)
+                                                .align(gearAlignment)
                                         )
                                     }
                                 }
