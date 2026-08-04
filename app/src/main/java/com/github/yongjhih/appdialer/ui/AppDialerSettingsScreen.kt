@@ -1,7 +1,10 @@
 package com.github.yongjhih.appdialer.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,13 +54,16 @@ fun AppDialerSettingsScreen(
     onNavigateBack: () -> Unit = {},
     onOpenSystemAppSettings: () -> Unit = {},
     isFuzzySearchEnabled: Boolean = true,
-    onFuzzySearchToggle: (Boolean) -> Unit = {}
+    onFuzzySearchToggle: (Boolean) -> Unit = {},
+    settingsTriggerKey: String = "9",
+    onSettingsTriggerKeyChange: (String) -> Unit = {}
 ) {
     var hapticFeedbackEnabled by remember { mutableStateOf(true) }
     var autoCloseOnLaunch by remember { mutableStateOf(true) }
     var includeSystemApps by remember { mutableStateOf(false) }
     var autoLaunchSingleMatch by remember { mutableStateOf(false) }
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
+    var selectedTriggerKey by remember(settingsTriggerKey) { mutableStateOf(settingsTriggerKey) }
     var bgDimAmount by remember { mutableFloatStateOf(0.4f) }
 
     val colorScheme = MaterialTheme.colorScheme
@@ -94,8 +102,18 @@ fun AppDialerSettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Section 1: Appearance & Touch
-            SettingsCategoryHeader(title = "Appearance & Touch", icon = Icons.Default.Settings)
+            // Section 1: Appearance & Keypad Customization
+            SettingsCategoryHeader(title = "Appearance & Keypad", icon = Icons.Default.Settings)
+
+            SettingsKeySelectorItem(
+                title = "Long-Press Settings Key (長按開啟設定按鈕)",
+                subtitle = "Select which keypad button long-press opens settings",
+                selectedKey = selectedTriggerKey,
+                onKeySelected = { key ->
+                    selectedTriggerKey = key
+                    onSettingsTriggerKeyChange(key)
+                }
+            )
 
             SettingsSwitchItem(
                 title = "Haptic Feedback",
@@ -168,6 +186,70 @@ fun AppDialerSettingsScreen(
                 subtitle = "1.0.0 (Build 1)",
                 onClick = {}
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SettingsKeySelectorItem(
+    title: String,
+    subtitle: String,
+    selectedKey: String,
+    onKeySelected: (String) -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val availableKeys = listOf("X", "2", "3", "4", "5", "6", "7", "8", "9")
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        color = colorScheme.settingsContainerBackground,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = colorScheme.onSurface
+            )
+            Text(
+                text = subtitle,
+                fontSize = 12.sp,
+                color = colorScheme.outline
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                availableKeys.forEach { key ->
+                    val isSelected = (key == selectedKey)
+                    Surface(
+                        modifier = Modifier
+                            .clickable { onKeySelected(key) },
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) colorScheme.primary else colorScheme.surfaceVariant
+                    ) {
+                        Text(
+                            text = key,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSelected) Color.Black else colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

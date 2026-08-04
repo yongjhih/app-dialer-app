@@ -40,10 +40,13 @@ class MainActivity : ComponentActivity() {
     private var filteredApps by mutableStateOf<List<AppModel>>(emptyList())
     private var searchQuery by mutableStateOf("")
     private var currentScreen by mutableStateOf(Screen.DIALER)
+    private var settingsTriggerKey by mutableStateOf("9")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         disablePendingTransition()
         super.onCreate(savedInstanceState)
+
+        settingsTriggerKey = RecentAppsManager.getSettingsTriggerKey(this)
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
                     Screen.DIALER -> AppDialerScreen(
                         apps = filteredApps,
                         searchQuery = searchQuery,
+                        settingsTriggerKey = settingsTriggerKey,
                         onDigitPressed = { digit ->
                             searchQuery += digit
                             filterApps()
@@ -101,6 +105,11 @@ class MainActivity : ComponentActivity() {
                         onFuzzySearchToggle = { enabled ->
                             RecentAppsManager.setFuzzySearchEnabled(this@MainActivity, enabled)
                             filterApps()
+                        },
+                        settingsTriggerKey = settingsTriggerKey,
+                        onSettingsTriggerKeyChange = { key ->
+                            RecentAppsManager.setSettingsTriggerKey(this@MainActivity, key)
+                            settingsTriggerKey = key
                         }
                     )
                 }

@@ -7,6 +7,7 @@ object RecentAppsManager {
     private const val PREF_NAME = "app_dialer_recent_apps"
     private const val KEY_RECENT_PACKAGES = "recent_packages"
     private const val KEY_FUZZY_SEARCH = "fuzzy_search"
+    private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
     private const val MAX_RECENT_APPS = 20
 
     private fun getPrefs(context: Context): SharedPreferences {
@@ -37,5 +38,13 @@ object RecentAppsManager {
 
     fun setFuzzySearchEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_FUZZY_SEARCH, enabled).apply()
+    }
+
+    fun getSettingsTriggerKey(context: Context): String {
+        return getPrefs(context).getString(KEY_SETTINGS_TRIGGER_KEY, "9") ?: "9"
+    }
+
+    fun setSettingsTriggerKey(context: Context, key: String) {
+        getPrefs(context).edit().putString(KEY_SETTINGS_TRIGGER_KEY, key).apply()
     }
 }

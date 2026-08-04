@@ -60,6 +60,7 @@ import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 fun AppDialerScreen(
     apps: List<AppModel>,
     searchQuery: String = "",
+    settingsTriggerKey: String = "9",
     onDigitPressed: (String) -> Unit,
     onDeleteOneDigit: () -> Unit,
     onClearAllDigits: () -> Unit,
@@ -143,27 +144,32 @@ fun AppDialerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 3x3 Keypad Grid
-                // Row 1: X (Short press delete 1, Long press delete all) / 12 ABC / 3 DEF
+                // Row 1: X / 12 ABC / 3 DEF
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
                         icon = Icons.Default.Close,
+                        subtitleIcon = if (settingsTriggerKey == "X") Icons.Default.Settings else null,
                         onClick = onDeleteOneDigit,
-                        onLongClick = onClearAllDigits,
+                        onLongClick = if (settingsTriggerKey == "X") onOpenDialerSettings else onClearAllDigits,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "12",
                         letters = "ABC",
+                        subtitleIcon = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("2") },
+                        onLongClick = if (settingsTriggerKey == "12" || settingsTriggerKey == "2") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "3",
                         letters = "DEF",
+                        subtitleIcon = if (settingsTriggerKey == "3") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("3") },
+                        onLongClick = if (settingsTriggerKey == "3") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -178,26 +184,32 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "4",
                         letters = "GHI",
+                        subtitleIcon = if (settingsTriggerKey == "4") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("4") },
+                        onLongClick = if (settingsTriggerKey == "4") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "5",
                         letters = "JKL",
+                        subtitleIcon = if (settingsTriggerKey == "5") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("5") },
+                        onLongClick = if (settingsTriggerKey == "5") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "6",
                         letters = "MNO",
+                        subtitleIcon = if (settingsTriggerKey == "6") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("6") },
+                        onLongClick = if (settingsTriggerKey == "6") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Row 3: 7 PQRS / 8 TUV / 9 WXYZ (Settings on long press)
+                // Row 3: 7 PQRS / 8 TUV / 9 WXYZ
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -205,21 +217,25 @@ fun AppDialerScreen(
                     KeypadButton(
                         number = "7",
                         letters = "PQRS",
+                        subtitleIcon = if (settingsTriggerKey == "7") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("7") },
+                        onLongClick = if (settingsTriggerKey == "7") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "8",
                         letters = "TUV",
+                        subtitleIcon = if (settingsTriggerKey == "8") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("8") },
+                        onLongClick = if (settingsTriggerKey == "8") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
                         number = "9",
                         letters = "WXYZ",
-                        subtitleIcon = Icons.Default.Settings,
+                        subtitleIcon = if (settingsTriggerKey == "9") Icons.Default.Settings else null,
                         onClick = { onDigitPressed("9") },
-                        onLongClick = onOpenDialerSettings,
+                        onLongClick = if (settingsTriggerKey == "9") onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -388,6 +404,7 @@ fun AppDialerScreenPreview() {
         AppDialerScreen(
             apps = sampleApps,
             searchQuery = "",
+            settingsTriggerKey = "9",
             onDigitPressed = {},
             onDeleteOneDigit = {},
             onClearAllDigits = {},
