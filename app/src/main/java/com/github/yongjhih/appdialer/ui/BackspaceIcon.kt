@@ -18,7 +18,7 @@ val BackspaceIcon: ImageVector
             viewportHeight = 24f
         ).apply {
             path(
-                fillColor = SolidColor(Color.White),
+                fill = SolidColor(Color.White),
                 pathFillType = PathFillType.NonZero
             ) {
                 moveTo(22f, 3f)

@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -600,7 +599,7 @@ fun VisualKeypadTriggerSelector(
                                 ) {
                                     if (key == "X") {
                                         Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.Backspace,
+                                            imageVector = BackspaceIcon,
                                             contentDescription = "Backspace",
                                             tint = if (isSelected) Color.Black else colorScheme.onSurface,
                                             modifier = Modifier.size(18.dp)
