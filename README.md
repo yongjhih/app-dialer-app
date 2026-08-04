@@ -1,7 +1,7 @@
 # 📱 AppDialer
 
 <p align="center">
-  <img src="app/src/main/res/mipmap-xxhdpi/ic_launcher.png" width="100" height="100" alt="AppDialer Logo" />
+  <img src="docs/app-dialer-icon.svg" width="100" height="100" alt="AppDialer Logo" />
 </p>
 
 <p align="center">
