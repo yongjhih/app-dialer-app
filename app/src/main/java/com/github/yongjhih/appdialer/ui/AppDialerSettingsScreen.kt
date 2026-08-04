@@ -54,6 +54,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.R
+import com.github.yongjhih.appdialer.model.DefaultKeyLayout
+import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.ui.theme.cardBorder
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
@@ -72,14 +74,14 @@ fun AppDialerSettingsScreen(
     onDisablePinyinOnZhuyinToggle: (Boolean) -> Unit = {},
     settingsTriggerKey: String = "9",
     onSettingsTriggerKeyChange: (String) -> Unit = {},
-    lettersPos: String = "Center",
-    onLettersPosChange: (String) -> Unit = {},
-    numberPos: String = "TopRight",
-    onNumberPosChange: (String) -> Unit = {},
-    zhuyinPos: String = "BottomLeft",
-    onZhuyinPosChange: (String) -> Unit = {},
-    functionPos: String = "BottomRight",
-    onFunctionPosChange: (String) -> Unit = {}
+    lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
+    onLettersPosChange: (KeyLabelPosition) -> Unit = {},
+    numberPos: KeyLabelPosition = DefaultKeyLayout.number,
+    onNumberPosChange: (KeyLabelPosition) -> Unit = {},
+    zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
+    onZhuyinPosChange: (KeyLabelPosition) -> Unit = {},
+    functionPos: KeyLabelPosition = DefaultKeyLayout.function,
+    onFunctionPosChange: (KeyLabelPosition) -> Unit = {}
 ) {
     var hapticFeedbackEnabled by remember { mutableStateOf(true) }
     var autoCloseOnLaunch by remember { mutableStateOf(true) }
@@ -292,19 +294,19 @@ fun AppDialerSettingsScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun InteractiveKeyLayoutPicker(
-    lettersPos: String,
-    onLettersPosChange: (String) -> Unit,
-    numberPos: String,
-    onNumberPosChange: (String) -> Unit,
-    zhuyinPos: String,
-    onZhuyinPosChange: (String) -> Unit,
-    functionPos: String,
-    onFunctionPosChange: (String) -> Unit
+    lettersPos: KeyLabelPosition,
+    onLettersPosChange: (KeyLabelPosition) -> Unit,
+    numberPos: KeyLabelPosition,
+    onNumberPosChange: (KeyLabelPosition) -> Unit,
+    zhuyinPos: KeyLabelPosition,
+    onZhuyinPosChange: (KeyLabelPosition) -> Unit,
+    functionPos: KeyLabelPosition,
+    onFunctionPosChange: (KeyLabelPosition) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    var selectedSlot by remember { mutableStateOf("Center") }
+    var selectedSlot by remember { mutableStateOf(KeyLabelPosition.CENTER) }
 
-    fun getElementAtSlot(slot: String): String = when (slot) {
+    fun getElementAtSlot(slot: KeyLabelPosition): String = when (slot) {
         lettersPos -> "Letters"
         numberPos -> "Number"
         zhuyinPos -> "Zhuyin"
@@ -312,7 +314,7 @@ fun InteractiveKeyLayoutPicker(
         else -> "None"
     }
 
-    fun assignElementToSlot(element: String, targetSlot: String) {
+    fun assignElementToSlot(element: String, targetSlot: KeyLabelPosition) {
         val currentElemAtSlot = getElementAtSlot(targetSlot)
 
         // Settings Function Icon CANNOT be set to "None"!
@@ -323,15 +325,16 @@ fun InteractiveKeyLayoutPicker(
         // If targetSlot currently holds "Function" and user assigns another element,
         // automatically relocate "Function" to an available slot or default to "BottomRight".
         if (currentElemAtSlot == "Function" && element != "Function") {
-            val availableSlots = listOf("BottomRight", "BottomLeft", "TopRight", "TopLeft", "Center")
-            val newFunctionSlot = availableSlots.firstOrNull { it != targetSlot && getElementAtSlot(it) == "None" } ?: "BottomRight"
+            val newFunctionSlot = KeyLabelPosition.entries.firstOrNull {
+                it != KeyLabelPosition.HIDDEN && it != targetSlot && getElementAtSlot(it) == "None"
+            } ?: DefaultKeyLayout.function
             onFunctionPosChange(newFunctionSlot)
         }
 
         // Clear targetSlot if another element was previously there
-        if (lettersPos == targetSlot) onLettersPosChange("None")
-        if (numberPos == targetSlot) onNumberPosChange("None")
-        if (zhuyinPos == targetSlot) onZhuyinPosChange("None")
+        if (lettersPos == targetSlot) onLettersPosChange(KeyLabelPosition.HIDDEN)
+        if (numberPos == targetSlot) onNumberPosChange(KeyLabelPosition.HIDDEN)
+        if (zhuyinPos == targetSlot) onZhuyinPosChange(KeyLabelPosition.HIDDEN)
 
         // Assign chosen element to targetSlot
         when (element) {
@@ -343,18 +346,18 @@ fun InteractiveKeyLayoutPicker(
     }
 
     fun resetToDefaults() {
-        onLettersPosChange("Center")
-        onNumberPosChange("TopRight")
-        onZhuyinPosChange("BottomLeft")
-        onFunctionPosChange("BottomRight")
+        onLettersPosChange(DefaultKeyLayout.letters)
+        onNumberPosChange(DefaultKeyLayout.number)
+        onZhuyinPosChange(DefaultKeyLayout.zhuyin)
+        onFunctionPosChange(DefaultKeyLayout.function)
     }
 
     val slotLabels = mapOf(
-        "TopLeft" to stringResource(R.string.slot_top_left),
-        "TopRight" to stringResource(R.string.slot_top_right),
-        "Center" to stringResource(R.string.slot_center),
-        "BottomLeft" to stringResource(R.string.slot_bottom_left),
-        "BottomRight" to stringResource(R.string.slot_bottom_right)
+        KeyLabelPosition.TOP_LEFT to stringResource(R.string.slot_top_left),
+        KeyLabelPosition.TOP_RIGHT to stringResource(R.string.slot_top_right),
+        KeyLabelPosition.CENTER to stringResource(R.string.slot_center),
+        KeyLabelPosition.BOTTOM_LEFT to stringResource(R.string.slot_bottom_left),
+        KeyLabelPosition.BOTTOM_RIGHT to stringResource(R.string.slot_bottom_right)
     )
 
     Surface(
@@ -419,15 +422,9 @@ fun InteractiveKeyLayoutPicker(
                         .fillMaxSize()
                         .padding(8.dp)
                 ) {
-                    val slots = listOf(
-                        "TopLeft" to Alignment.TopStart,
-                        "TopRight" to Alignment.TopEnd,
-                        "Center" to Alignment.Center,
-                        "BottomLeft" to Alignment.BottomStart,
-                        "BottomRight" to Alignment.BottomEnd
-                    )
+                    val slots = KeyLabelPosition.entries.filter { it != KeyLabelPosition.HIDDEN }
 
-                    slots.forEach { (slotKey, alignment) ->
+                    slots.forEach { slotKey ->
                         val isFocused = (selectedSlot == slotKey)
                         val element = getElementAtSlot(slotKey)
                         val badgeText = when (element) {
@@ -435,12 +432,12 @@ fun InteractiveKeyLayoutPicker(
                             "Number" -> "12"
                             "Zhuyin" -> "ㄅㄆㄇ"
                             "Function" -> "⚙"
-                            else -> slotLabels[slotKey] ?: slotKey
+                            else -> slotLabels[slotKey] ?: slotKey.preferenceValue
                         }
 
                         Surface(
                             modifier = Modifier
-                                .align(alignment)
+                                .align(slotKey.alignment)
                                 .clickable { selectedSlot = slotKey },
                             shape = RoundedCornerShape(8.dp),
                             color = if (isFocused) colorScheme.primary else if (element != "None") colorScheme.surfaceVariant else Color.Transparent,
@@ -451,7 +448,7 @@ fun InteractiveKeyLayoutPicker(
                         ) {
                             Text(
                                 text = badgeText,
-                                fontSize = if (slotKey == "Center") 14.sp else 10.sp,
+                                fontSize = if (slotKey == KeyLabelPosition.CENTER) 14.sp else 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isFocused) Color.Black else if (element == "Zhuyin") colorScheme.primary else colorScheme.onSurface,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
@@ -525,7 +522,7 @@ fun VisualKeypadTriggerSelector(
     title: String,
     subtitle: String,
     selectedKey: String,
-    functionPos: String = "BottomRight",
+    functionPos: KeyLabelPosition = DefaultKeyLayout.function,
     onKeySelected: (String) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -536,7 +533,7 @@ fun VisualKeypadTriggerSelector(
     )
 
     // Gear badge position synchronizes with functionPos (fallback to BottomEnd if Center)
-    val gearAlignment = if (functionPos == "Center") Alignment.BottomEnd else parseAlignment(functionPos)
+    val gearAlignment = if (functionPos == KeyLabelPosition.CENTER) Alignment.BottomEnd else functionPos.toAlignment()
 
     Surface(
         modifier = Modifier

@@ -2,6 +2,8 @@ package com.github.yongjhih.appdialer.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.github.yongjhih.appdialer.model.DefaultKeyLayout
+import com.github.yongjhih.appdialer.model.KeyLabelPosition
 
 object RecentAppsManager {
     private const val PREF_NAME = "app_dialer_recent_apps"
@@ -73,15 +75,26 @@ object RecentAppsManager {
     }
 
     // Element Position Configs
-    fun getLettersPosition(context: Context): String = getPrefs(context).getString(KEY_POS_LETTERS, "Center") ?: "Center"
-    fun setLettersPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_LETTERS, pos).apply()
+    fun getLettersPosition(context: Context): KeyLabelPosition =
+        getPosition(context, KEY_POS_LETTERS, DefaultKeyLayout.letters)
+    fun setLettersPosition(context: Context, pos: KeyLabelPosition) = setPosition(context, KEY_POS_LETTERS, pos)
 
-    fun getNumberPosition(context: Context): String = getPrefs(context).getString(KEY_POS_NUMBER, "TopRight") ?: "TopRight"
-    fun setNumberPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_NUMBER, pos).apply()
+    fun getNumberPosition(context: Context): KeyLabelPosition =
+        getPosition(context, KEY_POS_NUMBER, DefaultKeyLayout.number)
+    fun setNumberPosition(context: Context, pos: KeyLabelPosition) = setPosition(context, KEY_POS_NUMBER, pos)
 
-    fun getZhuyinPosition(context: Context): String = getPrefs(context).getString(KEY_POS_ZHUYIN, "BottomLeft") ?: "BottomLeft"
-    fun setZhuyinPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_ZHUYIN, pos).apply()
+    fun getZhuyinPosition(context: Context): KeyLabelPosition =
+        getPosition(context, KEY_POS_ZHUYIN, DefaultKeyLayout.zhuyin)
+    fun setZhuyinPosition(context: Context, pos: KeyLabelPosition) = setPosition(context, KEY_POS_ZHUYIN, pos)
 
-    fun getFunctionPosition(context: Context): String = getPrefs(context).getString(KEY_POS_FUNCTION, "BottomRight") ?: "BottomRight"
-    fun setFunctionPosition(context: Context, pos: String) = getPrefs(context).edit().putString(KEY_POS_FUNCTION, pos).apply()
+    fun getFunctionPosition(context: Context): KeyLabelPosition =
+        getPosition(context, KEY_POS_FUNCTION, DefaultKeyLayout.function)
+    fun setFunctionPosition(context: Context, pos: KeyLabelPosition) = setPosition(context, KEY_POS_FUNCTION, pos)
+
+    private fun getPosition(context: Context, key: String, default: KeyLabelPosition): KeyLabelPosition =
+        KeyLabelPosition.fromPreference(getPrefs(context).getString(key, default.preferenceValue), default)
+
+    private fun setPosition(context: Context, key: String, position: KeyLabelPosition) {
+        getPrefs(context).edit().putString(key, position.preferenceValue).apply()
+    }
 }

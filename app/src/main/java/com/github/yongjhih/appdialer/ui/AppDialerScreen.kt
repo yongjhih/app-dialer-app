@@ -50,19 +50,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.R
 import com.github.yongjhih.appdialer.model.AppModel
+import com.github.yongjhih.appdialer.model.DefaultKeyLayout
+import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.ui.theme.cardBorder
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
 import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 
-fun parseAlignment(pos: String): Alignment = when (pos) {
-    "TopLeft" -> Alignment.TopStart
-    "TopRight" -> Alignment.TopEnd
-    "BottomLeft" -> Alignment.BottomStart
-    "BottomRight" -> Alignment.BottomEnd
-    else -> Alignment.Center
-}
+fun KeyLabelPosition.toAlignment(): Alignment = alignment
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -71,10 +67,10 @@ fun AppDialerScreen(
     searchQuery: String = "",
     settingsTriggerKey: String = "9",
     isZhuyinEnabled: Boolean = false,
-    lettersPos: String = "Center",
-    numberPos: String = "TopRight",
-    zhuyinPos: String = "BottomLeft",
-    functionPos: String = "BottomRight",
+    lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
+    numberPos: KeyLabelPosition = DefaultKeyLayout.number,
+    zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
+    functionPos: KeyLabelPosition = DefaultKeyLayout.function,
     onDigitPressed: (String) -> Unit,
     onDeleteOneDigit: () -> Unit,
     onClearAllDigits: () -> Unit,
@@ -371,10 +367,10 @@ fun KeypadButton(
     letters: String? = null,
     zhuyin: String? = null,
     subtitleIcon: ImageVector? = null,
-    numberPos: String = "TopRight",
-    lettersPos: String = "Center",
-    zhuyinPos: String = "BottomLeft",
-    functionPos: String = "BottomRight",
+    numberPos: KeyLabelPosition = DefaultKeyLayout.number,
+    lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
+    zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
+    functionPos: KeyLabelPosition = DefaultKeyLayout.function,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -419,7 +415,7 @@ fun KeypadButton(
 
             // 2. Settings Gear Icon (Positioned at functionPos, or BottomEnd if Center)
             if (subtitleIcon != null) {
-                val align = if (functionPos == "Center") Alignment.BottomEnd else parseAlignment(functionPos)
+                val align = if (functionPos == KeyLabelPosition.CENTER) Alignment.BottomEnd else functionPos.toAlignment()
                 Icon(
                     imageVector = subtitleIcon,
                     contentDescription = "Settings",
@@ -432,7 +428,7 @@ fun KeypadButton(
 
             // 3. Number Badge
             if (!number.isNullOrEmpty()) {
-                val align = parseAlignment(numberPos)
+                val align = numberPos.toAlignment()
                 val isCenter = align == Alignment.Center
                 Text(
                     text = number,
@@ -445,7 +441,7 @@ fun KeypadButton(
 
             // 4. Letters Badge (ABC)
             if (!letters.isNullOrEmpty()) {
-                val align = parseAlignment(lettersPos)
+                val align = lettersPos.toAlignment()
                 val isCenter = align == Alignment.Center
                 Text(
                     text = letters,
@@ -458,7 +454,7 @@ fun KeypadButton(
 
             // 5. Zhuyin Badge (ㄅㄆㄇㄈ)
             if (!zhuyin.isNullOrEmpty()) {
-                val align = parseAlignment(zhuyinPos)
+                val align = zhuyinPos.toAlignment()
                 val isCenter = align == Alignment.Center
                 Text(
                     text = zhuyin,

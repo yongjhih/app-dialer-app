@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.yongjhih.appdialer.model.AppModel
+import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.ui.AppDialerScreen
 import com.github.yongjhih.appdialer.ui.AppDialerSettingsScreen
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
@@ -44,10 +45,10 @@ class MainActivity : ComponentActivity() {
     private var isZhuyinEnabled by mutableStateOf(false)
     private var isDisablePinyinOnZhuyinEnabled by mutableStateOf(false)
 
-    private var lettersPos by mutableStateOf("Center")
-    private var numberPos by mutableStateOf("TopRight")
-    private var zhuyinPos by mutableStateOf("BottomLeft")
-    private var functionPos by mutableStateOf("BottomRight")
+    private var lettersPos by mutableStateOf(DefaultKeyLayout.letters)
+    private var numberPos by mutableStateOf(DefaultKeyLayout.number)
+    private var zhuyinPos by mutableStateOf(DefaultKeyLayout.zhuyin)
+    private var functionPos by mutableStateOf(DefaultKeyLayout.function)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Must run before super so launch transition doesn't flash an opaque frame.
