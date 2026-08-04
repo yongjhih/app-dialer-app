@@ -1,7 +1,9 @@
 package com.github.yongjhih.appdialer.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,10 +45,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
+import com.github.yongjhih.appdialer.ui.theme.cardBorder
+import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.settingsContainerBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,44 +130,33 @@ fun AppDialerSettingsScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                // Section 1: Keypad Layout & Position Customization
-                SettingsCategoryHeader(title = "Keypad Element Layout (按鍵元素位置配置)", icon = Icons.Default.Settings)
+                // Section 1: Interactive Keypad Layout Customization
+                SettingsCategoryHeader(title = "Keypad Visual Layout (視覺化按鍵佈局配置)", icon = Icons.Default.Settings)
 
-                SettingsPositionSelectorItem(
-                    title = "Letters Position (ABC 字母位置)",
-                    selectedPosition = selectedLettersPos,
-                    onPositionSelected = {
+                InteractiveKeyLayoutPicker(
+                    lettersPos = selectedLettersPos,
+                    onLettersPosChange = {
                         selectedLettersPos = it
                         onLettersPosChange(it)
-                    }
-                )
-
-                SettingsPositionSelectorItem(
-                    title = "Number Position (數字位置)",
-                    selectedPosition = selectedNumberPos,
-                    onPositionSelected = {
+                    },
+                    numberPos = selectedNumberPos,
+                    onNumberPosChange = {
                         selectedNumberPos = it
                         onNumberPosChange(it)
-                    }
-                )
-
-                SettingsPositionSelectorItem(
-                    title = "Zhuyin Position (注音位置)",
-                    selectedPosition = selectedZhuyinPos,
-                    onPositionSelected = {
+                    },
+                    zhuyinPos = selectedZhuyinPos,
+                    onZhuyinPosChange = {
                         selectedZhuyinPos = it
                         onZhuyinPosChange(it)
-                    }
-                )
-
-                SettingsPositionSelectorItem(
-                    title = "Function Icon Position (功能圖示位置)",
-                    selectedPosition = selectedFunctionPos,
-                    onPositionSelected = {
+                    },
+                    functionPos = selectedFunctionPos,
+                    onFunctionPosChange = {
                         selectedFunctionPos = it
                         onFunctionPosChange(it)
                     }
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 SettingsKeySelectorItem(
                     title = "Long-Press Settings Key (長按開啟設定按鈕)",
@@ -261,16 +256,47 @@ fun AppDialerSettingsScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsPositionSelectorItem(
-    title: String,
-    selectedPosition: String,
-    onPositionSelected: (String) -> Unit
+fun InteractiveKeyLayoutPicker(
+    lettersPos: String,
+    onLettersPosChange: (String) -> Unit,
+    numberPos: String,
+    onNumberPosChange: (String) -> Unit,
+    zhuyinPos: String,
+    onZhuyinPosChange: (String) -> Unit,
+    functionPos: String,
+    onFunctionPosChange: (String) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val options = listOf(
-        "Center" to "中央",
+    var selectedSlot by remember { mutableStateOf("Center") }
+
+    fun getElementAtSlot(slot: String): String = when (slot) {
+        lettersPos -> "Letters"
+        numberPos -> "Number"
+        zhuyinPos -> "Zhuyin"
+        functionPos -> "Function"
+        else -> "None"
+    }
+
+    fun assignElementToSlot(element: String, targetSlot: String) {
+        // Clear targetSlot if another element was previously there
+        if (lettersPos == targetSlot) onLettersPosChange("None")
+        if (numberPos == targetSlot) onNumberPosChange("None")
+        if (zhuyinPos == targetSlot) onZhuyinPosChange("None")
+        if (functionPos == targetSlot) onFunctionPosChange("None")
+
+        // Assign chosen element to targetSlot
+        when (element) {
+            "Letters" -> onLettersPosChange(targetSlot)
+            "Number" -> onNumberPosChange(targetSlot)
+            "Zhuyin" -> onZhuyinPosChange(targetSlot)
+            "Function" -> onFunctionPosChange(targetSlot)
+        }
+    }
+
+    val slotLabels = mapOf(
         "TopLeft" to "左上",
         "TopRight" to "右上",
+        "Center" to "中央",
         "BottomLeft" to "左下",
         "BottomRight" to "右下"
     )
@@ -285,36 +311,115 @@ fun SettingsPositionSelectorItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = title,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface
+                text = "Tap any position on keycard below, then select element (點選按鍵卡片上位置以配置內容)",
+                fontSize = 13.sp,
+                color = colorScheme.outline,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Interactive Keycard Preview Diagram
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(130.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = colorScheme.keypadButtonBackground,
+                border = BorderStroke(1.dp, colorScheme.cardBorder)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    val slots = listOf(
+                        "TopLeft" to Alignment.TopStart,
+                        "TopRight" to Alignment.TopEnd,
+                        "Center" to Alignment.Center,
+                        "BottomLeft" to Alignment.BottomStart,
+                        "BottomRight" to Alignment.BottomEnd
+                    )
+
+                    slots.forEach { (slotKey, alignment) ->
+                        val isFocused = (selectedSlot == slotKey)
+                        val element = getElementAtSlot(slotKey)
+                        val badgeText = when (element) {
+                            "Letters" -> "ABC"
+                            "Number" -> "12"
+                            "Zhuyin" -> "ㄅㄆㄇ"
+                            "Function" -> "⚙"
+                            else -> slotLabels[slotKey] ?: slotKey
+                        }
+
+                        Surface(
+                            modifier = Modifier
+                                .align(alignment)
+                                .clickable { selectedSlot = slotKey },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isFocused) colorScheme.primary else if (element != "None") colorScheme.surfaceVariant else Color.Transparent,
+                            border = BorderStroke(
+                                width = if (isFocused) 1.5.dp else 0.5.dp,
+                                color = if (isFocused) colorScheme.primary else colorScheme.outlineVariant
+                            )
+                        ) {
+                            Text(
+                                text = badgeText,
+                                fontSize = if (slotKey == "Center") 14.sp else 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isFocused) Color.Black else if (element == "Zhuyin") colorScheme.primary else colorScheme.onSurface,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "正在配置「${slotLabels[selectedSlot]}」位置內容：",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            // Element Choice Chips
+            val elementChoices = listOf(
+                "Letters" to "ABC (字母)",
+                "Number" to "12 (數字)",
+                "Zhuyin" to "ㄅㄆㄇ (注音)",
+                "Function" to "⚙ / X (功能圖示)",
+                "None" to "無 (清空)"
+            )
+
+            val currentAssignedElement = getElementAtSlot(selectedSlot)
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                options.forEach { (key, label) ->
-                    val isSelected = (key == selectedPosition)
+                elementChoices.forEach { (elemKey, elemLabel) ->
+                    val isSelected = (currentAssignedElement == elemKey)
                     Surface(
                         modifier = Modifier
-                            .clickable { onPositionSelected(key) },
+                            .clickable { assignElementToSlot(elemKey, selectedSlot) },
                         shape = RoundedCornerShape(8.dp),
                         color = if (isSelected) colorScheme.primary else colorScheme.surfaceVariant
                     ) {
                         Text(
-                            text = label,
-                            fontSize = 13.sp,
+                            text = elemLabel,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isSelected) Color.Black else colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         )
                     }
                 }
