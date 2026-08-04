@@ -1,5 +1,12 @@
 package com.github.yongjhih.appdialer.model
 
+data class KeypadKeyConfig(
+    val key: String,
+    val number: String = key,
+    val letters: String,
+    val zhuyin: String
+)
+
 object KeypadValues {
     const val KEY_BACKSPACE = "X"
 
@@ -36,5 +43,25 @@ object KeypadValues {
     const val LETTER_9 = "WXYZ"
     const val ZHUYIN_9 = "ㄞㄟㄠㄡ"
 
-    fun isKey2Trigger(value: String): Boolean = value == KEY_2 || value == NUMBER_2
+    val rows = listOf(
+        listOf(KEY_BACKSPACE, KEY_2, KEY_3),
+        listOf(KEY_4, KEY_5, KEY_6),
+        listOf(KEY_7, KEY_8, KEY_9)
+    )
+
+    private val keys = mapOf(
+        KEY_2 to KeypadKeyConfig(KEY_2, NUMBER_2, LETTER_2, ZHUYIN_2),
+        KEY_3 to KeypadKeyConfig(KEY_3, letters = LETTER_3, zhuyin = ZHUYIN_3),
+        KEY_4 to KeypadKeyConfig(KEY_4, letters = LETTER_4, zhuyin = ZHUYIN_4),
+        KEY_5 to KeypadKeyConfig(KEY_5, letters = LETTER_5, zhuyin = ZHUYIN_5),
+        KEY_6 to KeypadKeyConfig(KEY_6, letters = LETTER_6, zhuyin = ZHUYIN_6),
+        KEY_7 to KeypadKeyConfig(KEY_7, letters = LETTER_7, zhuyin = ZHUYIN_7),
+        KEY_8 to KeypadKeyConfig(KEY_8, letters = LETTER_8, zhuyin = ZHUYIN_8),
+        KEY_9 to KeypadKeyConfig(KEY_9, letters = LETTER_9, zhuyin = ZHUYIN_9)
+    )
+
+    fun configFor(key: String): KeypadKeyConfig = requireNotNull(keys[key])
+
+    fun matchesSettingsTrigger(key: String, trigger: String): Boolean =
+        if (key == KEY_2) trigger == KEY_2 || trigger == NUMBER_2 else key == trigger
 }
