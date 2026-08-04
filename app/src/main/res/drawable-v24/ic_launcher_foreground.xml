@@ -29,7 +29,7 @@
     <!-- Middle-Center (Dark Charcoal Surface) -->
     <path
         android:fillColor="#28282E"
-        android:pathData="M 50,46 H 58 A 4,4 0 0,1 62,50 V 58 A 4,4 0 0,1 58,62 H 50 A 4,4 0 0,1 46,58 V 50 A 4,4 0 0,1 30,46 Z" />
+        android:pathData="M 50,46 H 58 A 4,4 0 0,1 62,50 V 58 A 4,4 0 0,1 58,62 H 50 A 4,4 0 0,1 46,58 V 50 A 4,4 0 0,1 50,46 Z" />
 
     <!-- Middle-Right (Dark Charcoal Surface) -->
     <path
