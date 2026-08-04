@@ -62,6 +62,5 @@ object KeypadValues {
 
     fun configFor(key: String): KeypadKeyConfig = requireNotNull(keys[key])
 
-    fun matchesSettingsTrigger(key: String, trigger: String): Boolean =
-        if (key == KEY_2) trigger == KEY_2 || trigger == NUMBER_2 else key == trigger
+    fun matchesSettingsTrigger(key: String, trigger: String): Boolean = key == trigger
 }
