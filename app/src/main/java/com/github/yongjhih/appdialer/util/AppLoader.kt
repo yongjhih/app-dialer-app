@@ -3,6 +3,7 @@ package com.github.yongjhih.appdialer.util
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import com.github.yongjhih.appdialer.model.AppModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,7 +17,20 @@ object AppLoader {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
 
-        pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PackageManager.MATCH_ALL
+        } else {
+            0
+        }
+
+        val resolveInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            pm.queryIntentActivities(intent, flags)
+        }
+
+        resolveInfos
             .filterNot { it.activityInfo.packageName == context.packageName }
             .map { info ->
                 val label = info.loadLabel(pm).toString()
