@@ -312,11 +312,25 @@ fun InteractiveKeyLayoutPicker(
     }
 
     fun assignElementToSlot(element: String, targetSlot: String) {
+        val currentElemAtSlot = getElementAtSlot(targetSlot)
+
+        // Settings Function Icon CANNOT be set to "None"!
+        if (currentElemAtSlot == "Function" && element == "None") {
+            return
+        }
+
+        // If targetSlot currently holds "Function" and user assigns another element,
+        // automatically relocate "Function" to an available slot or default to "BottomRight".
+        if (currentElemAtSlot == "Function" && element != "Function") {
+            val availableSlots = listOf("BottomRight", "BottomLeft", "TopRight", "TopLeft", "Center")
+            val newFunctionSlot = availableSlots.firstOrNull { it != targetSlot && getElementAtSlot(it) == "None" } ?: "BottomRight"
+            onFunctionPosChange(newFunctionSlot)
+        }
+
         // Clear targetSlot if another element was previously there
         if (lettersPos == targetSlot) onLettersPosChange("None")
         if (numberPos == targetSlot) onNumberPosChange("None")
         if (zhuyinPos == targetSlot) onZhuyinPosChange("None")
-        if (functionPos == targetSlot) onFunctionPosChange("None")
 
         // Assign chosen element to targetSlot
         when (element) {
@@ -475,17 +489,27 @@ fun InteractiveKeyLayoutPicker(
             ) {
                 elementChoices.forEach { (elemKey, elemLabel) ->
                     val isSelected = (currentAssignedElement == elemKey)
+                    val isNoneDisabled = (currentAssignedElement == "Function" && elemKey == "None")
+
                     Surface(
                         modifier = Modifier
-                            .clickable { assignElementToSlot(elemKey, selectedSlot) },
+                            .clickable(enabled = !isNoneDisabled) { assignElementToSlot(elemKey, selectedSlot) },
                         shape = RoundedCornerShape(8.dp),
-                        color = if (isSelected) colorScheme.primary else colorScheme.surfaceVariant
+                        color = when {
+                            isSelected -> colorScheme.primary
+                            isNoneDisabled -> colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            else -> colorScheme.surfaceVariant
+                        }
                     ) {
                         Text(
                             text = elemLabel,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSelected) Color.Black else colorScheme.onSurface,
+                            color = when {
+                                isSelected -> Color.Black
+                                isNoneDisabled -> colorScheme.outline.copy(alpha = 0.5f)
+                                else -> colorScheme.onSurface
+                            },
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         )
                     }
