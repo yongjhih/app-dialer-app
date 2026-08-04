@@ -4,3 +4,4 @@
 * Jitpack publishable
 * Refine README zh remove unnecessary English words
 * Add unit tests including UI espresso testing
+* [x] Remove border and increase corner-radius

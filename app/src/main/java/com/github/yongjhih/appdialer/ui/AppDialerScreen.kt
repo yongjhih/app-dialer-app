@@ -1,7 +1,6 @@
 package com.github.yongjhih.appdialer.ui
 
 import android.graphics.drawable.ColorDrawable
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -115,9 +114,8 @@ fun AppDialerScreen(
                     onClick = {}, // Intercept click on card
                     onLongClick = {}
                 ),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(32.dp),
             colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-            border = BorderStroke(1.dp, colorScheme.cardBorder),
             elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
         ) {
             Column(
@@ -399,9 +397,8 @@ fun KeypadButton(
                     }
                 } else null
             ),
-        shape = RoundedCornerShape(14.dp),
-        color = colorScheme.keypadButtonBackground,
-        border = BorderStroke(0.5.dp, colorScheme.cardBorder)
+        shape = RoundedCornerShape(20.dp),
+        color = colorScheme.keypadButtonBackground
     ) {
         Box(
             modifier = Modifier
