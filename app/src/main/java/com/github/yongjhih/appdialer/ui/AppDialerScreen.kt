@@ -332,7 +332,7 @@ fun KeypadButton(
 
     Surface(
         modifier = modifier
-            .height(60.dp)
+            .height(58.dp)
             .combinedClickable(
                 onClick = {
                     view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
@@ -349,69 +349,63 @@ fun KeypadButton(
         color = colorScheme.keypadButtonBackground,
         border = BorderStroke(0.5.dp, colorScheme.cardBorder)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 4.dp, horizontal = 2.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
+            // 1. Top-Right Corner Badge: Number
+            if (!number.isNullOrEmpty()) {
+                Text(
+                    text = number,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
+            }
+
+            // 2. Center Main Content: Letters or Icon
             if (icon != null) {
                 Icon(
                     imageVector = icon,
                     contentDescription = "Clear",
                     tint = colorScheme.onSurface,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.Center)
                 )
-            } else if (!number.isNullOrEmpty()) {
+            } else if (!letters.isNullOrEmpty()) {
                 Text(
-                    text = number,
+                    text = letters,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface,
-                    maxLines = 1
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-            if (!letters.isNullOrEmpty() || subtitleIcon != null || !zhuyin.isNullOrEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(top = 1.dp)
-                ) {
-                    if (!letters.isNullOrEmpty()) {
-                        Text(
-                            text = letters,
-                            fontSize = 9.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.keypadButtonTextSecondary,
-                            maxLines = 1
-                        )
-                    }
+            // 3. Bottom-Left Corner Badge: Zhuyin
+            if (!zhuyin.isNullOrEmpty()) {
+                Text(
+                    text = zhuyin,
+                    fontSize = 8.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary.copy(alpha = 0.9f),
+                    modifier = Modifier.align(Alignment.BottomStart)
+                )
+            }
 
-                    if (!zhuyin.isNullOrEmpty()) {
-                        if (!letters.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.width(2.dp))
-                        }
-                        Text(
-                            text = zhuyin,
-                            fontSize = 8.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.primary.copy(alpha = 0.95f),
-                            maxLines = 1
-                        )
-                    }
-
-                    if (subtitleIcon != null) {
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Icon(
-                            imageVector = subtitleIcon,
-                            contentDescription = "Settings",
-                            tint = colorScheme.keypadButtonTextSecondary,
-                            modifier = Modifier.size(9.dp)
-                        )
-                    }
-                }
+            // 4. Bottom-Right Corner Badge: Settings Subtitle Icon
+            if (subtitleIcon != null) {
+                Icon(
+                    imageVector = subtitleIcon,
+                    contentDescription = "Settings",
+                    tint = colorScheme.keypadButtonTextSecondary,
+                    modifier = Modifier
+                        .size(10.dp)
+                        .align(Alignment.BottomEnd)
+                )
             }
         }
     }
