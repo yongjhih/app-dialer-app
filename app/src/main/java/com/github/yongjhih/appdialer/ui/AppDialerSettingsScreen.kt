@@ -64,6 +64,8 @@ fun AppDialerSettingsScreen(
     onFuzzySearchToggle: (Boolean) -> Unit = {},
     isZhuyinModeEnabled: Boolean = false,
     onZhuyinModeToggle: (Boolean) -> Unit = {},
+    isDisablePinyinOnZhuyinEnabled: Boolean = false,
+    onDisablePinyinOnZhuyinToggle: (Boolean) -> Unit = {},
     settingsTriggerKey: String = "9",
     onSettingsTriggerKeyChange: (String) -> Unit = {},
     lettersPos: String = "Center",
@@ -81,6 +83,7 @@ fun AppDialerSettingsScreen(
     var autoLaunchSingleMatch by remember { mutableStateOf(false) }
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
     var zhuyinMode by remember(isZhuyinModeEnabled) { mutableStateOf(isZhuyinModeEnabled) }
+    var disablePinyinOnZhuyin by remember(isDisablePinyinOnZhuyinEnabled) { mutableStateOf(isDisablePinyinOnZhuyinEnabled) }
     var selectedTriggerKey by remember(settingsTriggerKey) { mutableStateOf(settingsTriggerKey) }
 
     var selectedLettersPos by remember(lettersPos) { mutableStateOf(lettersPos) }
@@ -203,6 +206,18 @@ fun AppDialerSettingsScreen(
                         onZhuyinModeToggle(it)
                     }
                 )
+
+                if (zhuyinMode) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.disable_pinyin_on_zhuyin_title),
+                        subtitle = stringResource(R.string.disable_pinyin_on_zhuyin_subtitle),
+                        checked = disablePinyinOnZhuyin,
+                        onCheckedChange = {
+                            disablePinyinOnZhuyin = it
+                            onDisablePinyinOnZhuyinToggle(it)
+                        }
+                    )
+                }
 
                 SettingsSwitchItem(
                     title = stringResource(R.string.fuzzy_search_title),

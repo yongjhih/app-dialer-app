@@ -3,27 +3,20 @@ package com.github.yongjhih.appdialer.util
 import com.github.yongjhih.appdialer.model.AppModel
 import java.util.Locale
 
-fun Char.toT9(): Char = when (this) {
-    '1', '2', 'a', 'b', 'c', 'A', 'B', 'C' -> '2'
-    'd', 'e', 'f', 'D', 'E', 'F' -> '3'
-    'g', 'h', 'i', 'G', 'H', 'I' -> '4'
-    'j', 'k', 'l', 'J', 'K', 'L' -> '5'
-    'm', 'n', 'o', 'M', 'N', 'O' -> '6'
-    'p', 'q', 'r', 's', 'P', 'Q', 'R', 'S' -> '7'
-    't', 'u', 'v', 'T', 'U', 'V' -> '8'
-    'w', 'x', 'y', 'z', 'W', 'X', 'Y', 'Z' -> '9'
+fun Char.toT9(): Char = when (this.lowercaseChar()) {
+    in 'a'..'c' -> '2'
+    in 'd'..'f' -> '3'
+    in 'g'..'i' -> '4'
+    in 'j'..'l' -> '5'
+    in 'm'..'o' -> '6'
+    in 'p'..'s' -> '7'
+    in 't'..'v' -> '8'
+    in 'w'..'z' -> '9'
     in '0'..'9' -> this
     else -> ' '
 }
 
-fun String.toT9(): String = map { it.toT9() }
-    .filterNot { it == ' ' }
-    .joinToString("")
-
-fun String.toT9Words(): List<String> = split(Regex("[^a-zA-Z0-9]+"))
-    .filter { it.isNotEmpty() }
-    .map { it.toT9() }
-    .filter { it.isNotEmpty() }
+fun String.toT9(): String = map { it.toT9() }.filter { it != ' ' }.joinToString("")
 
 fun String.toT9Initials(): String = split(Regex("[^a-zA-Z0-9]+"))
     .filter { it.isNotEmpty() }
@@ -73,7 +66,8 @@ fun List<AppModel>.filterAndScore(
     query: String,
     recentPackageNames: List<String> = emptyList(),
     isFuzzyEnabled: Boolean = false,
-    isZhuyinEnabled: Boolean = false
+    isZhuyinEnabled: Boolean = false,
+    isDisablePinyinOnZhuyin: Boolean = false
 ): List<AppModel> = query.trim().let { q ->
     if (q.isEmpty()) {
         val recentOrderMap = recentPackageNames.withIndex().associate { it.value to it.index }
@@ -84,7 +78,7 @@ fun List<AppModel>.filterAndScore(
     } else {
         asSequence()
             .mapNotNull { app ->
-                app.calculateMatch(q, isFuzzyEnabled, isZhuyinEnabled)?.let { (score, indices) ->
+                app.calculateMatch(q, isFuzzyEnabled, isZhuyinEnabled, isDisablePinyinOnZhuyin)?.let { (score, indices) ->
                     app.copy(matchScore = score, matchedIndices = indices)
                 }
             }
@@ -99,7 +93,8 @@ fun List<AppModel>.filterAndScore(
 private fun AppModel.calculateMatch(
     query: String,
     isFuzzyEnabled: Boolean,
-    isZhuyinEnabled: Boolean
+    isZhuyinEnabled: Boolean,
+    isDisablePinyinOnZhuyin: Boolean
 ): Pair<Int, List<Int>>? {
     val cleanQuery = query.trim()
     if (cleanQuery.isEmpty()) return Pair(0, emptyList())
@@ -145,8 +140,10 @@ private fun AppModel.calculateMatch(
         }
     }
 
+    val skipPinyin = isZhuyinEnabled && isDisablePinyinOnZhuyin
+
     // 4. CJK Pinyin / Romaji Transliteration Initials Match
-    if (!isZhuyinEnabled && t9CjkInitials.isNotEmpty()) {
+    if (!skipPinyin && t9CjkInitials.isNotEmpty()) {
         val cjkInitIdx = t9CjkInitials.indexOf(cleanQuery)
         if (cjkInitIdx != -1) {
             val matchedChars = (cjkInitIdx until (cjkInitIdx + cleanQuery.length))
@@ -157,7 +154,7 @@ private fun AppModel.calculateMatch(
     }
 
     // 5. CJK Transliteration Full Match
-    if (t9CjkFull.isNotEmpty()) {
+    if (!skipPinyin && t9CjkFull.isNotEmpty()) {
         val cjkFullIdx = t9CjkFull.indexOf(cleanQuery)
         if (cjkFullIdx != -1) {
             val matchedChars = label.indices.toList()

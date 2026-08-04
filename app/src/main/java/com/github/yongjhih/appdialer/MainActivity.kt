@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -43,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private var currentScreen by mutableStateOf(Screen.DIALER)
     private var settingsTriggerKey by mutableStateOf("9")
     private var isZhuyinEnabled by mutableStateOf(false)
+    private var isDisablePinyinOnZhuyinEnabled by mutableStateOf(false)
 
     private var lettersPos by mutableStateOf("Center")
     private var numberPos by mutableStateOf("TopRight")
@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
 
         settingsTriggerKey = RecentAppsManager.getSettingsTriggerKey(this)
         isZhuyinEnabled = RecentAppsManager.isZhuyinModeEnabled(this)
+        isDisablePinyinOnZhuyinEnabled = RecentAppsManager.isDisablePinyinOnZhuyinEnabled(this)
 
         lettersPos = RecentAppsManager.getLettersPosition(this)
         numberPos = RecentAppsManager.getNumberPosition(this)
@@ -131,6 +132,12 @@ class MainActivity : ComponentActivity() {
                         onZhuyinModeToggle = { enabled ->
                             RecentAppsManager.setZhuyinModeEnabled(this@MainActivity, enabled)
                             isZhuyinEnabled = enabled
+                            filterApps()
+                        },
+                        isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabled,
+                        onDisablePinyinOnZhuyinToggle = { enabled ->
+                            RecentAppsManager.setDisablePinyinOnZhuyinEnabled(this@MainActivity, enabled)
+                            isDisablePinyinOnZhuyinEnabled = enabled
                             filterApps()
                         },
                         settingsTriggerKey = settingsTriggerKey,
@@ -229,11 +236,13 @@ class MainActivity : ComponentActivity() {
         val recentPackages = RecentAppsManager.getRecentApps(this)
         val isFuzzy = RecentAppsManager.isFuzzySearchEnabled(this)
         val isZhuyin = RecentAppsManager.isZhuyinModeEnabled(this)
+        val isDisablePinyin = RecentAppsManager.isDisablePinyinOnZhuyinEnabled(this)
         filteredApps = allApps.filterAndScore(
             query = searchQuery,
             recentPackageNames = recentPackages,
             isFuzzyEnabled = isFuzzy,
-            isZhuyinEnabled = isZhuyin
+            isZhuyinEnabled = isZhuyin,
+            isDisablePinyinOnZhuyin = isDisablePinyin
         )
     }
 

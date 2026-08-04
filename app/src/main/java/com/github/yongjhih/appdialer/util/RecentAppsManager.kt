@@ -8,6 +8,7 @@ object RecentAppsManager {
     private const val KEY_RECENT_PACKAGES = "recent_packages"
     private const val KEY_FUZZY_SEARCH = "fuzzy_search"
     private const val KEY_ZHUYIN_MODE = "zhuyin_mode"
+    private const val KEY_DISABLE_PINYIN_ON_ZHUYIN = "disable_pinyin_on_zhuyin"
     private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
 
     private const val KEY_POS_LETTERS = "pos_letters"
@@ -53,6 +54,14 @@ object RecentAppsManager {
 
     fun setZhuyinModeEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_ZHUYIN_MODE, enabled).apply()
+    }
+
+    fun isDisablePinyinOnZhuyinEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_DISABLE_PINYIN_ON_ZHUYIN, false)
+    }
+
+    fun setDisablePinyinOnZhuyinEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_DISABLE_PINYIN_ON_ZHUYIN, enabled).apply()
     }
 
     fun getSettingsTriggerKey(context: Context): String {

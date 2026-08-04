@@ -39,6 +39,8 @@
     <!-- Search Preferences -->
     <string name="zhuyin_search_title">Zhuyin Search (ㄅㄆㄇ)</string>
     <string name="zhuyin_search_subtitle">Display ㄅㄆㄇㄈ on keypad and match Chinese via Zhuyin</string>
+    <string name="disable_pinyin_on_zhuyin_title">Disable Pinyin when Zhuyin Active</string>
+    <string name="disable_pinyin_on_zhuyin_subtitle">Disable Pinyin transliteration search while Zhuyin mode is ON</string>
     <string name="fuzzy_search_title">Fuzzy Search</string>
     <string name="fuzzy_search_subtitle">Allow non-contiguous character matching</string>
     <string name="include_system_apps_title">Include System Apps</string>

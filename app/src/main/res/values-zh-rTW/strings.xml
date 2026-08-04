@@ -39,6 +39,8 @@
     <!-- Search Preferences -->
     <string name="zhuyin_search_title">ㄅㄆㄇ 注音搜尋</string>
     <string name="zhuyin_search_subtitle">在鍵盤上標注 ㄅㄆㄇㄈ 並支援注音匹配 (預設關閉)</string>
+    <string name="disable_pinyin_on_zhuyin_title">開啟注音時關閉拼音搜尋</string>
+    <string name="disable_pinyin_on_zhuyin_subtitle">開啟注音模式時停用漢語拼音音譯比對</string>
     <string name="fuzzy_search_title">模糊搜尋 (Fuzzy Search)</string>
     <string name="fuzzy_search_subtitle">允許非連續字元相符匹配</string>
     <string name="include_system_apps_title">包含系統預裝 App</string>
