@@ -59,6 +59,7 @@ import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 @Composable
 fun AppDialerScreen(
     apps: List<AppModel>,
+    searchQuery: String = "",
     onDigitPressed: (String) -> Unit,
     onClear: () -> Unit,
     onAppClick: (AppModel) -> Unit,
@@ -69,8 +70,8 @@ fun AppDialerScreen(
     val colorScheme = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
 
-    // Automatically reset scroll position to index 0 whenever search results change
-    LaunchedEffect(apps) {
+    // Automatically reset scroll position to index 0 on ANY keypress or search query change
+    LaunchedEffect(searchQuery, apps) {
         if (apps.isNotEmpty()) {
             listState.scrollToItem(0)
         }
@@ -374,6 +375,7 @@ fun AppDialerScreenPreview() {
     AppDialerTheme {
         AppDialerScreen(
             apps = sampleApps,
+            searchQuery = "",
             onDigitPressed = {},
             onClear = {},
             onAppClick = {},
