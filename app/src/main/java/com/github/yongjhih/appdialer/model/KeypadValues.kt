@@ -1,40 +1,40 @@
 package com.github.yongjhih.appdialer.model
 
 object KeypadValues {
-    const val BACKSPACE = "X"
+    const val KEY_BACKSPACE = "X"
 
-    const val TWO = "2"
-    const val TWO_LABEL = "12"
-    const val TWO_LETTERS = "ABC"
-    const val TWO_ZHUYIN = "ㄅㄆㄇㄈ"
+    const val KEY_2 = "2"
+    const val NUMBER_2 = "12"
+    const val LETTER_2 = "ABC"
+    const val ZHUYIN_2 = "ㄅㄆㄇㄈ"
 
-    const val THREE = "3"
-    const val THREE_LETTERS = "DEF"
-    const val THREE_ZHUYIN = "ㄉㄊㄋㄌ"
+    const val KEY_3 = "3"
+    const val LETTER_3 = "DEF"
+    const val ZHUYIN_3 = "ㄉㄊㄋㄌ"
 
-    const val FOUR = "4"
-    const val FOUR_LETTERS = "GHI"
-    const val FOUR_ZHUYIN = "ㄍㄎㄏ"
+    const val KEY_4 = "4"
+    const val LETTER_4 = "GHI"
+    const val ZHUYIN_4 = "ㄍㄎㄏ"
 
-    const val FIVE = "5"
-    const val FIVE_LETTERS = "JKL"
-    const val FIVE_ZHUYIN = "ㄐㄑㄒ"
+    const val KEY_5 = "5"
+    const val LETTER_5 = "JKL"
+    const val ZHUYIN_5 = "ㄐㄑㄒ"
 
-    const val SIX = "6"
-    const val SIX_LETTERS = "MNO"
-    const val SIX_ZHUYIN = "ㄓㄔㄕㄖ"
+    const val KEY_6 = "6"
+    const val LETTER_6 = "MNO"
+    const val ZHUYIN_6 = "ㄓㄔㄕㄖ"
 
-    const val SEVEN = "7"
-    const val SEVEN_LETTERS = "PQRS"
-    const val SEVEN_ZHUYIN = "ㄗㄘㄙ"
+    const val KEY_7 = "7"
+    const val LETTER_7 = "PQRS"
+    const val ZHUYIN_7 = "ㄗㄘㄙ"
 
-    const val EIGHT = "8"
-    const val EIGHT_LETTERS = "TUV"
-    const val EIGHT_ZHUYIN = "ㄚㄛㄜㄝ"
+    const val KEY_8 = "8"
+    const val LETTER_8 = "TUV"
+    const val ZHUYIN_8 = "ㄚㄛㄜㄝ"
 
-    const val NINE = "9"
-    const val NINE_LETTERS = "WXYZ"
-    const val NINE_ZHUYIN = "ㄞㄟㄠㄡ"
+    const val KEY_9 = "9"
+    const val LETTER_9 = "WXYZ"
+    const val ZHUYIN_9 = "ㄞㄟㄠㄡ"
 
-    fun isTwoTrigger(value: String): Boolean = value == TWO || value == TWO_LABEL
+    fun isKey2Trigger(value: String): Boolean = value == KEY_2 || value == NUMBER_2
 }

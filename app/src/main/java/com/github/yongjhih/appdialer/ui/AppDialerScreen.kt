@@ -162,39 +162,39 @@ fun AppDialerScreen(
                 ) {
                     KeypadButton(
                         icon = Icons.AutoMirrored.Filled.Backspace,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.BACKSPACE) Icons.Default.Settings else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_BACKSPACE) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
                         onClick = onDeleteOneDigit,
-                        onLongClick = if (settingsTriggerKey == KeypadValues.BACKSPACE) onOpenDialerSettings else onClearAllDigits,
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_BACKSPACE) onOpenDialerSettings else onClearAllDigits,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.TWO_LABEL,
-                        letters = KeypadValues.TWO_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.TWO_ZHUYIN else null,
-                        subtitleIcon = if (KeypadValues.isTwoTrigger(settingsTriggerKey)) Icons.Default.Settings else null,
+                        number = KeypadValues.NUMBER_2,
+                        letters = KeypadValues.LETTER_2,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_2 else null,
+                        subtitleIcon = if (KeypadValues.isKey2Trigger(settingsTriggerKey)) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.TWO) },
-                        onLongClick = if (KeypadValues.isTwoTrigger(settingsTriggerKey)) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_2) },
+                        onLongClick = if (KeypadValues.isKey2Trigger(settingsTriggerKey)) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.THREE,
-                        letters = KeypadValues.THREE_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.THREE_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.THREE) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_3,
+                        letters = KeypadValues.LETTER_3,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_3 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_3) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.THREE) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.THREE) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_3) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_3) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -207,42 +207,42 @@ fun AppDialerScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
-                        number = KeypadValues.FOUR,
-                        letters = KeypadValues.FOUR_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.FOUR_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.FOUR) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_4,
+                        letters = KeypadValues.LETTER_4,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_4 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_4) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.FOUR) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.FOUR) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_4) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_4) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.FIVE,
-                        letters = KeypadValues.FIVE_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.FIVE_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.FIVE) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_5,
+                        letters = KeypadValues.LETTER_5,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_5 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_5) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.FIVE) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.FIVE) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_5) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_5) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.SIX,
-                        letters = KeypadValues.SIX_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.SIX_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.SIX) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_6,
+                        letters = KeypadValues.LETTER_6,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_6 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_6) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.SIX) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.SIX) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_6) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_6) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -255,42 +255,42 @@ fun AppDialerScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     KeypadButton(
-                        number = KeypadValues.SEVEN,
-                        letters = KeypadValues.SEVEN_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.SEVEN_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.SEVEN) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_7,
+                        letters = KeypadValues.LETTER_7,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_7 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_7) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.SEVEN) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.SEVEN) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_7) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_7) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.EIGHT,
-                        letters = KeypadValues.EIGHT_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.EIGHT_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.EIGHT) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_8,
+                        letters = KeypadValues.LETTER_8,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_8 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_8) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.EIGHT) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.EIGHT) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_8) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_8) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     KeypadButton(
-                        number = KeypadValues.NINE,
-                        letters = KeypadValues.NINE_LETTERS,
-                        zhuyin = if (isZhuyinEnabled) KeypadValues.NINE_ZHUYIN else null,
-                        subtitleIcon = if (settingsTriggerKey == KeypadValues.NINE) Icons.Default.Settings else null,
+                        number = KeypadValues.KEY_9,
+                        letters = KeypadValues.LETTER_9,
+                        zhuyin = if (isZhuyinEnabled) KeypadValues.ZHUYIN_9 else null,
+                        subtitleIcon = if (settingsTriggerKey == KeypadValues.KEY_9) Icons.Default.Settings else null,
                         numberPos = numberPos,
                         lettersPos = lettersPos,
                         zhuyinPos = zhuyinPos,
                         functionPos = functionPos,
-                        onClick = { onDigitPressed(KeypadValues.NINE) },
-                        onLongClick = if (settingsTriggerKey == KeypadValues.NINE) onOpenDialerSettings else null,
+                        onClick = { onDigitPressed(KeypadValues.KEY_9) },
+                        onLongClick = if (settingsTriggerKey == KeypadValues.KEY_9) onOpenDialerSettings else null,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                 }
@@ -502,9 +502,9 @@ fun AppDialerScreenPreview() {
 fun KeypadButtonPreview() {
     AppDialerTheme {
         KeypadButton(
-            number = KeypadValues.NINE,
-            letters = KeypadValues.NINE_LETTERS,
-            zhuyin = KeypadValues.NINE_ZHUYIN,
+            number = KeypadValues.KEY_9,
+            letters = KeypadValues.LETTER_9,
+            zhuyin = KeypadValues.ZHUYIN_9,
             subtitleIcon = Icons.Default.Settings,
             onClick = {}
         )
