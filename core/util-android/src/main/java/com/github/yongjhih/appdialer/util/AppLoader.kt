@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
+import android.util.Log
 import com.github.yongjhih.appdialer.model.AppModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,8 @@ fun ResolveInfo.toAppModel(
 
 object AppLoader {
 
+    private const val TAG = "AppLoader"
+
     @Volatile
     private var cachedApps: List<AppModel>? = null
 
@@ -49,6 +52,7 @@ object AppLoader {
     ): List<AppModel> = withContext(Dispatchers.IO) {
         val currentCache = cachedApps
         if (!forceRefresh && currentCache != null) {
+            Log.d(TAG, "Loaded ${currentCache.size} apps from memory cache.")
             return@withContext currentCache
         }
 
@@ -56,6 +60,7 @@ object AppLoader {
         val diskApps = if (!forceRefresh) AppDiskCache.loadAppsFromDisk(context) else null
         if (diskApps != null) {
             cachedApps = diskApps
+            Log.d(TAG, "Loaded ${diskApps.size} apps instantly from disk cache. Dispatching background PackageManager scan...")
             // Trigger background scan to sync PackageManager changes asynchronously without delaying UI launch
             scope.launch {
                 scanPackageManager(context, transliterator)
@@ -63,7 +68,7 @@ object AppLoader {
             return@withContext diskApps
         }
 
-        // Fallback if disk cache is empty (first boot)
+        Log.d(TAG, "Disk cache miss. Performing synchronous PackageManager scan...")
         scanPackageManager(context, transliterator)
     }
 
@@ -71,6 +76,7 @@ object AppLoader {
         context: Context,
         transliterator: CjkTransliterator
     ): List<AppModel> {
+        val startTime = System.currentTimeMillis()
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
@@ -94,12 +100,15 @@ object AppLoader {
             .map { info -> info.toAppModel(pm, transliterator) }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
+        val elapsed = System.currentTimeMillis() - startTime
+        Log.d(TAG, "Scanned ${apps.size} launcher activities in ${elapsed}ms.")
         cachedApps = apps
         AppDiskCache.saveAppsToDisk(context, apps)
         return apps
     }
 
     fun clearCache() {
+        Log.d(TAG, "Memory cache cleared.")
         cachedApps = null
     }
 }

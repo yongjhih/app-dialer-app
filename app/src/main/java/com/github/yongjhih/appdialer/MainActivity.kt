@@ -6,8 +6,8 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -27,12 +27,17 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    private companion object {
+        private const val TAG = "MainActivity"
+    }
+
     private var resetSignal by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         @Suppress("DEPRECATION")
         overridePendingTransition(0, 0)
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate (resetSignal=$resetSignal)")
 
         // Pre-warm AppLoader cache in background thread immediately on activity launch
         lifecycleScope.launch(Dispatchers.IO) {
@@ -65,6 +70,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         resetSignal++
+        Log.d(TAG, "onNewIntent (resetSignal=$resetSignal)")
     }
 
     private fun applyTransparentWindow() {

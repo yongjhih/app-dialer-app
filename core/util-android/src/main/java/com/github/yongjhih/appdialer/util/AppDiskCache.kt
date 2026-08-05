@@ -1,6 +1,7 @@
 package com.github.yongjhih.appdialer.util
 
 import android.content.Context
+import android.util.Log
 import com.github.yongjhih.appdialer.model.AppModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -10,11 +11,13 @@ import org.json.JSONObject
  */
 object AppDiskCache {
 
+    private const val TAG = "AppDiskCache"
     private const val PREF_NAME = "app_dialer_disk_cache"
     private const val KEY_CACHED_APPS_JSON = "cached_apps_json"
 
     fun saveAppsToDisk(context: Context, apps: List<AppModel>) {
         try {
+            val startTime = System.currentTimeMillis()
             val jsonArray = JSONArray()
             for (app in apps) {
                 val jsonObject = JSONObject().apply {
@@ -35,12 +38,16 @@ object AppDiskCache {
                 .edit()
                 .putString(KEY_CACHED_APPS_JSON, jsonArray.toString())
                 .apply()
+
+            val elapsed = System.currentTimeMillis() - startTime
+            Log.d(TAG, "Persisted ${apps.size} apps to disk cache JSON in ${elapsed}ms.")
         } catch (e: Exception) {
-            // Ignore cache save failures gracefully
+            Log.w(TAG, "Failed to persist apps to disk cache", e)
         }
     }
 
     fun loadAppsFromDisk(context: Context): List<AppModel>? {
+        val startTime = System.currentTimeMillis()
         val jsonString = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .getString(KEY_CACHED_APPS_JSON, null) ?: return null
 
@@ -81,8 +88,11 @@ object AppDiskCache {
                     )
                 )
             }
+            val elapsed = System.currentTimeMillis() - startTime
+            Log.d(TAG, "Loaded ${apps.size} apps from disk cache JSON in ${elapsed}ms.")
             apps.ifEmpty { null }
         } catch (e: Exception) {
+            Log.w(TAG, "Failed to parse disk cache JSON", e)
             null
         }
     }
