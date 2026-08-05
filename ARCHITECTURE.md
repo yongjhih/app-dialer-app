@@ -15,37 +15,37 @@ To ensure max maintainability, reusability, and multiplatform readiness (Kotlin 
 ```mermaid
 graph TD
     subgraph ":app (Ultra-Thin Application Shell)"
-        A[MainActivity / AppDialerApplication]
+        A["MainActivity / AppDialerApplication"]
     end
 
     subgraph ":feature:dialer-android (Android Feature Composition)"
-        B[AndroidMainAppWidget]
-        C[AndroidAppLauncher]
+        B["AndroidMainAppWidget"]
+        C["AndroidAppLauncher"]
     end
 
     subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.* & 0 :core:util-android)"
-        D[MainAppWidget Reactive Pipeline / NavHost]
-        E[AppDialerScreen / AppGridItem Skeleton UI]
-        F[AppDialerSettingsScreen]
-        G[AppLauncher Interface]
+        D["MainAppWidget Reactive Pipeline / NavHost"]
+        E["AppDialerScreen / AppGridItem Skeleton UI"]
+        F["AppDialerSettingsScreen"]
+        G["AppLauncher Interface"]
     end
 
     subgraph ":core:ui (Compose UI Design Tokens)"
-        H[Theme.kt / Color.kt]
+        H["Theme.kt / Color.kt"]
     end
 
     subgraph ":core:util-android (Android Framework Helpers)"
-        I[AppLoader / AndroidRecentAppsManager]
-        J[ViewUtils / AndroidCjkTransliterator / ResolveInfo.toAppModel() / coreUtilAndroidModule]
+        I["AppLoader / AndroidRecentAppsManager"]
+        J["ViewUtils / AndroidCjkTransliterator / ResolveInfo.toAppModel() / coreUtilAndroidModule"]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Algorithms & SAM Interfaces)"
-        K[T9Utils / RecentAppsManager / CjkTransliterator / coreUtilModule]
+        K["T9Utils / RecentAppsManager / CjkTransliterator / coreUtilModule"]
     end
 
     subgraph ":core:model (Pure Kotlin JVM Domain Models)"
-        L[AppModel Deferred Lazy Evaluation / KeyLabelPosition]
-        M[AppDefaults / KeyLayout]
+        L["AppModel Deferred Lazy Evaluation / KeyLabelPosition"]
+        M["AppDefaults / KeyLayout"]
     end
 
     A --> B
