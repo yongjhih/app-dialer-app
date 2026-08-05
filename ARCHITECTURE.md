@@ -1,6 +1,6 @@
 # AppDialer Architecture & Engineering Guidelines
 
-This document serves as the authoritative architectural blueprint for **AppDialer**, outlining multi-module design principles, platform decoupling rules, dependency injection patterns, navigation architecture, and testing standards.
+This document serves as the authoritative architectural blueprint for **AppDialer**, outlining multi-module design principles, platform decoupling rules, dependency injection patterns, reactive state management, concurrency control, navigation architecture, and testing standards.
 
 ---
 
@@ -79,7 +79,49 @@ graph TD
 
 ---
 
-## ⚡ 5. Performance & Async UI Architecture
+## 🔌 2. Dependency Injection & Decoupling Principles
+
+### ❌ Anti-Patterns Avoided
+1. **No Reflection for Framework APIs**: Avoid using reflection (`Class.forName()`) to access platform features. Instead, extract a clean SAM interface in the core module and provide native implementations in platform modules.
+2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
+
+### ✅ Best Practices Enforced
+1. **Strict Non-Null Receiver Type Safety**:
+   Extension functions MUST use explicit non-null receiver types (e.g. `Drawable.toImageBitmap(): ImageBitmap`) instead of ambiguous nullable types (`Any?.toImageBitmap(): ImageBitmap?`), enforcing compile-time type safety.
+2. **Interface Contract & Functional Parameter Injection**:
+   Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`). Default arguments (`recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager()`) allow 0-boilerplate local testing and preview instantiation.
+3. **Pre-converted UI Assets for Platform Independence**:
+   Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
+
+### 💉 DI Framework Selection & Migration Roadmap
+- **Current Phase (Pure Kotlin Manual DI)**: Default parameter injection is used for `:core:util` and `:feature:dialer` to maintain 0 external framework overhead, maximum KMP readiness, and instant unit test execution without annotation processing.
+- **Scale Migration Roadmap**:
+  - **KMP Multiplatform Target**: If expanding cross-platform (iOS / Desktop), adopt **Koin** (`koin-core` & `koin-compose`). Koin requires zero code generation (KSP/APT) and seamlessly integrates with Kotlin Multiplatform.
+  - **Pure Android Target**: If remaining strictly Android native, adopt **Hilt** (`hilt-android`). Hilt bindings MUST be isolated within `:app` and `:feature:dialer-android` as the application composition root, ensuring `:feature:dialer` remains completely framework-agnostic.
+
+---
+
+## 🔄 3. Reactive State & Concurrency Control
+
+1. **Unidirectional Data Flow (UDF) & `StateFlow`**:
+   All UI state updates MUST flow through reactive state holders (`StateFlow` / `MutableStateFlow` or Compose `remember` / `derivedStateOf`). Composable screens MUST consume state as read-only value streams.
+2. **T9 Input Debouncing (`Flow.debounce`)**:
+   During rapid multi-tap T9 keypad typing, search query string changes MUST be debounced to avoid unnecessary search and scoring operations across 200+ installed apps.
+   ```kotlin
+   // Recommended snapshotFlow debounce pattern for Compose state
+   snapshotFlow { searchQuery }
+       .debounce(100L) // 100ms debounce buffer
+       .flatMapLatest { query ->
+           flow { emit(allApps.filterAndScore(query, ...)) }
+       }
+       .flowOn(Dispatchers.Default)
+   ```
+3. **Concurrency Protection (`flatMapLatest`)**:
+   When a new T9 key is tapped, any ongoing in-flight filtering job for a previous search query MUST be automatically cancelled using `flatMapLatest`.
+
+---
+
+## ⚡ 4. Performance & Async UI Architecture
 
 1. **`ResolveInfo.toAppModel()` Mapping Extension**:
    `ResolveInfo.toAppModel(pm, transliterator)` encapsulates converting Android `ResolveInfo` objects into domain `AppModel` instances with deferred lazy providers for `iconProvider`, `t9CjkFullProvider`, `t9CjkInitialsProvider`, and `t9ZhuyinInitialsProvider`.
@@ -94,23 +136,7 @@ graph TD
 
 ---
 
-## 🔌 2. Dependency Injection & Decoupling Principles
-
-### ❌ Anti-Patterns Avoided
-1. **No Reflection for Framework APIs**: Avoid using reflection (`Class.forName()`) to access platform features. Instead, extract a clean SAM interface in the core module and provide native implementations in platform modules.
-2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
-
-### ✅ Best Practices Enforced
-1. **Strict Non-Null Receiver Type Safety**:
-   Extension functions MUST use explicit non-null receiver types (e.g. `Drawable.toImageBitmap(): ImageBitmap`) instead of ambiguous nullable types (`Any?.toImageBitmap(): ImageBitmap?`), enforcing compile-time type safety.
-2. **Interface Contract & Parameter Injection**:
-   Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`).
-3. **Pre-converted UI Assets for Platform Independence**:
-   Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
-
----
-
-## 📱 3. Activity & Navigation Architecture
+## 📱 5. Activity & Navigation Architecture
 
 1. **Ultra-Thin Activity Shell**: `MainActivity` is strictly limited to Activity lifecycle events, window transparency (`applyTransparentWindow()`), and passing intent re-launch triggers (`resetSignal`). It NEVER holds UI state or search query buffers.
 2. **Encapsulated State Container (`MainAppWidget`)**: All UI state management, search query filtering, and preference synchronization are encapsulated inside `MainAppWidget`.
@@ -120,8 +146,19 @@ graph TD
 
 ---
 
-## 🧪 4. Testing & Quality Assurance Standards
+## 🧪 6. Testing & Quality Assurance Standards
 
-- **Multi-Module Unit Tests**: Every module MUST maintain unit tests covering its public APIs and domain contracts (`:core:model`, `:core:util`, `:feature:dialer`).
-- **Pre-Commit Build Verification**: Run `./gradlew test assembleDebug` across all modules before any commit to ensure clean compilation and 100% test pass rate.
-- **Clean History Policy**: Git commit history MUST remain 100% free of build outputs (`build/`), temporary swap files (`*.swp`), or IDE artifacts.
+### 1. Multi-Module Unit Tests
+Every module MUST maintain unit tests covering its public APIs and domain contracts (`:core:model`, `:core:util`, `:feature:dialer`). Unit tests MUST run in pure JVM environments without Robolectric or Android emulator overhead.
+
+### 2. UI Component Testing (`ComposeTestRule`)
+UI interactions for `:feature:dialer` (keypad tapping, backspace deletion, settings navigation) MUST be verified using Compose UI Test framework (`createComposeRule()` / `createAndroidComposeRule()`):
+- Verify T9 key taps append corresponding digits to `searchQuery`.
+- Verify backspace key taps clear or pop digits.
+- Verify long-click actions trigger `onLongClick` app detail callbacks.
+
+### 3. Integration & E2E Testing Strategy (Maestro)
+- **Overlay Dialog E2E Testing**: Use **Maestro** or `integration_test` to verify overlay dialog dismiss on outside tap, app launch flow, and translucent background rendering.
+
+### 4. Pre-Commit Build Verification
+Run `./gradlew test assembleDebug` across all modules before any commit to ensure clean compilation and 100% test pass rate.
