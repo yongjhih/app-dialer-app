@@ -12,6 +12,7 @@ import java.util.Locale
 object AppLoader {
 
     suspend fun loadInstalledApps(context: Context): List<AppModel> = withContext(Dispatchers.IO) {
+        AndroidCjkTransliterator.init()
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
