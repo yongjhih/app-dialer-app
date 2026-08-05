@@ -1,14 +1,6 @@
-package com.github.yongjhih.appdialer
+package com.github.yongjhih.appdialer.util
 
-import android.graphics.drawable.ColorDrawable
 import com.github.yongjhih.appdialer.model.AppModel
-import com.github.yongjhih.appdialer.util.filterAndScore
-import com.github.yongjhih.appdialer.util.toCjkT9Full
-import com.github.yongjhih.appdialer.util.toCjkT9Initials
-import com.github.yongjhih.appdialer.util.toT9
-import com.github.yongjhih.appdialer.util.toT9Initials
-import com.github.yongjhih.appdialer.util.toT9Words
-import com.github.yongjhih.appdialer.util.toZhuyinT9Initials
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -50,12 +42,11 @@ class T9UtilsTest {
 
     @Test
     fun testFilterAndScoreExtension() {
-        val dummyDrawable = ColorDrawable()
         val apps = listOf(
-            createApp("YouTube", dummyDrawable),
-            createApp("Google Maps", dummyDrawable),
-            createApp("Chrome", dummyDrawable),
-            createApp("Spotify", dummyDrawable)
+            createApp("YouTube"),
+            createApp("Google Maps"),
+            createApp("Chrome"),
+            createApp("Spotify")
         )
 
         // Query "968" -> YouTube
@@ -77,12 +68,11 @@ class T9UtilsTest {
 
     @Test
     fun testCjkT9Matching() {
-        val dummyDrawable = ColorDrawable()
         val apps = listOf(
-            createApp("地圖", dummyDrawable, t9CjkInitials = "38", t9CjkFull = "3488"),
-            createApp("相機", dummyDrawable, t9CjkInitials = "95", t9CjkFull = "9426454"),
-            createApp("カメラ", dummyDrawable, t9CjkInitials = "56", t9CjkFull = "526372"),
-            createApp("設定", dummyDrawable, t9CjkInitials = "78", t9CjkFull = "738834")
+            createApp("地圖", t9CjkInitials = "38", t9CjkFull = "3488"),
+            createApp("相機", t9CjkInitials = "95", t9CjkFull = "9426454"),
+            createApp("カメラ", t9CjkInitials = "56", t9CjkFull = "526372"),
+            createApp("設定", t9CjkInitials = "78", t9CjkFull = "738834")
         )
 
         // Query "38" (D T) -> 地圖
@@ -108,11 +98,10 @@ class T9UtilsTest {
 
     @Test
     fun testZhuyinT9Matching() {
-        val dummyDrawable = ColorDrawable()
         val apps = listOf(
-            createApp("地圖", dummyDrawable, t9ZhuyinInitials = "33"),
-            createApp("相機", dummyDrawable, t9ZhuyinInitials = "55"),
-            createApp("設定", dummyDrawable, t9ZhuyinInitials = "63")
+            createApp("地圖", t9ZhuyinInitials = "33"),
+            createApp("相機", t9ZhuyinInitials = "55"),
+            createApp("設定", t9ZhuyinInitials = "63")
         )
 
         // Query "33" (ㄉㄊ) -> 地圖
@@ -133,11 +122,10 @@ class T9UtilsTest {
 
     @Test
     fun testRecentAppsOrderWhenQueryEmpty() {
-        val dummyDrawable = ColorDrawable()
         val apps = listOf(
-            createApp("Chrome", dummyDrawable),
-            createApp("Google Maps", dummyDrawable),
-            createApp("YouTube", dummyDrawable)
+            createApp("Chrome"),
+            createApp("Google Maps"),
+            createApp("YouTube")
         )
         val recentPackages = listOf(
             "com.example.youtube",
@@ -152,10 +140,9 @@ class T9UtilsTest {
 
     @Test
     fun testFuzzySearch() {
-        val dummyDrawable = ColorDrawable()
         val apps = listOf(
-            createApp("Calculator", dummyDrawable),
-            createApp("Settings", dummyDrawable)
+            createApp("Calculator"),
+            createApp("Settings")
         )
 
         // "2" (C) "7" (r) -> Calculator (C...r)
@@ -167,7 +154,6 @@ class T9UtilsTest {
 
     private fun createApp(
         label: String,
-        icon: ColorDrawable,
         t9CjkInitials: String = "",
         t9CjkFull: String = "",
         t9ZhuyinInitials: String = ""
@@ -176,7 +162,7 @@ class T9UtilsTest {
             label = label,
             packageName = "com.example.${label.lowercase().replace(" ", "")}",
             className = "MainActivity",
-            icon = icon,
+            icon = null,
             t9Full = label.toT9(),
             t9Initials = label.toT9Initials(),
             t9Words = label.toT9Words(),

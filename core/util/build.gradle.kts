@@ -15,7 +15,5 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 dependencies {
     implementation(project(":core:model"))
-
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
 }
