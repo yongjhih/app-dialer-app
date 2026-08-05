@@ -1,48 +1,49 @@
 # AppDialer Architecture & Engineering Guidelines
 
-This document outlines the architectural principles, module boundaries, navigation patterns, and Kotlin code style guidelines for **AppDialer**.
+This document serves as the authoritative architectural blueprint for **AppDialer**, outlining multi-module design principles, platform decoupling rules, dependency injection patterns, navigation architecture, and testing standards.
 
 ---
 
-## 🏛️ 1. Multi-Module Architecture Overview
+## 🏛️ 1. Multi-Module Design Principles & Layering
 
-AppDialer is modularized into single-responsibility Gradle modules separated by layer, Compose UI design systems, platform interfaces, and Android framework dependencies.
-Both **`:core:model`** and **`:core:util`** are **Pure Kotlin (JVM)** modules, allowing non-Android Kotlin projects (CLI tools, Server backends, KMP, Desktop apps) to depend on them seamlessly.
-**`:feature:dialer`** contains all Compose UI screens and state containers, decoupled from Android APIs via the **`AppLauncher`** interface and repository callbacks.
-**`:feature:dialer-android`** provides the Android-specific implementation (`AndroidAppLauncher`, `AndroidMainAppWidget`) bridging Android `Context`, `Intent`, `Settings`, `AppLoader`, and `RecentAppsManager`.
+AppDialer enforces strict single-responsibility modularization across 6 Gradle modules. 
+To ensure max maintainability, reusability, and multiplatform readiness (Kotlin Multiplatform / Compose Multiplatform):
+- **Domain & Utilities MUST be Pure Kotlin (JVM)**: Free of any Android AGP or Android framework dependencies.
+- **UI & Logic MUST be Platform Independent**: Decoupled from platform frameworks via functional interfaces.
+- **Android Framework Adapters MUST be Isolated**: Encapsulated in dedicated `-android` composition modules.
 
 ```mermaid
 graph TD
-    subgraph ":app (Android App)"
+    subgraph ":app (Ultra-Thin Application Shell)"
         A[MainActivity]
     end
 
-    subgraph ":feature:dialer-android (Android Library)"
+    subgraph ":feature:dialer-android (Android Feature Composition)"
         B[AndroidMainAppWidget]
         C[AndroidAppLauncher]
     end
 
-    subgraph ":feature:dialer (Compose UI - Platform Independent)"
+    subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.*)"
         D[MainAppWidget / NavHost]
         E[AppDialerScreen]
         F[AppDialerSettingsScreen]
         G[AppLauncher Interface]
     end
 
-    subgraph ":core:ui (Android / Multiplatform Compose UI)"
+    subgraph ":core:ui (Compose UI Design Tokens)"
         H[Theme.kt / Color.kt]
     end
 
-    subgraph ":core:util-android (Android Library)"
+    subgraph ":core:util-android (Android Framework Helpers)"
         I[AppLoader / RecentAppsManager]
-        J[ViewUtils / DrawableUtils]
+        J[ViewUtils / AndroidCjkTransliterator]
     end
 
-    subgraph ":core:util (Pure Kotlin JVM Library)"
-        K[T9Utils / CjkTransliterator]
+    subgraph ":core:util (Pure Kotlin JVM Algorithms & SAM Interfaces)"
+        K[T9Utils / CjkTransliterator SAM Interface]
     end
 
-    subgraph ":core:model (Pure Kotlin JVM Library)"
+    subgraph ":core:model (Pure Kotlin JVM Domain Models)"
         L[AppModel / KeyLabelPosition]
         M[AppDefaults / KeyLayout]
     end
@@ -64,51 +65,62 @@ graph TD
     M --> L
 ```
 
-### Module Responsibilities
+### Module Responsibilities Matrix
 
-| Module | Type | Responsibilities | Non-Android Reusable |
+| Module | Plugin Type | Responsibilities & Boundaries | Multiplatform Ready |
 | :--- | :--- | :--- | :---: |
-| **`:core:model`** | **Pure Kotlin (JVM)** | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad value definitions (`KeyLayout`). Zero Android SDK/Compose dependencies (`id("kotlin")`). | ✅ Yes |
-| **`:core:util`** | **Pure Kotlin (JVM)** | Pure Kotlin utilities & search algorithms (`T9Utils`, `CjkTransliterator`). Fully decoupled from Android framework APIs (`id("kotlin")`). | ✅ Yes |
-| **`:core:ui`** | **Compose Library** | Android-independent Compose UI design system tokens (`Color.kt`, `Theme.kt`), and pure UI composables. | 🟢 Compose Multiplatform |
-| **`:core:util-android`** | Android Library | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`, `DrawableUtils.kt`) requiring `Context`, `SharedPreferences`, `View`, `Drawable`, and `PackageManager`. | ❌ Android Only |
-| **`:feature:dialer`** | **Compose Library** | All UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation state (`MainAppWidget`). Decoupled from Android via `AppLauncher` interface. Zero `android.*` imports! | 🟢 Compose Multiplatform |
-| **`:feature:dialer-android`** | Android Library | Android-specific feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging `Context`, `Intent`, `Settings`, `AppLoader`, and `RecentAppsManager`. | ❌ Android Only |
-| **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. | ❌ Android Only |
+| **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
+| **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`) and SAM interfaces (`CjkTransliterator`). Zero Android SDK/reflection dependencies. | ✅ Yes |
+| **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
+| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`, `DrawableUtils`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
+| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` interface with **0 `android.*` imports**. | 🟢 Compose Multiplatform |
+| **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, and `Toast` to `:feature:dialer`. | ❌ Android Only |
+| **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
 
 ---
 
-## 📱 2. Ultra-Thin Activity & Declarative Navigation
+## 🔌 2. Dependency Injection & Decoupling Principles
 
-### Principles
-1. **Ultra-Thin Activity Shell**: `MainActivity` is restricted strictly to Android Activity lifecycle initialization, translucent window setup (`applyTransparentWindow()`), and passing re-launch signals (`resetSignal`). It MUST NOT store search queries, app lists, or keypad layout states.
-2. **Smart State Container (`MainAppWidget`)**: All UI states, asynchronous app loading, preferences synchronization, and screen routing are encapsulated inside `MainAppWidget`.
-3. **Jetpack Navigation Compose (`NavHost`)**: Screen navigation between `Destinations.DIALER` and `Destinations.SETTINGS` MUST use official `NavHost` and `rememberNavController()`.
-   - Automatic Backstack: NavHost manages backstack popping automatically on system back gestures or buttons.
-   - Re-launch Reset: Re-launching from Home Screen triggers `navController.navigate(Destinations.DIALER) { popUpTo(Destinations.DIALER) { inclusive = true } }`.
+### ❌ Anti-Patterns Avoided
+1. **No Reflection for Framework APIs**: Avoid using reflection (`Class.forName()`) to access platform features. Instead, extract a clean SAM interface in the core module and provide native implementations in platform modules.
+2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
+
+### ✅ Best Practices Enforced
+1. **Functional Parameter Injection with Default Arguments**:
+   Pass dependencies explicitly as function or constructor parameters with sensible default values.
+   ```kotlin
+   // In :core:util - SAM Interface & Pure Extension Function
+   fun interface CjkTransliterator {
+       fun toLatin(text: String): String
+   }
+
+   fun String.toCjkT9Full(transliterator: CjkTransliterator = DefaultCjkTransliterator): String {
+       val latin = transliterator.toLatin(this)
+       return latin.toT9()
+   }
+
+   // In :core:util-android - Explicit Injection
+   AppModel(
+       ...,
+       t9CjkFull = label.toCjkT9Full(AndroidCjkTransliterator)
+   )
+   ```
+2. **Platform Contract Interface Isolation**:
+   Isolate external side-effects (opening settings, launching apps, displaying toasts) behind platform-independent interface contracts (`AppLauncher`).
 
 ---
 
-## 🪄 3. Kotlin KTX & Expressive Extension Guidelines
+## 📱 3. Activity & Navigation Architecture
 
-### View Hierarchy Extensions
-Prefer Kotlin `Sequence` KTX extensions over imperative nested loops.
-Example (`ViewUtils.kt`):
-
-```kotlin
-/**
- * Returns a [Sequence] containing this [View] and its direct children (if it is a [ViewGroup]).
- */
-val View.selfAndChildren: Sequence<View>
-    get() = sequence {
-        yield(this@selfAndChildren)
-        (this@selfAndChildren as? ViewGroup)?.children?.let { yieldAll(it) }
-    }
-```
+1. **Ultra-Thin Activity Shell**: `MainActivity` is strictly limited to Activity lifecycle events, window transparency (`applyTransparentWindow()`), and passing intent re-launch triggers (`resetSignal`). It NEVER holds UI state or search query buffers.
+2. **Encapsulated State Container (`MainAppWidget`)**: All UI state management, search query filtering, and preference synchronization are encapsulated inside `MainAppWidget`.
+3. **Jetpack Navigation Compose (`NavHost`)**: Screen routing between `Destinations.DIALER` and `Destinations.SETTINGS` MUST use official Jetpack `NavHost` and `rememberNavController()`.
+4. **Platform-Independent Touch Feedback**: Composable touch feedback MUST use Compose's native `LocalHapticFeedback.current.performHapticFeedback()` instead of Android `View.performHapticFeedback()`.
 
 ---
 
-## ⚙️ 4. Build & Testing Standards
+## 🧪 4. Testing & Quality Assurance Standards
 
-- **Unit Testing**: Core search algorithms in `:core:util` (e.g. `T9UtilsTest`) MUST pass with 100% success before committing.
-- **Verification**: Build verification MUST be executed via `./gradlew test assembleDebug` across all modules.
+- **Multi-Module Unit Tests**: Every module MUST maintain unit tests covering its public APIs and domain contracts (`:core:model`, `:core:util`, `:feature:dialer`).
+- **Pre-Commit Build Verification**: Run `./gradlew test assembleDebug` across all modules before any commit to ensure clean compilation and 100% test pass rate.
+- **Clean History Policy**: Git commit history MUST remain 100% free of build outputs (`build/`), temporary swap files (`*.swp`), or IDE artifacts.
