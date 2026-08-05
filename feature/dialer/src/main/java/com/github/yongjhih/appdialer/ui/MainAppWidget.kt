@@ -60,18 +60,31 @@ fun MainAppWidget(
         allApps = loadApps()
     }
 
-    // Reactive State Flow Pipeline with Debounce & Concurrency Protection
+    // Reactive State Flow Pipeline with Instant Startup & Debounce Concurrency Protection
     LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
+        if (allApps.isEmpty()) return@LaunchedEffect
+
+        // Immediately compute and emit initial app list with 0ms delay
+        val recentPackages = recentAppsManager.getRecentApps()
+        val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+        filteredApps = allApps.filterAndScore(
+            query = searchQuery,
+            recentPackageNames = recentPackages,
+            isFuzzyEnabled = isFuzzy,
+            isZhuyinEnabled = isZhuyinEnabled,
+            isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+        )
+
         snapshotFlow { searchQuery }
-            .debounce(50L) // 50ms debouncing buffer for rapid T9 typing
+            .debounce { query -> if (query.isEmpty()) 0L else 50L }
             .flatMapLatest { query ->
                 flow {
-                    val recentPackages = recentAppsManager.getRecentApps()
-                    val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+                    val recents = recentAppsManager.getRecentApps()
+                    val fuzzy = recentAppsManager.isFuzzySearchEnabled()
                     val result = allApps.filterAndScore(
                         query = query,
-                        recentPackageNames = recentPackages,
-                        isFuzzyEnabled = isFuzzy,
+                        recentPackageNames = recents,
+                        isFuzzyEnabled = fuzzy,
                         isZhuyinEnabled = isZhuyinEnabled,
                         isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
                     )

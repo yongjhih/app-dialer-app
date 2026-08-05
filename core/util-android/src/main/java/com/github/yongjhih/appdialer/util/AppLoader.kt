@@ -6,7 +6,10 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
 import com.github.yongjhih.appdialer.model.AppModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -37,6 +40,8 @@ object AppLoader {
     @Volatile
     private var cachedApps: List<AppModel>? = null
 
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     suspend fun loadInstalledApps(
         context: Context,
         transliterator: CjkTransliterator = AndroidCjkTransliterator,
@@ -47,12 +52,25 @@ object AppLoader {
             return@withContext currentCache
         }
 
-        // Check Disk Cache for instant 0ms cold-start retrieval
+        // Instant 0ms Cold-Start Retrieval from Disk Cache
         val diskApps = if (!forceRefresh) AppDiskCache.loadAppsFromDisk(context) else null
-        if (diskApps != null && cachedApps == null) {
+        if (diskApps != null) {
             cachedApps = diskApps
+            // Trigger background scan to sync PackageManager changes asynchronously without delaying UI launch
+            scope.launch {
+                scanPackageManager(context, transliterator)
+            }
+            return@withContext diskApps
         }
 
+        // Fallback if disk cache is empty (first boot)
+        scanPackageManager(context, transliterator)
+    }
+
+    private fun scanPackageManager(
+        context: Context,
+        transliterator: CjkTransliterator
+    ): List<AppModel> {
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
@@ -78,7 +96,7 @@ object AppLoader {
 
         cachedApps = apps
         AppDiskCache.saveAppsToDisk(context, apps)
-        apps
+        return apps
     }
 
     fun clearCache() {
