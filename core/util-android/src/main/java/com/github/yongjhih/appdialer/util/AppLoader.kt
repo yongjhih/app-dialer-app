@@ -11,10 +11,19 @@ import java.util.Locale
 
 object AppLoader {
 
+    @Volatile
+    private var cachedApps: List<AppModel>? = null
+
     suspend fun loadInstalledApps(
         context: Context,
-        transliterator: CjkTransliterator = AndroidCjkTransliterator
+        transliterator: CjkTransliterator = AndroidCjkTransliterator,
+        forceRefresh: Boolean = false
     ): List<AppModel> = withContext(Dispatchers.IO) {
+        val currentCache = cachedApps
+        if (!forceRefresh && currentCache != null) {
+            return@withContext currentCache
+        }
+
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
@@ -33,7 +42,7 @@ object AppLoader {
             pm.queryIntentActivities(intent, flags)
         }
 
-        resolveInfos
+        val apps = resolveInfos
             .filterNot { it.activityInfo.packageName == context.packageName }
             .map { info ->
                 val label = info.loadLabel(pm).toString()
@@ -51,5 +60,12 @@ object AppLoader {
                 )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
+
+        cachedApps = apps
+        apps
+    }
+
+    fun clearCache() {
+        cachedApps = null
     }
 }

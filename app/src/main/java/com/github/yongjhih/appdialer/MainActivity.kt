@@ -17,9 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.github.yongjhih.appdialer.feature.dialer.android.AndroidMainAppWidget
 import com.github.yongjhih.appdialer.model.AppDefaults
+import com.github.yongjhih.appdialer.util.AppLoader
 import com.github.yongjhih.appdialer.util.selfAndChildren
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -28,6 +32,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         disablePendingTransition()
         super.onCreate(savedInstanceState)
+
+        // Pre-warm AppLoader cache in background thread immediately on activity launch
+        lifecycleScope.launch(Dispatchers.IO) {
+            AppLoader.loadInstalledApps(applicationContext)
+        }
 
         applyTransparentWindow()
 
@@ -58,38 +67,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun applyTransparentWindow() {
-        window.setFormat(PixelFormat.TRANSLUCENT)
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-
-        window.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window.attributes = window.attributes.apply {
-            dimAmount = AppDefaults.BACKGROUND_DIM_AMOUNT
-            format = PixelFormat.TRANSLUCENT
-        }
-
-        window.decorView.setBackgroundColor(Color.TRANSPARENT)
-        window.decorView.background = null
-    }
-
-    override fun finish() {
-        super.finish()
-        disablePendingTransition()
-    }
-
-    private fun disablePendingTransition() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
-        } else {
-            @Suppress("DEPRECATION")
-            overridePendingTransition(0, 0)
+        window.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+            )
+            val dimAmount = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                AppDefaults.BACKGROUND_DIM_AMOUNT
+            } else {
+                0.6f
+            }
+            setDimAmount(dimAmount)
+            setFormat(PixelFormat.TRANSLUCENT)
         }
     }
 }
