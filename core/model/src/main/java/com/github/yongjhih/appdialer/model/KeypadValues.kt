@@ -61,6 +61,4 @@ object KeypadValues {
     )
 
     fun configFor(key: String): KeypadKeyConfig = requireNotNull(keys[key])
-
-    fun matchesSettingsTrigger(key: String, trigger: String): Boolean = key == trigger
 }

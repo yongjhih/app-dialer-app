@@ -197,7 +197,7 @@ fun AppDialerScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             rowKeys.forEach { key ->
-                                val isSettingsTrigger = KeypadValues.matchesSettingsTrigger(key, settingsTriggerKey)
+                                val isSettingsTrigger = key == settingsTriggerKey
                                 if (key == KeypadValues.KEY_BACKSPACE) {
                                     val backspaceOnClick = if (isBackspaceSingleTapClearAllEnabled) onClearAllDigits else onDeleteOneDigit
                                     KeypadButton(
