@@ -15,7 +15,7 @@ To ensure max maintainability, reusability, and multiplatform readiness (Kotlin 
 ```mermaid
 graph TD
     subgraph ":app (Ultra-Thin Application Shell)"
-        A[MainActivity]
+        A[MainActivity / AppDialerApplication]
     end
 
     subgraph ":feature:dialer-android (Android Feature Composition)"
@@ -24,7 +24,7 @@ graph TD
     end
 
     subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.* & 0 :core:util-android)"
-        D[MainAppWidget / NavHost]
+        D[MainAppWidget Reactive Pipeline / NavHost]
         E[AppDialerScreen / AppGridItem Skeleton UI]
         F[AppDialerSettingsScreen]
         G[AppLauncher Interface]
@@ -36,11 +36,11 @@ graph TD
 
     subgraph ":core:util-android (Android Framework Helpers)"
         I[AppLoader / AndroidRecentAppsManager]
-        J[ViewUtils / AndroidCjkTransliterator / ResolveInfo.toAppModel()]
+        J[ViewUtils / AndroidCjkTransliterator / ResolveInfo.toAppModel() / coreUtilAndroidModule]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Algorithms & SAM Interfaces)"
-        K[T9Utils / RecentAppsManager / CjkTransliterator]
+        K[T9Utils / RecentAppsManager / CjkTransliterator / coreUtilModule]
     end
 
     subgraph ":core:model (Pure Kotlin JVM Domain Models)"
@@ -70,54 +70,83 @@ graph TD
 | Module | Plugin Type | Responsibilities & Boundaries | Multiplatform Ready |
 | :--- | :--- | :--- | :---: |
 | **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel` with deferred lazy evaluation & `iconProvider`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
-| **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
+| **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), Koin DI (`coreUtilModule`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
-| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ResolveInfo.toAppModel()`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
-| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
+| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ResolveInfo.toAppModel()`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`, `coreUtilAndroidModule`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
+| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, reactive search pipeline (`MainAppWidget`), and navigation. Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
 | **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, `AppLoader`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
-| **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
+| **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `AppDialerApplication` (Koin initialization), `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
 
 ---
 
-## 🔌 2. Dependency Injection & Decoupling Principles
+## 🔌 2. Dependency Injection Architecture (Koin DI)
 
-### ❌ Anti-Patterns Avoided
-1. **No Reflection for Framework APIs**: Avoid using reflection (`Class.forName()`) to access platform features. Instead, extract a clean SAM interface in the core module and provide native implementations in platform modules.
-2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
-
-### ✅ Best Practices Enforced
-1. **Strict Non-Null Receiver Type Safety**:
-   Extension functions MUST use explicit non-null receiver types (e.g. `Drawable.toImageBitmap(): ImageBitmap`) instead of ambiguous nullable types (`Any?.toImageBitmap(): ImageBitmap?`), enforcing compile-time type safety.
-2. **Interface Contract & Functional Parameter Injection**:
-   Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`). Default arguments (`recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager()`) allow 0-boilerplate local testing and preview instantiation.
-3. **Pre-converted UI Assets for Platform Independence**:
-   Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
-
-### 💉 DI Framework Selection & Migration Roadmap
-- **Current Phase (Pure Kotlin Manual DI)**: Default parameter injection is used for `:core:util` and `:feature:dialer` to maintain 0 external framework overhead, maximum KMP readiness, and instant unit test execution without annotation processing.
-- **Scale Migration Roadmap**:
-  - **KMP Multiplatform Target**: If expanding cross-platform (iOS / Desktop), adopt **Koin** (`koin-core` & `koin-compose`). Koin requires zero code generation (KSP/APT) and seamlessly integrates with Kotlin Multiplatform.
-  - **Pure Android Target**: If remaining strictly Android native, adopt **Hilt** (`hilt-android`). Hilt bindings MUST be isolated within `:app` and `:feature:dialer-android` as the application composition root, ensuring `:feature:dialer` remains completely framework-agnostic.
+### Koin DI Integration
+AppDialer adopts **Koin 3.5.3** as the primary Dependency Injection framework across all modules:
+1. **Pure Kotlin Module (`coreUtilModule` in `:core:util`)**:
+   Provides zero-android dependencies:
+   ```kotlin
+   val coreUtilModule = module {
+       single<CjkTransliterator> { DefaultCjkTransliterator }
+       single<RecentAppsManager> { InMemoryRecentAppsManager() }
+   }
+   ```
+2. **Android Adapter Module (`coreUtilAndroidModule` in `:core:util-android`)**:
+   Provides Android-native implementations:
+   ```kotlin
+   val coreUtilAndroidModule = module {
+       single<CjkTransliterator> { AndroidCjkTransliterator }
+       single<RecentAppsManager> { AndroidRecentAppsManager(get()) }
+   }
+   ```
+3. **Application Initialization (`AppDialerApplication` in `:app`)**:
+   Starts Koin container on application startup:
+   ```kotlin
+   class AppDialerApplication : Application() {
+       override fun onCreate() {
+           super.onCreate()
+           startKoin {
+               androidLogger(Level.ERROR)
+               androidContext(this@AppDialerApplication)
+               modules(coreUtilAndroidModule)
+           }
+       }
+   }
+   ```
 
 ---
 
 ## 🔄 3. Reactive State & Concurrency Control
 
 1. **Unidirectional Data Flow (UDF) & `StateFlow`**:
-   All UI state updates MUST flow through reactive state holders (`StateFlow` / `MutableStateFlow` or Compose `remember` / `derivedStateOf`). Composable screens MUST consume state as read-only value streams.
+   All UI state updates flow through reactive state holders (`StateFlow` / `MutableStateFlow` or Compose `remember` / `derivedStateOf`). Composable screens consume state as read-only value streams.
 2. **T9 Input Debouncing (`Flow.debounce`)**:
-   During rapid multi-tap T9 keypad typing, search query string changes MUST be debounced to avoid unnecessary search and scoring operations across 200+ installed apps.
+   Rapid multi-tap T9 keypad typing is debounced (50ms) via `snapshotFlow { searchQuery }.debounce(50L)` to avoid unnecessary search and scoring operations across 200+ installed apps.
+3. **Concurrency Protection & Off-Thread Processing (`flatMapLatest` & `Dispatchers.Default`)**:
+   In-flight search filtering jobs are automatically cancelled upon receiving new key digits via `flatMapLatest`, with calculations running off the main thread on `Dispatchers.Default`:
    ```kotlin
-   // Recommended snapshotFlow debounce pattern for Compose state
-   snapshotFlow { searchQuery }
-       .debounce(100L) // 100ms debounce buffer
-       .flatMapLatest { query ->
-           flow { emit(allApps.filterAndScore(query, ...)) }
-       }
-       .flowOn(Dispatchers.Default)
+   LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
+       snapshotFlow { searchQuery }
+           .debounce(50L)
+           .flatMapLatest { query ->
+               flow {
+                   val recentPackages = recentAppsManager.getRecentApps()
+                   val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+                   val result = allApps.filterAndScore(
+                       query = query,
+                       recentPackageNames = recentPackages,
+                       isFuzzyEnabled = isFuzzy,
+                       isZhuyinEnabled = isZhuyinEnabled,
+                       isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+                   )
+                   emit(result)
+               }.flowOn(Dispatchers.Default)
+           }
+           .collect { filtered ->
+               filteredApps = filtered
+           }
+   }
    ```
-3. **Concurrency Protection (`flatMapLatest`)**:
-   When a new T9 key is tapped, any ongoing in-flight filtering job for a previous search query MUST be automatically cancelled using `flatMapLatest`.
 
 ---
 
@@ -151,14 +180,27 @@ graph TD
 ### 1. Multi-Module Unit Tests
 Every module MUST maintain unit tests covering its public APIs and domain contracts (`:core:model`, `:core:util`, `:feature:dialer`). Unit tests MUST run in pure JVM environments without Robolectric or Android emulator overhead.
 
-### 2. UI Component Testing (`ComposeTestRule`)
-UI interactions for `:feature:dialer` (keypad tapping, backspace deletion, settings navigation) MUST be verified using Compose UI Test framework (`createComposeRule()` / `createAndroidComposeRule()`):
-- Verify T9 key taps append corresponding digits to `searchQuery`.
-- Verify backspace key taps clear or pop digits.
-- Verify long-click actions trigger `onLongClick` app detail callbacks.
+### 2. UI Component Testing (`ComposeTestRule` in `:feature:dialer`)
+UI interactions in `AppDialerScreenTest.kt` use `createComposeRule()` to test T9 keypad tapping, backspace deletion, and filtered app rendering:
+```kotlin
+@get:Rule
+val composeTestRule = createComposeRule()
+
+@Test
+fun testKeypadInputAndAppFiltering() {
+    composeTestRule.setContent {
+        AppDialerTheme {
+            MainAppWidget(loadApps = { listOf(sampleApp) })
+        }
+    }
+
+    composeTestRule.onNodeWithText("2").performClick()
+    composeTestRule.onNodeWithText("Camera").assertIsDisplayed()
+}
+```
 
 ### 3. Integration & E2E Testing Strategy (Maestro)
-- **Overlay Dialog E2E Testing**: Use **Maestro** or `integration_test` to verify overlay dialog dismiss on outside tap, app launch flow, and translucent background rendering.
+Use **Maestro** or `integration_test` to verify overlay dialog dismiss on outside tap, app launch flow, and translucent background rendering.
 
 ### 4. Pre-Commit Build Verification
 Run `./gradlew test assembleDebug` across all modules before any commit to ensure clean compilation and 100% test pass rate.
