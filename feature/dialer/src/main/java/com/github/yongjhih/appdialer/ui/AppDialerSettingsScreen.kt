@@ -54,7 +54,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.feature.dialer.R
-import com.github.yongjhih.appdialer.feature.dialer.BuildConfig
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition
@@ -287,8 +286,8 @@ fun AppDialerSettingsScreen(
                     title = stringResource(R.string.app_version_title),
                     subtitle = stringResource(
                         R.string.app_version_format,
-                        BuildConfig.VERSION_NAME,
-                        BuildConfig.VERSION_CODE
+                        AppDefaults.VERSION_NAME,
+                        AppDefaults.VERSION_CODE
                     ),
                     onClick = {}
                 )
