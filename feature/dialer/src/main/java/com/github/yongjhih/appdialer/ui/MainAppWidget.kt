@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.util.InMemoryRecentAppsManager
+import com.github.yongjhih.appdialer.util.Logger
 import com.github.yongjhih.appdialer.util.RecentAppsManager
 import com.github.yongjhih.appdialer.util.filterAndScore
 import kotlinx.coroutines.Dispatchers
@@ -37,14 +39,13 @@ object Destinations {
 fun MainAppWidget(
     resetSignal: Int = 0,
     loadApps: suspend () -> List<AppModel> = { emptyList() },
+    loadAppsSync: () -> List<AppModel>? = { null },
     recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
     appLauncher: AppLauncher? = null,
     onDismiss: () -> Unit = {}
 ) {
     val navController = rememberNavController()
 
-    var allApps by remember { mutableStateOf<List<AppModel>>(emptyList()) }
-    var filteredApps by remember { mutableStateOf<List<AppModel>>(emptyList()) }
     var searchQuery by remember { mutableStateOf("") }
 
     var settingsTriggerKey by remember { mutableStateOf(recentAppsManager.getSettingsTriggerKey()) }
@@ -56,22 +57,49 @@ fun MainAppWidget(
     var zhuyinPos by remember { mutableStateOf(recentAppsManager.getZhuyinPosition()) }
     var functionPos by remember { mutableStateOf(recentAppsManager.getFunctionPosition()) }
 
-    androidx.compose.runtime.SideEffect {
-        com.github.yongjhih.appdialer.util.Logger.d("AppDialerTime") { "MainAppWidget SideEffect executed (allApps=${allApps.size}, filteredApps=${filteredApps.size})" }
+    // Instant Frame 1 Initial State Retrieval (Pre-warmed from MainActivity.onCreate)
+    val initialLoadedApps = remember {
+        loadAppsSync() ?: emptyList()
     }
 
-    // Load installed apps once
+    val initialFilteredApps = remember(initialLoadedApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
+        if (initialLoadedApps.isNotEmpty()) {
+            val recents = recentAppsManager.getRecentApps()
+            val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+            initialLoadedApps.filterAndScore(
+                query = searchQuery,
+                recentPackageNames = recents,
+                isFuzzyEnabled = isFuzzy,
+                isZhuyinEnabled = isZhuyinEnabled,
+                isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+            )
+        } else {
+            emptyList()
+        }
+    }
+
+    var allApps by remember { mutableStateOf(initialLoadedApps) }
+    var filteredApps by remember { mutableStateOf(initialFilteredApps) }
+
+    SideEffect {
+        Logger.d("AppDialerTime") { "MainAppWidget SideEffect executed (allApps=${allApps.size}, filteredApps=${filteredApps.size})" }
+    }
+
+    // Load installed apps if not already populated on Frame 1
     LaunchedEffect(Unit) {
-        val start = System.currentTimeMillis()
-        allApps = loadApps()
-        com.github.yongjhih.appdialer.util.Logger.d("AppDialerTime") { "loadApps() returned ${allApps.size} apps in ${System.currentTimeMillis() - start}ms" }
+        if (allApps.isEmpty()) {
+            val start = System.currentTimeMillis()
+            val loaded = loadApps()
+            allApps = loaded
+            Logger.d("AppDialerTime") { "loadApps() returned ${loaded.size} apps in ${System.currentTimeMillis() - start}ms" }
+        }
     }
 
     // Reactive State Flow Pipeline with Instant Startup & Debounce Concurrency Protection
     LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
         if (allApps.isEmpty()) return@LaunchedEffect
 
-        // Immediately compute and emit initial app list with 0ms delay
+        // Immediately compute and emit initial app list with 0ms delay if not already filtered
         val recentPackages = recentAppsManager.getRecentApps()
         val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
         filteredApps = allApps.filterAndScore(
@@ -154,7 +182,6 @@ fun MainAppWidget(
                     },
                     onAppClick = { app ->
                         launchApp(app)
-                        onDismiss()
                     },
                     onAppLongClick = { app ->
                         openAppSettings(app)
@@ -169,46 +196,36 @@ fun MainAppWidget(
             composable(Destinations.SETTINGS) {
                 AppDialerSettingsScreen(
                     settingsTriggerKey = settingsTriggerKey,
-                    isZhuyinModeEnabled = isZhuyinEnabled,
+                    isZhuyinEnabled = isZhuyinEnabled,
                     isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
-                    isFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
                     functionPos = functionPos,
-                    onSettingsTriggerKeyChange = { key ->
+                    onSettingsTriggerKeyChanged = { key ->
                         settingsTriggerKey = key
                         recentAppsManager.setSettingsTriggerKey(key)
                     },
-                    onZhuyinModeToggle = { enabled ->
+                    onZhuyinToggleChanged = { enabled ->
                         isZhuyinEnabled = enabled
                         recentAppsManager.setZhuyinModeEnabled(enabled)
                     },
-                    onDisablePinyinOnZhuyinToggle = { enabled ->
+                    onDisablePinyinOnZhuyinToggleChanged = { enabled ->
                         isDisablePinyinOnZhuyinEnabledState = enabled
                         recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
                     },
-                    onFuzzySearchToggle = { enabled ->
-                        recentAppsManager.setFuzzySearchEnabled(enabled)
+                    onKeyLayoutPositionsChanged = { lPos, nPos, zPos, fPos ->
+                        lettersPos = lPos
+                        numberPos = nPos
+                        zhuyinPos = zPos
+                        functionPos = fPos
+                        recentAppsManager.setKeyLayoutPositions(lPos, nPos, zPos, fPos)
                     },
-                    onLettersPosChange = { pos ->
-                        lettersPos = pos
-                        recentAppsManager.setLettersPosition(pos)
-                    },
-                    onNumberPosChange = { pos ->
-                        numberPos = pos
-                        recentAppsManager.setNumberPosition(pos)
-                    },
-                    onZhuyinPosChange = { pos ->
-                        zhuyinPos = pos
-                        recentAppsManager.setZhuyinPosition(pos)
-                    },
-                    onFunctionPosChange = { pos ->
-                        functionPos = pos
-                        recentAppsManager.setFunctionPosition(pos)
-                    },
-                    onNavigateBack = {
+                    onBack = {
                         navController.popBackStack()
+                    },
+                    onOpenSystemAppSettings = {
+                        appLauncher?.openSystemAppSettings()
                     }
                 )
             }

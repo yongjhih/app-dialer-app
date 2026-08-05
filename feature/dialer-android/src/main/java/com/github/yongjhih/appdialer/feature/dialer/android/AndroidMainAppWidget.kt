@@ -47,6 +47,7 @@ fun AndroidMainAppWidget(
     MainAppWidget(
         resetSignal = resetSignal,
         loadApps = { AppLoader.loadInstalledApps(context) },
+        loadAppsSync = { AppLoader.loadInstalledAppsSync(context) },
         recentAppsManager = manager,
         appLauncher = androidLauncher,
         onDismiss = onDismiss
