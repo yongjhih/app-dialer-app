@@ -135,12 +135,12 @@ dependencyResolutionManagement {
 ```kotlin
 dependencies {
     // 純 Kotlin JVM 模型與 T9 搜尋演算法
-    implementation("com.github.yongjhih.appdialer:core-model:main-SNAPSHOT")
-    implementation("com.github.yongjhih.appdialer:core-util:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:core-model:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:core-util:main-SNAPSHOT")
 
     // Compose UI 與 Android 功能模組
-    implementation("com.github.yongjhih.appdialer:feature-dialer:main-SNAPSHOT")
-    implementation("com.github.yongjhih.appdialer:feature-dialer-android:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:feature-dialer:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:feature-dialer-android:main-SNAPSHOT")
 }
 ```
 
