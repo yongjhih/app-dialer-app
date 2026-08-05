@@ -65,9 +65,9 @@ object AppDiskCache {
                         t9Full = obj.optString("t9Full", ""),
                         t9Initials = obj.optString("t9Initials", ""),
                         t9Words = words,
-                        t9CjkFull = obj.optString("t9CjkFull", ""),
-                        t9CjkInitials = obj.optString("t9CjkInitials", ""),
-                        t9ZhuyinInitials = obj.optString("t9ZhuyinInitials", "")
+                        rawT9CjkFull = obj.optString("t9CjkFull", ""),
+                        rawT9CjkInitials = obj.optString("t9CjkInitials", ""),
+                        rawT9ZhuyinInitials = obj.optString("t9ZhuyinInitials", "")
                     )
                 )
             }
