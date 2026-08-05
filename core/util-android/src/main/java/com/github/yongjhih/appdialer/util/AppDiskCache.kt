@@ -1,7 +1,6 @@
 package com.github.yongjhih.appdialer.util
 
 import android.content.Context
-import android.util.Log
 import com.github.yongjhih.appdialer.model.AppModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -40,9 +39,9 @@ object AppDiskCache {
                 .apply()
 
             val elapsed = System.currentTimeMillis() - startTime
-            Log.d(TAG, "Persisted ${apps.size} apps to disk cache JSON in ${elapsed}ms.")
+            Logger.d(TAG) { "Persisted ${apps.size} apps to disk cache JSON in ${elapsed}ms." }
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to persist apps to disk cache", e)
+            Logger.w(TAG, e) { "Failed to persist apps to disk cache" }
         }
     }
 
@@ -89,10 +88,10 @@ object AppDiskCache {
                 )
             }
             val elapsed = System.currentTimeMillis() - startTime
-            Log.d(TAG, "Loaded ${apps.size} apps from disk cache JSON in ${elapsed}ms.")
+            Logger.d(TAG) { "Loaded ${apps.size} apps from disk cache JSON in ${elapsed}ms." }
             apps.ifEmpty { null }
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to parse disk cache JSON", e)
+            Logger.w(TAG, e) { "Failed to parse disk cache JSON" }
             null
         }
     }

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
-import android.util.Log
 import com.github.yongjhih.appdialer.model.AppModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,14 +58,14 @@ object AppLoader {
     ): List<AppModel>? {
         val currentCache = cachedApps
         if (currentCache != null) {
-            Log.d(TAG, "Sync load hit memory cache with ${currentCache.size} apps.")
+            Logger.d(TAG) { "Sync load hit memory cache with ${currentCache.size} apps." }
             return currentCache
         }
 
         val diskApps = AppDiskCache.loadAppsFromDisk(context)
         if (diskApps != null) {
             cachedApps = diskApps
-            Log.d(TAG, "Sync load hit disk cache with ${diskApps.size} apps. Scheduling background scan in 2s...")
+            Logger.d(TAG) { "Sync load hit disk cache with ${diskApps.size} apps. Scheduling background scan in 2s..." }
             scope.launch {
                 delay(2000L) // Delay background scan so initial Compose launch has zero CPU contention
                 scanPackageManager(context, transliterator)
@@ -83,7 +82,7 @@ object AppLoader {
     ): List<AppModel> = withContext(Dispatchers.IO) {
         val currentCache = cachedApps
         if (!forceRefresh && currentCache != null) {
-            Log.d(TAG, "Loaded ${currentCache.size} apps from memory cache.")
+            Logger.d(TAG) { "Loaded ${currentCache.size} apps from memory cache." }
             return@withContext currentCache
         }
 
@@ -91,7 +90,7 @@ object AppLoader {
         val diskApps = if (!forceRefresh) AppDiskCache.loadAppsFromDisk(context) else null
         if (diskApps != null) {
             cachedApps = diskApps
-            Log.d(TAG, "Loaded ${diskApps.size} apps instantly from disk cache. Scheduling background scan in 2s...")
+            Logger.d(TAG) { "Loaded ${diskApps.size} apps instantly from disk cache. Scheduling background scan in 2s..." }
             // Trigger background scan asynchronously after 2s without delaying UI launch
             scope.launch {
                 delay(2000L)
@@ -100,7 +99,7 @@ object AppLoader {
             return@withContext diskApps
         }
 
-        Log.d(TAG, "Disk cache miss. Performing concurrent PackageManager scan...")
+        Logger.d(TAG) { "Disk cache miss. Performing concurrent PackageManager scan..." }
         scanPackageManager(context, transliterator)
     }
 
@@ -142,14 +141,14 @@ object AppLoader {
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
         val elapsed = System.currentTimeMillis() - startTime
-        Log.d(TAG, "Scanned ${apps.size} launcher activities in ${elapsed}ms.")
+        Logger.d(TAG) { "Scanned ${apps.size} launcher activities in ${elapsed}ms." }
         cachedApps = apps
         AppDiskCache.saveAppsToDisk(context, apps)
         apps
     }
 
     fun clearCache() {
-        Log.d(TAG, "Memory cache cleared.")
+        Logger.d(TAG) { "Memory cache cleared." }
         cachedApps = null
     }
 }

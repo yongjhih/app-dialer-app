@@ -35,6 +35,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.koin.android)
+    implementation(libs.kotlin.logging)
 }
 
 publishing {
