@@ -113,28 +113,24 @@ fun MainAppWidget(
         ) {
             composable(Destinations.DIALER) {
                 AppDialerScreen(
+                    apps = filteredApps,
                     searchQuery = searchQuery,
-                    filteredApps = filteredApps,
                     settingsTriggerKey = settingsTriggerKey,
                     isZhuyinEnabled = isZhuyinEnabled,
-                    isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState,
-                    lettersPosition = lettersPos,
-                    numberPosition = numberPos,
-                    zhuyinPosition = zhuyinPos,
-                    functionPosition = functionPos,
-                    onKeyClick = { digit ->
+                    lettersPos = lettersPos,
+                    numberPos = numberPos,
+                    zhuyinPos = zhuyinPos,
+                    functionPos = functionPos,
+                    onDigitPressed = { digit ->
                         searchQuery += digit
                     },
-                    onBackspaceClick = {
+                    onDeleteOneDigit = {
                         if (searchQuery.isNotEmpty()) {
                             searchQuery = searchQuery.dropLast(1)
                         }
                     },
-                    onClearClick = {
+                    onClearAllDigits = {
                         searchQuery = ""
-                    },
-                    onOpenSettings = {
-                        navController.navigate(Destinations.SETTINGS)
                     },
                     onAppClick = { app ->
                         launchApp(app)
@@ -143,52 +139,55 @@ fun MainAppWidget(
                     onAppLongClick = { app ->
                         openAppSettings(app)
                     },
+                    onOpenDialerSettings = {
+                        navController.navigate(Destinations.SETTINGS)
+                    },
                     onDismiss = onDismiss
                 )
             }
 
             composable(Destinations.SETTINGS) {
                 AppDialerSettingsScreen(
-                    initialSettingsTriggerKey = settingsTriggerKey,
-                    initialIsZhuyinEnabled = isZhuyinEnabled,
-                    initialIsDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
-                    initialIsFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
-                    initialLettersPosition = lettersPos,
-                    initialNumberPosition = numberPos,
-                    initialZhuyinPosition = zhuyinPos,
-                    initialFunctionPosition = functionPos,
+                    settingsTriggerKey = settingsTriggerKey,
+                    isZhuyinModeEnabled = isZhuyinEnabled,
+                    isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
+                    isFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
+                    lettersPos = lettersPos,
+                    numberPos = numberPos,
+                    zhuyinPos = zhuyinPos,
+                    functionPos = functionPos,
                     onSettingsTriggerKeyChange = { key ->
                         settingsTriggerKey = key
                         recentAppsManager.setSettingsTriggerKey(key)
                     },
-                    onZhuyinEnabledChange = { enabled ->
+                    onZhuyinModeToggle = { enabled ->
                         isZhuyinEnabled = enabled
                         recentAppsManager.setZhuyinModeEnabled(enabled)
                     },
-                    onDisablePinyinOnZhuyinEnabledChange = { enabled ->
+                    onDisablePinyinOnZhuyinToggle = { enabled ->
                         isDisablePinyinOnZhuyinEnabledState = enabled
                         recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
                     },
-                    onFuzzySearchEnabledChange = { enabled ->
+                    onFuzzySearchToggle = { enabled ->
                         recentAppsManager.setFuzzySearchEnabled(enabled)
                     },
-                    onLettersPositionChange = { pos ->
+                    onLettersPosChange = { pos ->
                         lettersPos = pos
                         recentAppsManager.setLettersPosition(pos)
                     },
-                    onNumberPositionChange = { pos ->
+                    onNumberPosChange = { pos ->
                         numberPos = pos
                         recentAppsManager.setNumberPosition(pos)
                     },
-                    onZhuyinPositionChange = { pos ->
+                    onZhuyinPosChange = { pos ->
                         zhuyinPos = pos
                         recentAppsManager.setZhuyinPosition(pos)
                     },
-                    onFunctionPositionChange = { pos ->
+                    onFunctionPosChange = { pos ->
                         functionPos = pos
                         recentAppsManager.setFunctionPosition(pos)
                     },
-                    onBackClick = {
+                    onNavigateBack = {
                         navController.popBackStack()
                     }
                 )
