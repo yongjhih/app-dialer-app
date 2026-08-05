@@ -95,6 +95,15 @@ graph TD
 
 ---
 
+## ⚡ 5. Performance & Instant Launch Architecture
+
+1. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
+   `AppLoader` maintains an in-memory `@Volatile` cache of loaded `AppModel` lists. Subsequent calls to `loadInstalledApps()` return cached results in **0 milliseconds** without re-querying `PackageManager` or re-processing CJK transliteration.
+2. **Early Background Pre-Warming**:
+   `MainActivity.onCreate()` launches background cache loading on `Dispatchers.IO` immediately upon Activity instantiation (`lifecycleScope.launch(Dispatchers.IO) { AppLoader.loadInstalledApps(applicationContext) }`), guaranteeing instant UI rendering when composables render.
+
+---
+
 ## 📱 3. Activity & Navigation Architecture
 
 1. **Ultra-Thin Activity Shell**: `MainActivity` is strictly limited to Activity lifecycle events, window transparency (`applyTransparentWindow()`), and passing intent re-launch triggers (`resetSignal`). It NEVER holds UI state or search query buffers.
