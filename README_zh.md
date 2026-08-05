@@ -95,8 +95,8 @@
 
 1. **複製專案庫**：
    ```bash
-   git clone https://github.com/yongjhih/AppDialer.git
-   cd AppDialer
+   git clone https://github.com/yongjhih/app-dialer-app.git
+   cd app-dialer-app
    ```
 
 2. **編譯偵錯版 APK**：

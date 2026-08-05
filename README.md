@@ -97,8 +97,8 @@ Customize where each element is rendered on your keypad buttons:
 
 1. **Clone repository**:
    ```bash
-   git clone https://github.com/yongjhih/AppDialer.git
-   cd AppDialer
+   git clone https://github.com/yongjhih/app-dialer-app.git
+   cd app-dialer-app
    ```
 
 2. **Build Debug APK**:
