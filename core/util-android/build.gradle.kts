@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.github.yongjhih.appdialer.core.util"
+    namespace = "com.github.yongjhih.appdialer.core.util.android"
     compileSdk = 34
 
     defaultConfig {
@@ -22,7 +22,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
-
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.junit)
+    implementation(project(":core:util"))
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
 }

@@ -6,7 +6,7 @@ This document outlines the architectural principles, module boundaries, navigati
 
 ## 🏛️ 1. Multi-Module Architecture Overview
 
-AppDialer is modularized into four distinct, single-responsibility Gradle modules:
+AppDialer is modularized into single-responsibility Gradle modules separated by layer and framework dependencies:
 
 ```mermaid
 graph TD
@@ -20,10 +20,13 @@ graph TD
         D[AppDialerSettingsScreen]
     end
 
+    subgraph ":core:util-android"
+        E[AppLoader / RecentAppsManager]
+        F[ViewUtils / Extensions]
+    end
+
     subgraph ":core:util"
-        E[T9Utils / CjkTransliterator]
-        F[AppLoader / RecentAppsManager]
-        G[ViewUtils / Extensions]
+        G[T9Utils / CjkTransliterator]
     end
 
     subgraph ":core:model"
@@ -37,6 +40,8 @@ graph TD
     B --> E
     B --> F
     B --> G
+    E --> G
+    F --> G
     C --> H
     D --> H
     E --> H
@@ -49,7 +54,8 @@ graph TD
 | Module | Type | Responsibilities |
 | :--- | :--- | :--- |
 | **`:core:model`** | Android Library | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad value definitions (`KeyLayout`). Zero business logic, minimal dependencies. |
-| **`:core:util`** | Android Library | T9 Pinyin/Zhuyin search algorithms (`T9Utils`), CJK transliteration (`CjkTransliterator`), package installation loader (`AppLoader`), SharedPreferences manager (`RecentAppsManager`), and Android KTX view helpers (`ViewUtils`). |
+| **`:core:util`** | Android Library (Pure Utils) | Pure Kotlin utilities & algorithms (`T9Utils`, `CjkTransliterator`). Independent of Android framework APIs (`Context`, `View`). |
+| **`:core:util-android`** | Android Library (Android Framework Utils) | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`) requiring `Context`, `SharedPreferences`, `View`, and `PackageManager`. |
 | **`:feature:dialer`** | Android Library (Compose) | All Jetpack Compose UI screens, 3x3 interactive keypad diagrams, Material 3 themes (`Theme.kt`, `Color.kt`), and navigation orchestration (`MainAppWidget`). |
 | **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. |
 
@@ -81,13 +87,6 @@ val View.selfAndChildren: Sequence<View>
         yield(this@selfAndChildren)
         (this@selfAndChildren as? ViewGroup)?.children?.let { yieldAll(it) }
     }
-
-fun Activity.clearContentBackgrounds() {
-    findViewById<View>(android.R.id.content)?.selfAndChildren?.forEach { view ->
-        view.setBackgroundColor(Color.TRANSPARENT)
-        view.background = null
-    }
-}
 ```
 
 ---
