@@ -41,7 +41,7 @@ object AppLoader {
                     label = label,
                     packageName = info.activityInfo.packageName,
                     className = info.activityInfo.name,
-                    icon = info.loadIcon(pm),
+                    icon = info.loadIcon(pm).toImageBitmap(),
                     t9Full = label.toT9(),
                     t9Initials = label.toT9Initials(),
                     t9Words = label.toT9Words(),

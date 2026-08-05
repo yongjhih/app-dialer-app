@@ -59,7 +59,7 @@ import com.github.yongjhih.appdialer.ui.theme.cardBorder
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
 import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
-import com.github.yongjhih.appdialer.util.toImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 
 fun KeyLabelPosition.toAlignment(): Alignment = when (this) {
     KeyLabelPosition.TOP_LEFT -> Alignment.TopStart
@@ -215,7 +215,7 @@ fun AppGridItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    val imageBitmap = remember(app) { app.icon.toImageBitmap() }
+    val imageBitmap = remember(app) { app.icon as? ImageBitmap }
     val colorScheme = MaterialTheme.colorScheme
     val highlightColor = colorScheme.matchedHighlight
     val textColor = colorScheme.onSurface
