@@ -79,9 +79,21 @@ graph TD
 
 ---
 
-## ⚡ 2. Performance, Trie Cache & Async Assets Architecture
+## ⚡ 2. Performance, Trie Cache & Instant Launch Architecture
 
-### 🚀 2.1 LazyRow Item Keys & State Preservation for Silky Smooth UI
+### ⚡ 2.1 0ms Instant Cold-Start & Non-Blocking Background Scanning
+To eliminate visual delays when opening AppDialer:
+
+1. **Immediate Disk Cache Return ([`AppLoader.kt`](file:///Users/yongjhih/AndroidStudioProjects/AppDialer/core/util-android/src/main/java/com/github/yongjhih/appdialer/util/AppLoader.kt))**:
+   `AppLoader.loadInstalledApps(context)` reads `AppDiskCache` in **< 2ms** and returns `diskApps` immediately without waiting for `PackageManager.queryIntentActivities` (which takes ~300-500ms).
+2. **Asynchronous Background Sync**:
+   `PackageManager.queryIntentActivities` is dispatched asynchronously in a background coroutine (`scope.launch { scanPackageManager(...) }`) to update memory and disk caches without delaying app UI rendering.
+3. **0ms Initial State Pipeline Emission ([`MainAppWidget.kt`](file:///Users/yongjhih/AndroidStudioProjects/AppDialer/feature/dialer/src/main/java/com/github/yongjhih/appdialer/ui/MainAppWidget.kt))**:
+   `MainAppWidget` immediately evaluates and renders initial recent apps with 0ms delay. T9 typing debounce (`50ms`) is applied dynamically via `.debounce { query -> if (query.isEmpty()) 0L else 50L }` only when the user types digits.
+
+---
+
+### 🚀 2.2 LazyRow Item Keys & State Preservation for Silky Smooth UI
 To achieve buttery smooth scrolling and zero icon reloading/flickering during rapid T9 keypad typing:
 
 1. **`LazyRow` Explicit Unique Item Keys**:
@@ -91,7 +103,7 @@ To achieve buttery smooth scrolling and zero icon reloading/flickering during ra
 
 ---
 
-### 🌲 2.2 T9 Prefix Trie Cache (`T9TrieCache`) & Background Pre-Warming
+### 🌲 2.3 T9 Prefix Trie Cache (`T9TrieCache`) & Background Pre-Warming
 To achieve microsecond-level ($O(K)$) response times when the user taps digits on the T9 keypad, AppDialer utilizes `T9TrieCache` in `:core:util`:
 
 1. **Tree Architecture**:
@@ -103,7 +115,7 @@ To achieve microsecond-level ($O(K)$) response times when the user taps digits o
 
 ---
 
-### 🖼️ 2.3 Async Icon Loading (`awaitIcon()`) & Skeleton Placeholder UI
+### 🖼️ 2.4 Async Icon Loading (`awaitIcon()`) & Skeleton Placeholder UI
 Decoding Android `Drawable`s into Compose `ImageBitmap`s involves IPC and Canvas bitmap creation, which causes main-thread jank if performed synchronously during composition.
 
 1. **Deferred / Suspending Asset Contract (`AppModel`)**:
@@ -114,11 +126,6 @@ Decoding Android `Drawable`s into Compose `ImageBitmap`s involves IPC and Canvas
    While `imageBitmap` is null (loading in background), `AppGridItem` renders a 48.dp rounded square skeleton box with a soft translucent background (`onSurface.copy(alpha = 0.12f)`) displaying the app's first initial letter. Upon resolution, `imageBitmap` updates smoothly.
 4. **Dynamic Icon Providers for Disk-Cached Models (`AppDiskCache`)**:
    When `AppDiskCache` restores `AppModel` instances from disk on cold start, it dynamically attaches `iconProvider = { pm.getApplicationIcon(packageName).toImageBitmap() }`. When rendered, `awaitIcon()` evaluates this provider off-thread, guaranteeing icons render seamlessly for both disk-cached and fresh models.
-
----
-
-### 💾 2.4 Non-Bitmap Metadata Disk Cache (`AppDiskCache`)
-`AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk. Cold start reads cached metadata from disk in **< 2ms**, providing instant app availability while `PackageManager` scans for package updates in the background.
 
 ---
 
@@ -161,7 +168,7 @@ AppDialer adopts **Koin 3.5.3** as the primary Dependency Injection framework ac
 1. **Unidirectional Data Flow (UDF) & `StateFlow`**:
    All UI state updates flow through reactive state holders (`StateFlow` / `MutableStateFlow` or Compose `remember` / `derivedStateOf`).
 2. **T9 Input Debouncing (`Flow.debounce`)**:
-   Rapid multi-tap T9 keypad typing is debounced (50ms) via `snapshotFlow { searchQuery }.debounce(50L)`.
+   Rapid multi-tap T9 keypad typing is debounced (50ms) via `snapshotFlow { searchQuery }.debounce { query -> if (query.isEmpty()) 0L else 50L }`.
 3. **Concurrency Protection & Off-Thread Processing (`flatMapLatest` & `Dispatchers.Default`)**:
    In-flight search filtering jobs are automatically cancelled upon receiving new key digits via `flatMapLatest`.
 
