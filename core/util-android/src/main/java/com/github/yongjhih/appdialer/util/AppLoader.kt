@@ -47,6 +47,12 @@ object AppLoader {
             return@withContext currentCache
         }
 
+        // Check Disk Cache for instant 0ms cold-start retrieval
+        val diskApps = if (!forceRefresh) AppDiskCache.loadAppsFromDisk(context) else null
+        if (diskApps != null && cachedApps == null) {
+            cachedApps = diskApps
+        }
+
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
@@ -71,6 +77,7 @@ object AppLoader {
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
         cachedApps = apps
+        AppDiskCache.saveAppsToDisk(context, apps)
         apps
     }
 

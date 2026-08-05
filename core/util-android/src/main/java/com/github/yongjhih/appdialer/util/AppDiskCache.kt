@@ -1,0 +1,79 @@
+package com.github.yongjhih.appdialer.util
+
+import android.content.Context
+import com.github.yongjhih.appdialer.model.AppModel
+import org.json.JSONArray
+import org.json.JSONObject
+
+/**
+ * Disk cache helper for persisting non-bitmap [AppModel] metadata across app restarts.
+ */
+object AppDiskCache {
+
+    private const val PREF_NAME = "app_dialer_disk_cache"
+    private const val KEY_CACHED_APPS_JSON = "cached_apps_json"
+
+    fun saveAppsToDisk(context: Context, apps: List<AppModel>) {
+        try {
+            val jsonArray = JSONArray()
+            for (app in apps) {
+                val jsonObject = JSONObject().apply {
+                    put("label", app.label)
+                    put("packageName", app.packageName)
+                    put("className", app.className)
+                    put("t9Full", app.t9Full)
+                    put("t9Initials", app.t9Initials)
+                    put("t9Words", JSONArray(app.t9Words))
+                    put("t9CjkFull", app.t9CjkFull)
+                    put("t9CjkInitials", app.t9CjkInitials)
+                    put("t9ZhuyinInitials", app.t9ZhuyinInitials)
+                }
+                jsonArray.put(jsonObject)
+            }
+
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putString(KEY_CACHED_APPS_JSON, jsonArray.toString())
+                .apply()
+        } catch (e: Exception) {
+            // Ignore cache save failures gracefully
+        }
+    }
+
+    fun loadAppsFromDisk(context: Context): List<AppModel>? {
+        val jsonString = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CACHED_APPS_JSON, null) ?: return null
+
+        return try {
+            val jsonArray = JSONArray(jsonString)
+            val apps = mutableListOf<AppModel>()
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val wordsArray = obj.optJSONArray("t9Words")
+                val words = mutableListOf<String>()
+                if (wordsArray != null) {
+                    for (j in 0 until wordsArray.length()) {
+                        words.add(wordsArray.getString(j))
+                    }
+                }
+
+                apps.add(
+                    AppModel(
+                        label = obj.getString("label"),
+                        packageName = obj.getString("packageName"),
+                        className = obj.getString("className"),
+                        t9Full = obj.optString("t9Full", ""),
+                        t9Initials = obj.optString("t9Initials", ""),
+                        t9Words = words,
+                        t9CjkFull = obj.optString("t9CjkFull", ""),
+                        t9CjkInitials = obj.optString("t9CjkInitials", ""),
+                        t9ZhuyinInitials = obj.optString("t9ZhuyinInitials", "")
+                    )
+                )
+            }
+            apps.ifEmpty { null }
+        } catch (e: Exception) {
+            null
+        }
+    }
+}

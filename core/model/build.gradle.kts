@@ -14,5 +14,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(kotlin("test"))
 }
