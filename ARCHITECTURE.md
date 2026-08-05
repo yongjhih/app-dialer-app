@@ -25,7 +25,7 @@ graph TD
 
     subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.* & 0 :core:util-android)"
         D["MainAppWidget Reactive Pipeline / NavHost"]
-        E["AppDialerScreen / AppGridItem Skeleton UI"]
+        E["AppDialerScreen / AppGridItem Skeleton UI & Item Keys"]
         F["AppDialerSettingsScreen"]
         G["AppLauncher Interface"]
     end
@@ -73,7 +73,7 @@ graph TD
 | **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), T9 prefix trie cache (`T9TrieCache`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), Koin DI (`coreUtilModule`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AppDiskCache`, `AndroidRecentAppsManager`, `ResolveInfo.toAppModel()`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`, `coreUtilAndroidModule`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
-| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, reactive search pipeline (`MainAppWidget`), and navigation. Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
+| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, reactive search pipeline (`MainAppWidget`), item key optimizations, and navigation. Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
 | **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, `AppLoader`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
 | **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `AppDialerApplication` (Koin initialization), `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
 
@@ -81,7 +81,17 @@ graph TD
 
 ## ⚡ 2. Performance, Trie Cache & Async Assets Architecture
 
-### 🌲 2.1 T9 Prefix Trie Cache (`T9TrieCache`) & Background Pre-Warming
+### 🚀 2.1 LazyRow Item Keys & State Preservation for Silky Smooth UI
+To achieve buttery smooth scrolling and zero icon reloading/flickering during rapid T9 keypad typing:
+
+1. **`LazyRow` Explicit Unique Item Keys**:
+   `LazyRow` uses explicit item keys (`key = { app -> "${app.packageName}/${app.className}" }`), allowing Compose to track, reuse, and reorder item composables without re-instantiating them.
+2. **Stable State Preservation (`remember` & `LaunchedEffect`)**:
+   `AppGridItem` keys internal bitmap state on `app.packageName` and `app.className` instead of the full `AppModel` object (`remember(app.packageName, app.className)`). When T9 typing re-scores `AppModel` instances with updated `matchScore` and `matchedIndices`, the already-decoded `imageBitmap` is preserved in memory **100% flicker-free**.
+
+---
+
+### 🌲 2.2 T9 Prefix Trie Cache (`T9TrieCache`) & Background Pre-Warming
 To achieve microsecond-level ($O(K)$) response times when the user taps digits on the T9 keypad, AppDialer utilizes `T9TrieCache` in `:core:util`:
 
 1. **Tree Architecture**:
@@ -89,54 +99,17 @@ To achieve microsecond-level ($O(K)$) response times when the user taps digits o
 2. **Time Complexity**:
    Searching for a T9 digit sequence (e.g., `"236"`) traverses at most $K$ nodes ($K$ = query length, typically 1 to 5 digits), yielding sub-millisecond (~0.01ms) instant filtering regardless of installed app count.
 3. **Background Pre-Warming Pipeline**:
-   Upon app startup, `T9TrieCache.preWarmRecentQueries(allApps, recentQueries)` runs on `Dispatchers.Default` to populate nodes for recent and frequent search queries:
-   ```kotlin
-   val trieCache = T9TrieCache()
-   
-   // Background pre-warming on Dispatchers.Default
-   suspend fun preWarm(apps: List<AppModel>, recentQueries: List<String>) = withContext(Dispatchers.Default) {
-       trieCache.rebuild(apps)
-       for (query in recentQueries) {
-           trieCache.searchPrefix(query)
-       }
-   }
-   ```
+   Upon app startup, `T9TrieCache.preWarmRecentQueries(allApps, recentQueries)` runs on `Dispatchers.Default` to populate nodes for recent and frequent search queries.
 
 ---
 
-### 🖼️ 2.2 Async Icon Loading (`awaitIcon()`) & Skeleton Placeholder UI
+### 🖼️ 2.3 Async Icon Loading (`awaitIcon()`) & Skeleton Placeholder UI
 Decoding Android `Drawable`s into Compose `ImageBitmap`s involves IPC and Canvas bitmap creation, which causes main-thread jank if performed synchronously during composition.
 
 1. **Deferred / Suspending Asset Contract (`AppModel`)**:
-   `AppModel` encapsulates lazy providers (`iconProvider: (() -> Any?)?`, `iconDeferred: Deferred<Any?>?`) and exposes a non-blocking suspending fetcher `awaitIcon()`:
-   ```kotlin
-   data class AppModel(
-       val label: String,
-       val packageName: String,
-       val iconDeferred: Deferred<Any?>? = null,
-       val iconProvider: (() -> Any?)? = null,
-       private val rawIcon: Any? = null
-   ) {
-       val icon: Any? by lazy { rawIcon }
-       
-       suspend fun awaitIcon(): Any? {
-           return rawIcon ?: iconDeferred?.await() ?: iconProvider?.invoke()
-       }
-   }
-   ```
+   `AppModel` encapsulates lazy providers (`iconProvider: (() -> Any?)?`, `iconDeferred: Deferred<Any?>?`) and exposes a non-blocking suspending fetcher `awaitIcon()`.
 2. **Off-Thread Composition in `AppGridItem` (`:feature:dialer`)**:
-   `AppGridItem` executes `app.awaitIcon()` inside `LaunchedEffect(app)` on `Dispatchers.IO`:
-   ```kotlin
-   var imageBitmap by remember(app) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
-   
-   LaunchedEffect(app) {
-       if (imageBitmap == null) {
-           imageBitmap = withContext(Dispatchers.IO) {
-               app.awaitIcon() as? ImageBitmap
-           }
-       }
-   }
-   ```
+   `AppGridItem` executes `app.awaitIcon()` inside `LaunchedEffect(app.packageName, app.className)` on `Dispatchers.IO`.
 3. **Skeleton Loading Placeholder**:
    While `imageBitmap` is null (loading in background), `AppGridItem` renders a 48.dp rounded square skeleton box with a soft translucent background (`onSurface.copy(alpha = 0.12f)`) displaying the app's first initial letter. Upon resolution, `imageBitmap` updates smoothly.
 4. **Dynamic Icon Providers for Disk-Cached Models (`AppDiskCache`)**:
@@ -144,7 +117,7 @@ Decoding Android `Drawable`s into Compose `ImageBitmap`s involves IPC and Canvas
 
 ---
 
-### 💾 2.3 Non-Bitmap Metadata Disk Cache (`AppDiskCache`)
+### 💾 2.4 Non-Bitmap Metadata Disk Cache (`AppDiskCache`)
 `AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk. Cold start reads cached metadata from disk in **< 2ms**, providing instant app availability while `PackageManager` scans for package updates in the background.
 
 ---
