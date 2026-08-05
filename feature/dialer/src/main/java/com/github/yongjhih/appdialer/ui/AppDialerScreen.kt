@@ -198,11 +198,12 @@ fun AppDialerScreen(
                         ) {
                             rowKeys.forEach { key ->
                                 val isSettingsTrigger = key == settingsTriggerKey
+                                val subtitleIcon = if (isSettingsTrigger) Icons.Default.Settings else null
                                 if (key == KeypadValues.KEY_BACKSPACE) {
                                     val backspaceOnClick = if (isBackspaceSingleTapClearAllEnabled) onClearAllDigits else onDeleteOneDigit
                                     KeypadButton(
                                         icon = Icons.AutoMirrored.Filled.Backspace,
-                                        subtitleIcon = if (isSettingsTrigger) Icons.Default.Settings else null,
+                                        subtitleIcon = subtitleIcon,
                                         numberPos = numberPos,
                                         lettersPos = lettersPos,
                                         zhuyinPos = zhuyinPos,
@@ -213,12 +214,12 @@ fun AppDialerScreen(
                                         modifier = Modifier.weight(1f, fill = true)
                                     )
                                 } else {
-                                    val config = KeypadValues.keys[key] ?: return@forEach
+                                    val config = KeypadValues.keys.getValue(key)
                                     KeypadButton(
                                         number = config.number,
                                         letters = config.letters,
                                         zhuyin = if (isZhuyinEnabled) config.zhuyin else null,
-                                        subtitleIcon = if (isSettingsTrigger) Icons.Default.Settings else null,
+                                        subtitleIcon = subtitleIcon,
                                         numberPos = numberPos,
                                         lettersPos = lettersPos,
                                         zhuyinPos = zhuyinPos,
