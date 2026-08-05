@@ -5,7 +5,6 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -18,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.ui.MainAppWidget
+import com.github.yongjhih.appdialer.util.clearContentBackgrounds
 import android.graphics.Color as AndroidColor
 
 class MainActivity : ComponentActivity() {
@@ -72,21 +72,6 @@ class MainActivity : ComponentActivity() {
 
         window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
         window.decorView.background = null
-    }
-
-    private fun clearContentBackgrounds() {
-        findViewById<View>(android.R.id.content)?.let { content ->
-            content.setBackgroundColor(AndroidColor.TRANSPARENT)
-            content.background = null
-            if (content is ViewGroup) {
-                for (i in 0 until content.childCount) {
-                    content.getChildAt(i)?.let { child ->
-                        child.setBackgroundColor(AndroidColor.TRANSPARENT)
-                        child.background = null
-                    }
-                }
-            }
-        }
     }
 
     override fun finish() {
