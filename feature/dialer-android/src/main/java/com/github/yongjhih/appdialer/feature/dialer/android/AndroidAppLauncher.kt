@@ -1,0 +1,60 @@
+package com.github.yongjhih.appdialer.feature.dialer.android
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import android.widget.Toast
+import com.github.yongjhih.appdialer.feature.dialer.R
+import com.github.yongjhih.appdialer.model.AppDefaults
+import com.github.yongjhih.appdialer.model.AppModel
+import com.github.yongjhih.appdialer.ui.AppLauncher
+
+class AndroidAppLauncher(
+    private val context: Context,
+    private val onDismiss: () -> Unit = {}
+) : AppLauncher {
+
+    override fun launchApp(app: AppModel) {
+        try {
+            val launchIntent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+            if (launchIntent != null) {
+                context.startActivity(launchIntent)
+                onDismiss()
+            } else {
+                Toast.makeText(context, context.getString(R.string.cannot_launch_app, app.label), Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, context.getString(R.string.error_launching_app, e.message.orEmpty()), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun openAppDetails(app: AppModel) {
+        try {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse(AppDefaults.PACKAGE_URI_SCHEME + app.packageName)
+            )
+            context.startActivity(intent)
+            onDismiss()
+        } catch (e: Exception) {
+            Toast.makeText(context, context.getString(R.string.cannot_open_app_settings, app.label), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun openSystemAppSettings() {
+        try {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse(AppDefaults.PACKAGE_URI_SCHEME + context.packageName)
+            )
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context, R.string.cannot_open_settings, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+}

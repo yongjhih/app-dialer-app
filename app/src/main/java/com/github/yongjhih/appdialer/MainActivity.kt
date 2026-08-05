@@ -17,8 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
+import com.github.yongjhih.appdialer.feature.dialer.android.AndroidMainAppWidget
 import com.github.yongjhih.appdialer.model.AppDefaults
-import com.github.yongjhih.appdialer.ui.MainAppWidget
 import com.github.yongjhih.appdialer.util.selfAndChildren
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         applyTransparentWindow()
 
         setContent {
-            MainAppWidget(
+            AndroidMainAppWidget(
                 resetSignal = resetSignal,
                 onDismiss = { finish() },
                 onApplyTransparentWindow = { applyTransparentWindow() }

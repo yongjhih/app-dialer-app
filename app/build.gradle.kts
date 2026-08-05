@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:util-android"))
     implementation(project(":feature:dialer"))
+    implementation(project(":feature:dialer-android"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

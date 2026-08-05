@@ -6,10 +6,10 @@ This document outlines the architectural principles, module boundaries, navigati
 
 ## 🏛️ 1. Multi-Module Architecture Overview
 
-AppDialer is modularized into single-responsibility Gradle modules separated by layer, Compose UI design systems, and Android framework dependencies.
+AppDialer is modularized into single-responsibility Gradle modules separated by layer, Compose UI design systems, platform interfaces, and Android framework dependencies.
 Both **`:core:model`** and **`:core:util`** are **Pure Kotlin (JVM)** modules, allowing non-Android Kotlin projects (CLI tools, Server backends, KMP, Desktop apps) to depend on them seamlessly.
-**`:core:ui`** encapsulates Android-independent Compose UI tokens and themes (`Color.kt`, `Theme.kt`).
-**`:core:util-android`** handles Android SDK framework helpers including app package loading, recents storage, and Android graphics/drawable conversions (`DrawableUtils.kt`).
+**`:feature:dialer`** contains all Compose UI screens and state containers, decoupled from Android APIs via the **`AppLauncher`** interface and repository callbacks.
+**`:feature:dialer-android`** provides the Android-specific implementation (`AndroidAppLauncher`, `AndroidMainAppWidget`) bridging Android `Context`, `Intent`, `Settings`, `AppLoader`, and `RecentAppsManager`.
 
 ```mermaid
 graph TD
@@ -17,43 +17,51 @@ graph TD
         A[MainActivity]
     end
 
-    subgraph ":feature:dialer (Android Library - Feature Composition)"
-        B[MainAppWidget / NavHost]
-        C[AppDialerScreen]
-        D[AppDialerSettingsScreen]
+    subgraph ":feature:dialer-android (Android Library)"
+        B[AndroidMainAppWidget]
+        C[AndroidAppLauncher]
+    end
+
+    subgraph ":feature:dialer (Compose UI - Platform Independent)"
+        D[MainAppWidget / NavHost]
+        E[AppDialerScreen]
+        F[AppDialerSettingsScreen]
+        G[AppLauncher Interface]
     end
 
     subgraph ":core:ui (Android / Multiplatform Compose UI)"
-        E[Theme.kt / Color.kt]
+        H[Theme.kt / Color.kt]
     end
 
     subgraph ":core:util-android (Android Library)"
-        F[AppLoader / RecentAppsManager]
-        G[ViewUtils / DrawableUtils]
+        I[AppLoader / RecentAppsManager]
+        J[ViewUtils / DrawableUtils]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Library)"
-        H[T9Utils / CjkTransliterator]
+        K[T9Utils / CjkTransliterator]
     end
 
     subgraph ":core:model (Pure Kotlin JVM Library)"
-        I[AppModel / KeyLabelPosition]
-        J[AppDefaults / KeyLayout]
+        L[AppModel / KeyLabelPosition]
+        M[AppDefaults / KeyLayout]
     end
 
     A --> B
     B --> C
     B --> D
-    B --> E
-    B --> F
-    B --> G
-    B --> H
-    C --> I
-    D --> I
-    F --> H
-    G --> H
-    H --> I
-    J --> I
+    C --> G
+    D --> E
+    D --> F
+    D --> H
+    B --> I
+    B --> J
+    E --> L
+    F --> L
+    I --> K
+    J --> K
+    K --> L
+    M --> L
 ```
 
 ### Module Responsibilities
@@ -64,7 +72,8 @@ graph TD
 | **`:core:util`** | **Pure Kotlin (JVM)** | Pure Kotlin utilities & search algorithms (`T9Utils`, `CjkTransliterator`). Fully decoupled from Android framework APIs (`id("kotlin")`). | ✅ Yes |
 | **`:core:ui`** | **Compose Library** | Android-independent Compose UI design system tokens (`Color.kt`, `Theme.kt`), and pure UI composables. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | Android Library | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`, `DrawableUtils.kt`) requiring `Context`, `SharedPreferences`, `View`, `Drawable`, and `PackageManager`. | ❌ Android Only |
-| **`:feature:dialer`** | Android Library (Compose) | All feature screen compositions, 3x3 interactive keypad diagrams, and navigation orchestration (`MainAppWidget`). | ❌ Android Only |
+| **`:feature:dialer`** | **Compose Library** | All UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation state (`MainAppWidget`). Decoupled from Android via `AppLauncher` interface. Zero `android.*` imports! | 🟢 Compose Multiplatform |
+| **`:feature:dialer-android`** | Android Library | Android-specific feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging `Context`, `Intent`, `Settings`, `AppLoader`, and `RecentAppsManager`. | ❌ Android Only |
 | **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. | ❌ Android Only |
 
 ---

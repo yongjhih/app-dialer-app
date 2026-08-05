@@ -1,6 +1,5 @@
 package com.github.yongjhih.appdialer.ui
 
-import android.graphics.drawable.ColorDrawable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,7 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -288,7 +288,7 @@ fun KeypadButton(
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val view = LocalView.current
+    val hapticFeedback = LocalHapticFeedback.current
     val colorScheme = MaterialTheme.colorScheme
 
     Surface(
@@ -296,12 +296,12 @@ fun KeypadButton(
             .height(58.dp)
             .combinedClickable(
                 onClick = {
-                    view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     onClick()
                 },
                 onLongClick = if (onLongClick != null) {
                     {
-                        view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         onLongClick()
                     }
                 } else null
@@ -385,10 +385,10 @@ fun KeypadButton(
 @Composable
 fun AppDialerScreenPreview() {
     val sampleApps = listOf(
-        AppModel("YouTube", "com.google.android.youtube", "MainActivity", ColorDrawable(android.graphics.Color.RED), "9688823", "9", listOf("9688823")),
-        AppModel("Google Maps", "com.google.android.apps.maps", "MainActivity", ColorDrawable(android.graphics.Color.GREEN), "4664536277", "46", listOf("466453", "6277")),
-        AppModel("Chrome", "com.android.chrome", "MainActivity", ColorDrawable(android.graphics.Color.YELLOW), "247663", "2", listOf("247663")),
-        AppModel("Spotify", "com.spotify.music", "MainActivity", ColorDrawable(android.graphics.Color.CYAN), "7768439", "7", listOf("7768439"))
+        AppModel("YouTube", "com.google.android.youtube", "MainActivity", null, "9688823", "9", listOf("9688823")),
+        AppModel("Google Maps", "com.google.android.apps.maps", "MainActivity", null, "4664536277", "46", listOf("466453", "6277")),
+        AppModel("Chrome", "com.android.chrome", "MainActivity", null, "247663", "2", listOf("247663")),
+        AppModel("Spotify", "com.spotify.music", "MainActivity", null, "7768439", "7", listOf("7768439"))
     )
 
     AppDialerTheme {
