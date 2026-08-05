@@ -1,12 +1,10 @@
 package com.github.yongjhih.appdialer.model
 
-import android.graphics.drawable.Drawable
-
 data class AppModel(
     val label: String,
     val packageName: String,
     val className: String,
-    val icon: Drawable,
+    val icon: Any? = null,
     val t9Full: String,
     val t9Initials: String,
     val t9Words: List<String>,

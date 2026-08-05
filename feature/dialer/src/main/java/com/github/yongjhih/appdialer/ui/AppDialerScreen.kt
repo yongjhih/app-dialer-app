@@ -60,7 +60,14 @@ import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
 import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
 
-fun KeyLabelPosition.toAlignment(): Alignment = alignment
+fun KeyLabelPosition.toAlignment(): Alignment = when (this) {
+    KeyLabelPosition.TOP_LEFT -> Alignment.TopStart
+    KeyLabelPosition.TOP_RIGHT -> Alignment.TopEnd
+    KeyLabelPosition.CENTER -> Alignment.Center
+    KeyLabelPosition.BOTTOM_LEFT -> Alignment.BottomStart
+    KeyLabelPosition.BOTTOM_RIGHT -> Alignment.BottomEnd
+    KeyLabelPosition.HIDDEN -> Alignment.Center
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

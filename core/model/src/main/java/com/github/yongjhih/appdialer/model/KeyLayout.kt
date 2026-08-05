@@ -1,18 +1,16 @@
 package com.github.yongjhih.appdialer.model
 
-import androidx.compose.ui.Alignment
-
 /**
  * A stable, type-safe identifier for a position within a keypad button.
  * [preferenceValue] preserves values written by earlier app versions.
  */
-enum class KeyLabelPosition(val preferenceValue: String, val alignment: Alignment) {
-    TOP_LEFT("TopLeft", Alignment.TopStart),
-    TOP_RIGHT("TopRight", Alignment.TopEnd),
-    CENTER("Center", Alignment.Center),
-    BOTTOM_LEFT("BottomLeft", Alignment.BottomStart),
-    BOTTOM_RIGHT("BottomRight", Alignment.BottomEnd),
-    HIDDEN("None", Alignment.Center);
+enum class KeyLabelPosition(val preferenceValue: String) {
+    TOP_LEFT("TopLeft"),
+    TOP_RIGHT("TopRight"),
+    CENTER("Center"),
+    BOTTOM_LEFT("BottomLeft"),
+    BOTTOM_RIGHT("BottomRight"),
+    HIDDEN("None");
 
     companion object {
         fun fromPreference(value: String?, default: KeyLabelPosition): KeyLabelPosition =

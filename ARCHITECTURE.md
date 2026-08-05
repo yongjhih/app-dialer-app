@@ -6,30 +6,31 @@ This document outlines the architectural principles, module boundaries, navigati
 
 ## 🏛️ 1. Multi-Module Architecture Overview
 
-AppDialer is modularized into single-responsibility Gradle modules separated by layer and framework dependencies:
+AppDialer is modularized into single-responsibility Gradle modules separated by layer and framework dependencies.
+Both **`:core:model`** and **`:core:util`** are **Pure Kotlin (JVM)** modules, allowing non-Android Kotlin projects (CLI tools, Server backends, KMP, Desktop apps) to depend on them seamlessly.
 
 ```mermaid
 graph TD
-    subgraph ":app"
+    subgraph ":app (Android App)"
         A[MainActivity]
     end
 
-    subgraph ":feature:dialer"
+    subgraph ":feature:dialer (Android Library - Compose)"
         B[MainAppWidget / NavHost]
         C[AppDialerScreen]
         D[AppDialerSettingsScreen]
     end
 
-    subgraph ":core:util-android"
+    subgraph ":core:util-android (Android Library)"
         E[AppLoader / RecentAppsManager]
         F[ViewUtils / Extensions]
     end
 
-    subgraph ":core:util"
+    subgraph ":core:util (Pure Kotlin JVM Library)"
         G[T9Utils / CjkTransliterator]
     end
 
-    subgraph ":core:model"
+    subgraph ":core:model (Pure Kotlin JVM Library)"
         H[AppModel / KeyLabelPosition]
         I[AppDefaults / KeyLayout]
     end
@@ -51,13 +52,13 @@ graph TD
 
 ### Module Responsibilities
 
-| Module | Type | Responsibilities |
-| :--- | :--- | :--- |
-| **`:core:model`** | Android Library | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad value definitions (`KeyLayout`). Zero business logic, minimal dependencies. |
-| **`:core:util`** | Android Library (Pure Utils) | Pure Kotlin utilities & algorithms (`T9Utils`, `CjkTransliterator`). Independent of Android framework APIs (`Context`, `View`). |
-| **`:core:util-android`** | Android Library (Android Framework Utils) | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`) requiring `Context`, `SharedPreferences`, `View`, and `PackageManager`. |
-| **`:feature:dialer`** | Android Library (Compose) | All Jetpack Compose UI screens, 3x3 interactive keypad diagrams, Material 3 themes (`Theme.kt`, `Color.kt`), and navigation orchestration (`MainAppWidget`). |
-| **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. |
+| Module | Type | Responsibilities | Non-Android Reusable |
+| :--- | :--- | :--- | :---: |
+| **`:core:model`** | **Pure Kotlin (JVM)** | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad value definitions (`KeyLayout`). Zero Android SDK/Compose dependencies (`id("kotlin")`). | ✅ Yes |
+| **`:core:util`** | **Pure Kotlin (JVM)** | Pure Kotlin utilities & search algorithms (`T9Utils`, `CjkTransliterator`). Fully decoupled from Android framework APIs (`id("kotlin")`). | ✅ Yes |
+| **`:core:util-android`** | Android Library | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`) requiring `Context`, `SharedPreferences`, `View`, and `PackageManager`. | ❌ Android Only |
+| **`:feature:dialer`** | Android Library (Compose) | All Jetpack Compose UI screens, 3x3 interactive keypad diagrams, Material 3 themes (`Theme.kt`, `Color.kt`), and navigation orchestration (`MainAppWidget`). | ❌ Android Only |
+| **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. | ❌ Android Only |
 
 ---
 
