@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    `maven-publish`
 }
 
 android {
@@ -25,6 +26,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -39,4 +45,17 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.github.yongjhih.appdialer"
+            artifactId = "core-ui"
+            version = "1.0.0"
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }

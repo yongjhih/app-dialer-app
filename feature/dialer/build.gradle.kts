@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    `maven-publish`
 }
 
 android {
@@ -26,6 +27,11 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
     }
 }
 
@@ -54,4 +60,17 @@ dependencies {
     // Compose UI Testing
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.github.yongjhih.appdialer"
+            artifactId = "feature-dialer"
+            version = "1.0.0"
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }

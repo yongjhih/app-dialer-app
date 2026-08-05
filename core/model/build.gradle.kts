@@ -1,5 +1,6 @@
 plugins {
     id("kotlin")
+    `maven-publish`
 }
 
 java {
@@ -16,4 +17,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(kotlin("test"))
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            groupId = "com.github.yongjhih.appdialer"
+            artifactId = "core-model"
+            version = "1.0.0"
+        }
+    }
 }

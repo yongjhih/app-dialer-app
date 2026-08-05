@@ -1,5 +1,6 @@
 plugins {
     id("kotlin")
+    `maven-publish`
 }
 
 java {
@@ -18,4 +19,15 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(kotlin("test"))
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            groupId = "com.github.yongjhih.appdialer"
+            artifactId = "core-util"
+            version = "1.0.0"
+        }
+    }
 }
