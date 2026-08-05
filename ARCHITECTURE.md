@@ -81,17 +81,14 @@ graph TD
 
 ## ⚡ 4. Performance & Async UI Architecture
 
-1. **T9 Prefix Trie Cache (`T9TrieCache`)**:
-   - T9 search queries use `T9TrieCache` for $O(K)$ lookup speed (~0.01ms).
-   - `preWarmRecentQueries(allApps, recentQueries)` runs in a background coroutine upon app startup to pre-build Trie nodes for recent search inputs.
-2. **AppModel Non-Bitmap Metadata Disk Cache (`AppDiskCache`)**:
-   - `AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk.
-   - On cold start, `AppLoader` reads cached metadata from disk in **< 2ms**, providing instant app availability while `PackageManager` scans for package updates in background.
-3. **`Deferred<T>` & Suspending Methods in `AppModel`**:
-   - `AppModel` supports `Deferred<T>` fields (`iconDeferred`, `t9CjkFullDeferred`, `t9CjkInitialsDeferred`, `t9ZhuyinInitialsDeferred`) and suspending fetchers (`awaitIcon()`, `awaitCjkFull()`, `awaitCjkInitials()`, `awaitZhuyinInitials()`).
-   - Heavy tasks (Canvas bitmap rendering and ICU CJK transliteration) run asynchronously in background jobs, preventing any main-thread blocking.
-4. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
-   - `AppLoader` maintains an in-memory `@Volatile` cache. Re-open calls return cached results in **0 milliseconds**.
+1. **Dynamic Icon Providers for Disk-Cached Models (`AppDiskCache`)**:
+   When `AppDiskCache` restores `AppModel` instances from disk, it dynamically attaches an `iconProvider = { pm.getApplicationIcon(packageName).toImageBitmap() }`. When rendered in `AppGridItem`, `app.awaitIcon()` evaluates this provider off-thread on `Dispatchers.IO`, ensuring icons render seamlessly for both cached and fresh models.
+2. **T9 Prefix Trie Cache (`T9TrieCache`)**:
+   T9 search queries use `T9TrieCache` for $O(K)$ lookup speed (~0.01ms). `preWarmRecentQueries(allApps, recentQueries)` runs in a background coroutine upon app startup.
+3. **AppModel Non-Bitmap Metadata Disk Cache (`AppDiskCache`)**:
+   `AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk. Cold start reads cached metadata from disk in **< 2ms**.
+4. **`Deferred<T>` & Suspending Methods in `AppModel`**:
+   `AppModel` supports `Deferred<T>` fields and suspending fetcher `awaitIcon()`. Heavy tasks (Canvas bitmap rendering and ICU CJK transliteration) run asynchronously in background jobs on `Dispatchers.IO`.
 
 ---
 
