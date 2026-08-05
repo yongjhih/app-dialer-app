@@ -50,13 +50,13 @@ object AppLoader {
                     label = label,
                     packageName = info.activityInfo.packageName,
                     className = info.activityInfo.name,
-                    icon = info.loadIcon(pm).toImageBitmap(),
                     t9Full = label.toT9(),
                     t9Initials = label.toT9Initials(),
                     t9Words = label.toT9Words(),
-                    t9CjkFull = label.toCjkT9Full(transliterator),
-                    t9CjkInitials = label.toCjkT9Initials(transliterator),
-                    t9ZhuyinInitials = label.toZhuyinT9Initials(transliterator)
+                    iconProvider = { info.loadIcon(pm).toImageBitmap() },
+                    t9CjkFullProvider = { label.toCjkT9Full(transliterator) },
+                    t9CjkInitialsProvider = { label.toCjkT9Initials(transliterator) },
+                    t9ZhuyinInitialsProvider = { label.toZhuyinT9Initials(transliterator) }
                 )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
