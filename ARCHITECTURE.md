@@ -110,8 +110,10 @@ To achieve microsecond-level ($O(K)$) response times when the user taps digits o
    Each node (`TrieNode`) maps digit characters (`'2'..'9'`) to child nodes and maintains a list of matching `AppModel` references.
 2. **Time Complexity**:
    Searching for a T9 digit sequence (e.g., `"236"`) traverses at most $K$ nodes ($K$ = query length, typically 1 to 5 digits), yielding sub-millisecond (~0.01ms) instant filtering regardless of installed app count.
-3. **Background Pre-Warming Pipeline**:
-   Upon app startup, `T9TrieCache.preWarmRecentQueries(allApps, recentQueries)` runs on `Dispatchers.Default` to populate nodes for recent and frequent search queries.
+3. **Runtime Wiring (`MainAppWidget`)**:
+   `MainAppWidget` owns a `T9TrieCache`, rebuilds it on `Dispatchers.Default` whenever `allApps` changes, and passes it into `filterAndScore(..., trie = trieCache)` so digit taps prune candidates in O(K) before scoring. Fuzzy mode still scans the full list.
+4. **Background Pre-Warming Pipeline**:
+   `T9TrieCache.preWarmRecentQueries(allApps, recentQueries)` (or `rebuild`) runs on `Dispatchers.Default` to populate nodes; suffix insertion makes contiguous mid-key queries work like `indexOf`.
 
 ---
 

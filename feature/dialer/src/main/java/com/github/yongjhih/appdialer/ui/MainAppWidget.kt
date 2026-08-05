@@ -20,6 +20,7 @@ import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.util.InMemoryRecentAppsManager
 import com.github.yongjhih.appdialer.util.Logger
 import com.github.yongjhih.appdialer.util.RecentAppsManager
+import com.github.yongjhih.appdialer.util.T9TrieCache
 import com.github.yongjhih.appdialer.util.filterAndScore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 object Destinations {
     const val DIALER = "dialer"
@@ -57,6 +59,9 @@ fun MainAppWidget(
     var zhuyinPos by remember { mutableStateOf(recentAppsManager.getZhuyinPosition()) }
     var functionPos by remember { mutableStateOf(recentAppsManager.getFunctionPosition()) }
 
+    // Shared T9 trie: rebuilt when [allApps] changes; used to prune search candidates.
+    val trieCache = remember { T9TrieCache() }
+
     // Instant Frame 1 Initial State Retrieval (Pre-warmed from MainActivity.onCreate)
     val initialLoadedApps = remember {
         loadAppsSync() ?: emptyList()
@@ -66,12 +71,14 @@ fun MainAppWidget(
         if (initialLoadedApps.isNotEmpty()) {
             val recents = recentAppsManager.getRecentApps()
             val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+            // Empty query → recent-apps ordering (trie not needed yet)
             initialLoadedApps.filterAndScore(
                 query = searchQuery,
                 recentPackageNames = recents,
                 isFuzzyEnabled = isFuzzy,
                 isZhuyinEnabled = isZhuyinEnabled,
-                isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+                isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState,
+                trie = null
             )
         } else {
             emptyList()
@@ -80,9 +87,10 @@ fun MainAppWidget(
 
     var allApps by remember { mutableStateOf(initialLoadedApps) }
     var filteredApps by remember { mutableStateOf(initialFilteredApps) }
+    var trieGeneration by remember { mutableStateOf(0) }
 
     SideEffect {
-        Logger.d("AppDialerTime") { "MainAppWidget SideEffect executed (allApps=${allApps.size}, filteredApps=${filteredApps.size})" }
+        Logger.d("AppDialerTime") { "MainAppWidget SideEffect executed (allApps=${allApps.size}, filteredApps=${filteredApps.size}, trie=${trieCache.indexedAppCount})" }
     }
 
     // Load installed apps if not already populated on Frame 1
@@ -95,9 +103,28 @@ fun MainAppWidget(
         }
     }
 
+    // Build / rebuild T9 trie off the main thread whenever the app catalog changes.
+    LaunchedEffect(allApps) {
+        if (allApps.isEmpty()) {
+            trieCache.clear()
+            trieGeneration = 0
+            return@LaunchedEffect
+        }
+        val start = System.currentTimeMillis()
+        withContext(Dispatchers.Default) {
+            trieCache.rebuild(allApps)
+        }
+        trieGeneration++
+        Logger.d("AppDialerTime") {
+            "T9TrieCache rebuilt for ${trieCache.indexedAppCount} apps in ${System.currentTimeMillis() - start}ms"
+        }
+    }
+
     // Reactive State Flow Pipeline with Instant Startup & Debounce Concurrency Protection
-    LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
+    LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState, trieGeneration) {
         if (allApps.isEmpty()) return@LaunchedEffect
+
+        val activeTrie = if (trieCache.isReady()) trieCache else null
 
         // Immediately compute and emit initial app list with 0ms delay if not already filtered
         val recentPackages = recentAppsManager.getRecentApps()
@@ -107,7 +134,8 @@ fun MainAppWidget(
             recentPackageNames = recentPackages,
             isFuzzyEnabled = isFuzzy,
             isZhuyinEnabled = isZhuyinEnabled,
-            isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+            isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState,
+            trie = activeTrie
         )
 
         snapshotFlow { searchQuery }
@@ -121,7 +149,8 @@ fun MainAppWidget(
                         recentPackageNames = recents,
                         isFuzzyEnabled = fuzzy,
                         isZhuyinEnabled = isZhuyinEnabled,
-                        isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+                        isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState,
+                        trie = if (trieCache.isReady()) trieCache else null
                     )
                     emit(result)
                 }.flowOn(Dispatchers.Default)

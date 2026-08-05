@@ -66,13 +66,18 @@ fun String.toZhuyinT9Initials(transliterator: CjkTransliterator = DefaultCjkTran
 /**
  * Filter and score apps with support for recent apps ordering, character highlight indexing,
  * fuzzy T9 matching, and CJK (Chinese & Japanese) Pinyin/Romaji/Zhuyin transliteration matching.
+ *
+ * When [trie] is ready and fuzzy is off, candidates are pruned via [T9TrieCache.searchPrefix]
+ * (O(K) digit walk) before scoring — same match semantics, far less work on large app lists.
+ * Fuzzy mode always scans the full list (non-contiguous matches are not trie-indexable).
  */
 fun List<AppModel>.filterAndScore(
     query: String,
     recentPackageNames: List<String> = emptyList(),
     isFuzzyEnabled: Boolean = false,
     isZhuyinEnabled: Boolean = false,
-    isDisablePinyinOnZhuyin: Boolean = false
+    isDisablePinyinOnZhuyin: Boolean = false,
+    trie: T9TrieCache? = null
 ): List<AppModel> = query.trim().let { q ->
     if (q.isEmpty()) {
         val recentOrderMap = recentPackageNames.withIndex().associate { it.value to it.index }
@@ -81,7 +86,15 @@ fun List<AppModel>.filterAndScore(
                 .thenBy { it.label.lowercase(Locale.getDefault()) }
         ).map { it.copy(matchScore = 0, matchedIndices = emptyList()) }
     } else {
-        asSequence()
+        val candidates: List<AppModel> = when {
+            // Fuzzy = non-contiguous; cannot prune with contiguous T9 trie
+            isFuzzyEnabled -> this
+            trie != null && trie.isReady() -> trie.searchPrefix(q)
+            else -> this
+        }
+
+        candidates
+            .asSequence()
             .mapNotNull { app ->
                 app.calculateMatch(q, isFuzzyEnabled, isZhuyinEnabled, isDisablePinyinOnZhuyin)?.let { (score, indices) ->
                     app.copy(matchScore = score, matchedIndices = indices)
