@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://jitpack.io/#yongjhih/AppDialer"><img src="https://jitpack.io/v/yongjhih/AppDialer.svg" alt="JitPack"></a>
+  <a href="https://jitpack.io/#yongjhih/app-dialer-app"><img src="https://jitpack.io/v/yongjhih/app-dialer-app.svg" alt="JitPack"></a>
   <a href="https://developer.android.com/about/versions/android-5.0"><img src="https://img.shields.io/badge/Min%20SDK-API%2021%20%28Android%205.0%29-brightgreen.svg" alt="Min SDK"></a>
   <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Language-Kotlin-blue.svg" alt="Language"></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose%20%2F%20Material%203-blueviolet.svg" alt="UI Framework"></a>
@@ -137,12 +137,12 @@ Then add the desired AppDialer module(s) to your module's `build.gradle.kts`:
 ```kotlin
 dependencies {
     // Pure Kotlin JVM models & T9 search algorithms
-    implementation("com.github.yongjhih.AppDialer:core-model:main-SNAPSHOT")
-    implementation("com.github.yongjhih.AppDialer:core-util:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:core-model:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:core-util:main-SNAPSHOT")
 
     // Compose UI & Android Feature modules
-    implementation("com.github.yongjhih.AppDialer:feature-dialer:main-SNAPSHOT")
-    implementation("com.github.yongjhih.AppDialer:feature-dialer-android:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:feature-dialer:main-SNAPSHOT")
+    implementation("com.github.yongjhih.app-dialer-app:feature-dialer-android:main-SNAPSHOT")
 }
 ```
 
