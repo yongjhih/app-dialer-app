@@ -34,8 +34,13 @@ class MainActivity : ComponentActivity() {
     private var resetSignal by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        @Suppress("DEPRECATION")
-        overridePendingTransition(0, 0)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
+        }
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate (resetSignal=$resetSignal)")
 
@@ -72,6 +77,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
+        }
         resetSignal++
         Log.d(TAG, "onNewIntent (resetSignal=$resetSignal)")
     }
