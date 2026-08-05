@@ -44,7 +44,7 @@ graph TD
     end
 
     subgraph ":core:model (Pure Kotlin JVM Domain Models)"
-        L[AppModel / KeyLabelPosition]
+        L[AppModel Deferred Lazy Evaluation / KeyLabelPosition]
         M[AppDefaults / KeyLayout]
     end
 
@@ -69,13 +69,24 @@ graph TD
 
 | Module | Plugin Type | Responsibilities & Boundaries | Multiplatform Ready |
 | :--- | :--- | :--- | :---: |
-| **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
+| **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel` with deferred lazy evaluation), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
 | **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
 | **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
 | **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, `AppLoader`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
 | **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
+
+---
+
+## ⚡ 5. Performance & Instant Launch Architecture
+
+1. **Deferred / Lazy Evaluation in `AppModel`**:
+   `AppModel` supports lazy providers (`iconProvider`, `t9CjkFullProvider`, `t9CjkInitialsProvider`, `t9ZhuyinInitialsProvider`). Heavy tasks (such as PNG/Canvas icon rendering and ICU CJK transliteration) are deferred until the property is explicitly read during search or UI rendering.
+2. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
+   `AppLoader` maintains an in-memory `@Volatile` cache of loaded `AppModel` lists. Subsequent calls to `loadInstalledApps()` return cached results in **0 milliseconds**.
+3. **Early Background Pre-Warming**:
+   `MainActivity.onCreate()` launches background cache loading on `Dispatchers.IO` immediately upon Activity instantiation.
 
 ---
 
@@ -92,15 +103,6 @@ graph TD
    Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`).
 3. **Pre-converted UI Assets for Platform Independence**:
    Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
-
----
-
-## ⚡ 5. Performance & Instant Launch Architecture
-
-1. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
-   `AppLoader` maintains an in-memory `@Volatile` cache of loaded `AppModel` lists. Subsequent calls to `loadInstalledApps()` return cached results in **0 milliseconds** without re-querying `PackageManager` or re-processing CJK transliteration.
-2. **Early Background Pre-Warming**:
-   `MainActivity.onCreate()` launches background cache loading on `Dispatchers.IO` immediately upon Activity instantiation (`lifecycleScope.launch(Dispatchers.IO) { AppLoader.loadInstalledApps(applicationContext) }`), guaranteeing instant UI rendering when composables render.
 
 ---
 
