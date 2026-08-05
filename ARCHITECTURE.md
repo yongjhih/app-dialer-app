@@ -25,7 +25,7 @@ graph TD
 
     subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.* & 0 :core:util-android)"
         D[MainAppWidget / NavHost]
-        E[AppDialerScreen]
+        E[AppDialerScreen / AppGridItem Skeleton UI]
         F[AppDialerSettingsScreen]
         G[AppLauncher Interface]
     end
@@ -69,7 +69,7 @@ graph TD
 
 | Module | Plugin Type | Responsibilities & Boundaries | Multiplatform Ready |
 | :--- | :--- | :--- | :---: |
-| **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel` with deferred lazy evaluation), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
+| **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel` with deferred lazy evaluation & `iconProvider`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
 | **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
@@ -79,13 +79,15 @@ graph TD
 
 ---
 
-## ⚡ 5. Performance & Instant Launch Architecture
+## ⚡ 5. Performance & Async UI Architecture
 
-1. **Deferred / Lazy Evaluation in `AppModel`**:
+1. **Async Icon Loading with Skeleton Placeholder (`AppGridItem`)**:
+   When rendering `AppGridItem`, `AppModel.iconProvider` is evaluated asynchronously on background thread (`Dispatchers.IO`). While loading, a sleek 48.dp **Skeleton Loading Placeholder** displaying the app's first initial letter is shown on translucent background (`onSurface.copy(alpha = 0.12f)`). When decoded, the icon updates seamlessly.
+2. **Deferred / Lazy Evaluation in `AppModel`**:
    `AppModel` supports lazy providers (`iconProvider`, `t9CjkFullProvider`, `t9CjkInitialsProvider`, `t9ZhuyinInitialsProvider`). Heavy tasks (such as PNG/Canvas icon rendering and ICU CJK transliteration) are deferred until the property is explicitly read during search or UI rendering.
-2. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
+3. **In-Memory Volatile Caching (`AppLoader.cachedApps`)**:
    `AppLoader` maintains an in-memory `@Volatile` cache of loaded `AppModel` lists. Subsequent calls to `loadInstalledApps()` return cached results in **0 milliseconds**.
-3. **Early Background Pre-Warming**:
+4. **Early Background Pre-Warming**:
    `MainActivity.onCreate()` launches background cache loading on `Dispatchers.IO` immediately upon Activity instantiation.
 
 ---
