@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="https://jitpack.io/#yongjhih/AppDialer"><img src="https://jitpack.io/v/yongjhih/AppDialer.svg" alt="JitPack"></a>
   <a href="https://developer.android.com/about/versions/android-5.0"><img src="https://img.shields.io/badge/Min%20SDK-API%2021%20%28Android%205.0%29-brightgreen.svg" alt="Min SDK"></a>
   <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Language-Kotlin-blue.svg" alt="Language"></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose%20%2F%20Material%203-blueviolet.svg" alt="UI Framework"></a>
@@ -112,6 +113,36 @@
    ```bash
    ./gradlew installDebug
    ```
+
+---
+
+## 📦 引入依賴 (JitPack)
+
+在專案根目錄的 `settings.gradle.kts` 新增 JitPack Maven 儲存庫：
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+
+接著在模組的 `build.gradle.kts` 加入所需的 AppDialer 模組：
+
+```kotlin
+dependencies {
+    // 純 Kotlin JVM 模型與 T9 搜尋演算法
+    implementation("com.github.yongjhih.AppDialer:core-model:main-SNAPSHOT")
+    implementation("com.github.yongjhih.AppDialer:core-util:main-SNAPSHOT")
+
+    // Compose UI 與 Android 功能模組
+    implementation("com.github.yongjhih.AppDialer:feature-dialer:main-SNAPSHOT")
+    implementation("com.github.yongjhih.AppDialer:feature-dialer-android:main-SNAPSHOT")
+}
+```
 
 ---
 
