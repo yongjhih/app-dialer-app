@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.SideEffect
@@ -91,6 +92,11 @@ class MainActivity : ComponentActivity() {
             }
 
             AppDialerTheme {
+                // Intercept Android System Back button on Settings Screen to return to Dialer Screen
+                BackHandler(enabled = (currentScreen == Screen.SETTINGS)) {
+                    currentScreen = Screen.DIALER
+                }
+
                 when (currentScreen) {
                     Screen.DIALER -> AppDialerScreen(
                         apps = filteredApps,
@@ -175,6 +181,14 @@ class MainActivity : ComponentActivity() {
         // Content view exists after setContent; clear residual opaque backgrounds.
         clearContentBackgrounds()
         loadApps()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // Reset to Dialer screen when launched again
+        currentScreen = Screen.DIALER
+        searchQuery = ""
+        filterApps()
     }
 
     /**
