@@ -1,5 +1,6 @@
 package com.github.yongjhih.appdialer.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -101,6 +102,15 @@ fun AppDialerScreen(
 
     androidx.compose.runtime.SideEffect {
         com.github.yongjhih.appdialer.util.Logger.d("AppDialerTime") { "AppDialerScreen SideEffect executed (apps=${apps.size})" }
+    }
+
+    // Intercept system back gesture: clear search query if not empty, otherwise exit with custom transition
+    BackHandler {
+        if (searchQuery.isNotEmpty()) {
+            onClearAllDigits()
+        } else {
+            onDismiss()
+        }
     }
 
     // Automatically reset scroll position to index 0 on ANY keypress or search query change

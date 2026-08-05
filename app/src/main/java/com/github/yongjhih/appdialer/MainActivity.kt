@@ -20,8 +20,8 @@ import com.github.yongjhih.appdialer.feature.dialer.android.AndroidMainAppWidget
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.util.AppLoader
 import com.github.yongjhih.appdialer.util.Logger
+import com.github.yongjhih.appdialer.util.RecentAppsManager
 import com.github.yongjhih.appdialer.util.selfAndChildren
-
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
