@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.yongjhih.appdialer.R
+import com.github.yongjhih.appdialer.feature.dialer.R
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout

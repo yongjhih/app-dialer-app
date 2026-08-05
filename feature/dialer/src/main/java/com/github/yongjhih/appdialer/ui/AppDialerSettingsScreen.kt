@@ -53,8 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yongjhih.appdialer.R
-import com.github.yongjhih.appdialer.BuildConfig
+import com.github.yongjhih.appdialer.feature.dialer.R
+import com.github.yongjhih.appdialer.feature.dialer.BuildConfig
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition

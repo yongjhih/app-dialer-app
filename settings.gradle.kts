@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "App Dialer"
 include(":app")
- 
+include(":core:model")
+include(":core:util")
+include(":feature:dialer")
