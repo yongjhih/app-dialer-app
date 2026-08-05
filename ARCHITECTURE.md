@@ -35,12 +35,12 @@ graph TD
     end
 
     subgraph ":core:util-android (Android Framework Helpers)"
-        I[AppLoader / RecentAppsManager]
+        I[AppLoader / AndroidRecentAppsManager]
         J[ViewUtils / AndroidCjkTransliterator]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Algorithms & SAM Interfaces)"
-        K[T9Utils / CjkTransliterator SAM Interface]
+        K[T9Utils / RecentAppsManager / CjkTransliterator]
     end
 
     subgraph ":core:model (Pure Kotlin JVM Domain Models)"
@@ -70,11 +70,11 @@ graph TD
 | Module | Plugin Type | Responsibilities & Boundaries | Multiplatform Ready |
 | :--- | :--- | :--- | :---: |
 | **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
-| **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`) and SAM interfaces (`CjkTransliterator`). Zero Android SDK/reflection dependencies. | ✅ Yes |
+| **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
-| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`, `DrawableUtils`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
-| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` interface with **0 `android.*` imports**. | 🟢 Compose Multiplatform |
-| **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, and `Toast` to `:feature:dialer`. | ❌ Android Only |
+| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
+| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports**. | 🟢 Compose Multiplatform |
+| **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
 | **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
 
 ---
@@ -86,27 +86,29 @@ graph TD
 2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
 
 ### ✅ Best Practices Enforced
-1. **Functional Parameter Injection with Default Arguments**:
-   Pass dependencies explicitly as function or constructor parameters with sensible default values.
+1. **Interface Contract & Parameter Injection**:
+   Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`).
    ```kotlin
-   // In :core:util - SAM Interface & Pure Extension Function
-   fun interface CjkTransliterator {
-       fun toLatin(text: String): String
+   // In :core:util - Pure Interface Contract
+   interface RecentAppsManager {
+       fun addRecentApp(packageName: String)
+       fun getRecentApps(): List<String>
+       ...
    }
 
-   fun String.toCjkT9Full(transliterator: CjkTransliterator = DefaultCjkTransliterator): String {
-       val latin = transliterator.toLatin(this)
-       return latin.toT9()
-   }
-
-   // In :core:util-android - Explicit Injection
-   AppModel(
-       ...,
-       t9CjkFull = label.toCjkT9Full(AndroidCjkTransliterator)
+   // In :feature:dialer - Pure Compose UI Dependency
+   @Composable
+   fun MainAppWidget(
+       recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
+       appLauncher: AppLauncher? = null,
+       ...
    )
+
+   // In :feature:dialer-android - Android SharedPreferences Adapter
+   val manager = remember(context) { AndroidRecentAppsManager(context) }
    ```
-2. **Platform Contract Interface Isolation**:
-   Isolate external side-effects (opening settings, launching apps, displaying toasts) behind platform-independent interface contracts (`AppLauncher`).
+2. **Functional Parameter Injection with Default Arguments**:
+   Pass dependencies explicitly as function or constructor parameters with sensible default values (`DefaultCjkTransliterator`, `InMemoryRecentAppsManager`).
 
 ---
 
