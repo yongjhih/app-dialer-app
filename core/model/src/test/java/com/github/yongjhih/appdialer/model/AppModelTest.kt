@@ -1,5 +1,6 @@
 package com.github.yongjhih.appdialer.model
 
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -28,7 +29,7 @@ class AppModelTest {
     }
 
     @Test
-    fun testDeferredAppModelProviders() {
+    fun testDeferredAppModelProviders() = runBlocking {
         var iconEvaluated = false
         var cjkFullEvaluated = false
 
@@ -53,11 +54,11 @@ class AppModelTest {
         assertFalse(iconEvaluated)
         assertFalse(cjkFullEvaluated)
 
-        // Providers are lazily evaluated only when accessed
-        assertEquals("MockIcon", app.icon)
+        // Providers are lazily evaluated when awaitIcon/awaitCjkFull is invoked
+        assertEquals("MockIcon", app.awaitIcon())
         assertTrue(iconEvaluated)
 
-        assertEquals("3488", app.t9CjkFull)
+        assertEquals("3488", app.awaitCjkFull())
         assertTrue(cjkFullEvaluated)
     }
 
