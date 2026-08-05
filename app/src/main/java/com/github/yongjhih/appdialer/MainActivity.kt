@@ -1,10 +1,12 @@
 package com.github.yongjhih.appdialer
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -17,8 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.ui.MainAppWidget
-import com.github.yongjhih.appdialer.util.clearContentBackgrounds
-import android.graphics.Color as AndroidColor
+import com.github.yongjhih.appdialer.util.selfAndChildren
 
 class MainActivity : ComponentActivity() {
 
@@ -31,8 +32,8 @@ class MainActivity : ComponentActivity() {
         applyTransparentWindow()
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
         applyTransparentWindow()
@@ -45,7 +46,10 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        clearContentBackgrounds()
+        findViewById<View>(android.R.id.content)?.selfAndChildren?.forEach { view ->
+            view.setBackgroundColor(Color.TRANSPARENT)
+            view.background = null
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -55,9 +59,9 @@ class MainActivity : ComponentActivity() {
 
     private fun applyTransparentWindow() {
         window.setFormat(PixelFormat.TRANSLUCENT)
-        window.setBackgroundDrawable(ColorDrawable(AndroidColor.TRANSPARENT))
-        window.statusBarColor = AndroidColor.TRANSPARENT
-        window.navigationBarColor = AndroidColor.TRANSPARENT
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
 
         window.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -70,7 +74,7 @@ class MainActivity : ComponentActivity() {
             format = PixelFormat.TRANSLUCENT
         }
 
-        window.decorView.setBackgroundColor(AndroidColor.TRANSPARENT)
+        window.decorView.setBackgroundColor(Color.TRANSPARENT)
         window.decorView.background = null
     }
 
