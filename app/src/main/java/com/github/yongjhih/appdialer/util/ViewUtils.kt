@@ -7,17 +7,21 @@ import android.view.ViewGroup
 import androidx.core.view.children
 
 /**
+ * Returns a [Sequence] containing this [View] and its direct children (if it is a [ViewGroup]).
+ */
+val View.selfAndChildren: Sequence<View>
+    get() = sequence {
+        yield(this@selfAndChildren)
+        (this@selfAndChildren as? ViewGroup)?.children?.let { yieldAll(it) }
+    }
+
+/**
  * Extension function to clear residual opaque backgrounds from activity content view
- * and its direct child views using Android KTX children extension, allowing translucent
- * themes to show through properly.
+ * and its direct child views, allowing translucent themes to show through properly.
  */
 fun Activity.clearContentBackgrounds() {
-    findViewById<View>(android.R.id.content)?.let { content ->
-        content.setBackgroundColor(Color.TRANSPARENT)
-        content.background = null
-        (content as? ViewGroup)?.children?.forEach { child ->
-            child.setBackgroundColor(Color.TRANSPARENT)
-            child.background = null
-        }
+    findViewById<View>(android.R.id.content)?.selfAndChildren?.forEach { view ->
+        view.setBackgroundColor(Color.TRANSPARENT)
+        view.background = null
     }
 }
