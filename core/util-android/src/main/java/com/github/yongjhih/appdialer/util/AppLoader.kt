@@ -3,11 +3,34 @@ package com.github.yongjhih.appdialer.util
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.os.Build
 import com.github.yongjhih.appdialer.model.AppModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
+
+/**
+ * Extension function to convert an Android [ResolveInfo] into an [AppModel].
+ */
+fun ResolveInfo.toAppModel(
+    pm: PackageManager,
+    transliterator: CjkTransliterator = AndroidCjkTransliterator
+): AppModel {
+    val label = loadLabel(pm).toString()
+    return AppModel(
+        label = label,
+        packageName = activityInfo.packageName,
+        className = activityInfo.name,
+        t9Full = label.toT9(),
+        t9Initials = label.toT9Initials(),
+        t9Words = label.toT9Words(),
+        iconProvider = { loadIcon(pm).toImageBitmap() },
+        t9CjkFullProvider = { label.toCjkT9Full(transliterator) },
+        t9CjkInitialsProvider = { label.toCjkT9Initials(transliterator) },
+        t9ZhuyinInitialsProvider = { label.toZhuyinT9Initials(transliterator) }
+    )
+}
 
 object AppLoader {
 
@@ -44,21 +67,7 @@ object AppLoader {
 
         val apps = resolveInfos
             .filterNot { it.activityInfo.packageName == context.packageName }
-            .map { info ->
-                val label = info.loadLabel(pm).toString()
-                AppModel(
-                    label = label,
-                    packageName = info.activityInfo.packageName,
-                    className = info.activityInfo.name,
-                    t9Full = label.toT9(),
-                    t9Initials = label.toT9Initials(),
-                    t9Words = label.toT9Words(),
-                    iconProvider = { info.loadIcon(pm).toImageBitmap() },
-                    t9CjkFullProvider = { label.toCjkT9Full(transliterator) },
-                    t9CjkInitialsProvider = { label.toCjkT9Initials(transliterator) },
-                    t9ZhuyinInitialsProvider = { label.toZhuyinT9Initials(transliterator) }
-                )
-            }
+            .map { info -> info.toAppModel(pm, transliterator) }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
         cachedApps = apps
