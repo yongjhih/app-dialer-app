@@ -1,5 +1,6 @@
 package com.github.yongjhih.appdialer.feature.dialer.android
 
+import android.util.Log
 import android.view.View
 import android.graphics.Color as AndroidColor
 import androidx.compose.runtime.Composable
@@ -22,6 +23,8 @@ fun AndroidMainAppWidget(
     val context = LocalContext.current
     val view = LocalView.current
 
+    Log.d("AppDialerTime", "AndroidMainAppWidget Composable executed")
+
     val manager = remember(recentAppsManager, context) {
         recentAppsManager ?: AndroidRecentAppsManager(context)
     }
@@ -38,6 +41,7 @@ fun AndroidMainAppWidget(
         view.setBackgroundColor(AndroidColor.TRANSPARENT)
         view.background = null
         onApplyTransparentWindow()
+        Log.d("AppDialerTime", "AndroidMainAppWidget SideEffect executed")
     }
 
     MainAppWidget(

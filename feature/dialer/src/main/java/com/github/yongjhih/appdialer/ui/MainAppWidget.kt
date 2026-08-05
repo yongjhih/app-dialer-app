@@ -56,9 +56,15 @@ fun MainAppWidget(
     var zhuyinPos by remember { mutableStateOf(recentAppsManager.getZhuyinPosition()) }
     var functionPos by remember { mutableStateOf(recentAppsManager.getFunctionPosition()) }
 
+    androidx.compose.runtime.SideEffect {
+        android.util.Log.d("AppDialerTime", "MainAppWidget SideEffect executed (allApps=${allApps.size}, filteredApps=${filteredApps.size})")
+    }
+
     // Load installed apps once
     LaunchedEffect(Unit) {
+        val start = System.currentTimeMillis()
         allApps = loadApps()
+        android.util.Log.d("AppDialerTime", "loadApps() returned ${allApps.size} apps in ${System.currentTimeMillis() - start}ms")
     }
 
     // Reactive State Flow Pipeline with Instant Startup & Debounce Concurrency Protection

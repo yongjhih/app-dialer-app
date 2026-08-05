@@ -98,6 +98,10 @@ fun AppDialerScreen(
     val colorScheme = MaterialTheme.colorScheme
     val listState = rememberLazyListState()
 
+    androidx.compose.runtime.SideEffect {
+        android.util.Log.d("AppDialerTime", "AppDialerScreen SideEffect executed (apps=${apps.size})")
+    }
+
     // Automatically reset scroll position to index 0 on ANY keypress or search query change
     LaunchedEffect(searchQuery, apps) {
         if (apps.isNotEmpty()) {
