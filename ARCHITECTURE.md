@@ -23,7 +23,7 @@ graph TD
         C[AndroidAppLauncher]
     end
 
-    subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.*)"
+    subgraph ":feature:dialer (Compose UI - Platform Independent 0 android.* & 0 :core:util-android)"
         D[MainAppWidget / NavHost]
         E[AppDialerScreen]
         F[AppDialerSettingsScreen]
@@ -36,7 +36,7 @@ graph TD
 
     subgraph ":core:util-android (Android Framework Helpers)"
         I[AppLoader / AndroidRecentAppsManager]
-        J[ViewUtils / AndroidCjkTransliterator]
+        J[ViewUtils / AndroidCjkTransliterator / DrawableUtils]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Algorithms & SAM Interfaces)"
@@ -109,6 +109,8 @@ graph TD
    ```
 2. **Functional Parameter Injection with Default Arguments**:
    Pass dependencies explicitly as function or constructor parameters with sensible default values (`DefaultCjkTransliterator`, `InMemoryRecentAppsManager`).
+3. **Pre-converted UI Assets for Platform Independence**:
+   Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
 
 ---
 
