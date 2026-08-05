@@ -26,7 +26,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            groupId = "com.github.yongjhih.appdialer"
+            groupId = "com.github.yongjhih.app-dialer-app"
             artifactId = "core-util"
             version = "1.0.0"
         }

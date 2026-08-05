@@ -40,7 +40,7 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "com.github.yongjhih.appdialer"
+            groupId = "com.github.yongjhih.app-dialer-app"
             artifactId = "core-util-android"
             version = "1.0.0"
             afterEvaluate {
