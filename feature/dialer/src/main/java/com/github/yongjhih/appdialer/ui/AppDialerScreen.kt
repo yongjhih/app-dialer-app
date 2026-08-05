@@ -250,11 +250,13 @@ fun AppGridItem(
             modifier = Modifier.padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                bitmap = imageBitmap,
-                contentDescription = app.label,
-                modifier = Modifier.size(48.dp)
-            )
+            imageBitmap?.let { bitmap ->
+                Image(
+                    bitmap = bitmap,
+                    contentDescription = app.label,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 

@@ -442,7 +442,7 @@ fun InteractiveKeyLayoutPicker(
 
                         Surface(
                             modifier = Modifier
-                                .align(slotKey.alignment)
+                                .align(slotKey.toAlignment())
                                 .clickable { selectedSlot = slotKey },
                             shape = RoundedCornerShape(8.dp),
                             color = if (isFocused) colorScheme.primary else if (element != "None") colorScheme.surfaceVariant else Color.Transparent,
