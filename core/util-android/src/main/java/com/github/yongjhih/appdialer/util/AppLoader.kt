@@ -57,12 +57,7 @@ object AppLoader {
                     t9CjkFullProvider = { label.toCjkT9Full(transliterator) },
                     t9CjkInitialsProvider = { label.toCjkT9Initials(transliterator) },
                     t9ZhuyinInitialsProvider = { label.toZhuyinT9Initials(transliterator) }
-                ).apply {
-                    icon
-                    t9CjkFull
-                    t9CjkInitials
-                    t9ZhuyinInitials
-                }
+                )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
