@@ -196,32 +196,41 @@ fun MainAppWidget(
             composable(Destinations.SETTINGS) {
                 AppDialerSettingsScreen(
                     settingsTriggerKey = settingsTriggerKey,
-                    isZhuyinEnabled = isZhuyinEnabled,
+                    isZhuyinModeEnabled = isZhuyinEnabled,
                     isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
                     functionPos = functionPos,
-                    onSettingsTriggerKeyChanged = { key ->
+                    onSettingsTriggerKeyChange = { key ->
                         settingsTriggerKey = key
                         recentAppsManager.setSettingsTriggerKey(key)
                     },
-                    onZhuyinToggleChanged = { enabled ->
+                    onZhuyinModeToggle = { enabled ->
                         isZhuyinEnabled = enabled
                         recentAppsManager.setZhuyinModeEnabled(enabled)
                     },
-                    onDisablePinyinOnZhuyinToggleChanged = { enabled ->
+                    onDisablePinyinOnZhuyinToggle = { enabled ->
                         isDisablePinyinOnZhuyinEnabledState = enabled
                         recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
                     },
-                    onKeyLayoutPositionsChanged = { lPos, nPos, zPos, fPos ->
+                    onLettersPosChange = { lPos ->
                         lettersPos = lPos
-                        numberPos = nPos
-                        zhuyinPos = zPos
-                        functionPos = fPos
-                        recentAppsManager.setKeyLayoutPositions(lPos, nPos, zPos, fPos)
+                        recentAppsManager.setLettersPosition(lPos)
                     },
-                    onBack = {
+                    onNumberPosChange = { nPos ->
+                        numberPos = nPos
+                        recentAppsManager.setNumberPosition(nPos)
+                    },
+                    onZhuyinPosChange = { zPos ->
+                        zhuyinPos = zPos
+                        recentAppsManager.setZhuyinPosition(zPos)
+                    },
+                    onFunctionPosChange = { fPos ->
+                        functionPos = fPos
+                        recentAppsManager.setFunctionPosition(fPos)
+                    },
+                    onNavigateBack = {
                         navController.popBackStack()
                     },
                     onOpenSystemAppSettings = {
