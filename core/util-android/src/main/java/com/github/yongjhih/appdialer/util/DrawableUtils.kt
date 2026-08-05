@@ -1,4 +1,4 @@
-package com.github.yongjhih.appdialer.ui
+package com.github.yongjhih.appdialer.util
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

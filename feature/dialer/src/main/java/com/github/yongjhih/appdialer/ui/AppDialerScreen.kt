@@ -49,8 +49,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yongjhih.appdialer.feature.dialer.R
-import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.model.AppDefaults
+import com.github.yongjhih.appdialer.model.AppModel
 import com.github.yongjhih.appdialer.model.DefaultKeyLayout
 import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.model.KeypadValues
@@ -59,6 +59,7 @@ import com.github.yongjhih.appdialer.ui.theme.cardBorder
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonBackground
 import com.github.yongjhih.appdialer.ui.theme.keypadButtonTextSecondary
 import com.github.yongjhih.appdialer.ui.theme.matchedHighlight
+import com.github.yongjhih.appdialer.util.toImageBitmap
 
 fun KeyLabelPosition.toAlignment(): Alignment = when (this) {
     KeyLabelPosition.TOP_LEFT -> Alignment.TopStart
