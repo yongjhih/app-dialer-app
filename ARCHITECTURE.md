@@ -73,8 +73,8 @@ graph TD
 | **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
-| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports**. | 🟢 Compose Multiplatform |
-| **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
+| **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
+| **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, `AppLoader`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
 | **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
 
 ---
@@ -96,7 +96,7 @@ graph TD
        ...
    }
 
-   // In :feature:dialer - Pure Compose UI Dependency
+   // In :feature:dialer - Pure Compose UI Dependency (No :core:util-android dependency!)
    @Composable
    fun MainAppWidget(
        recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
