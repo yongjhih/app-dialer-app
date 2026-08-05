@@ -6,7 +6,6 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -20,6 +19,7 @@ import androidx.core.view.WindowCompat
 import com.github.yongjhih.appdialer.feature.dialer.android.AndroidMainAppWidget
 import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.util.AppLoader
+import com.github.yongjhih.appdialer.util.Logger
 import com.github.yongjhih.appdialer.util.selfAndChildren
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val createStart = System.currentTimeMillis()
         val appStart = AppDialerApplication.appStartTime.let { if (it > 0) it else createStart }
-        Log.d("AppDialerTime", "[t=${createStart - appStart}ms] MainActivity.onCreate started")
+        Logger.d("AppDialerTime") { "[t=${createStart - appStart}ms] MainActivity.onCreate started" }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
@@ -43,13 +43,13 @@ class MainActivity : ComponentActivity() {
             overridePendingTransition(0, 0)
         }
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate (resetSignal=$resetSignal)")
+        Logger.d(TAG) { "onCreate (resetSignal=$resetSignal)" }
 
         // Synchronously retrieve disk cache (< 1ms) BEFORE setContent so Frame 1 renders immediately
         val syncStart = System.currentTimeMillis()
         AppLoader.loadInstalledAppsSync(applicationContext)
         val syncElapsed = System.currentTimeMillis() - syncStart
-        Log.d("AppDialerTime", "[t=${System.currentTimeMillis() - appStart}ms] AppLoader.loadInstalledAppsSync completed in ${syncElapsed}ms")
+        Logger.d("AppDialerTime") { "[t=${System.currentTimeMillis() - appStart}ms] AppLoader.loadInstalledAppsSync completed in ${syncElapsed}ms" }
 
         applyTransparentWindow()
 
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         applyTransparentWindow()
 
         val setContentStart = System.currentTimeMillis()
-        Log.d("AppDialerTime", "[t=${setContentStart - appStart}ms] Calling setContent {}...")
+        Logger.d("AppDialerTime") { "[t=${setContentStart - appStart}ms] Calling setContent {}..." }
 
         setContent {
             AndroidMainAppWidget(
@@ -72,11 +72,11 @@ class MainActivity : ComponentActivity() {
         }
 
         val setContentEnd = System.currentTimeMillis()
-        Log.d("AppDialerTime", "[t=${setContentEnd - appStart}ms] setContent {} finished (took ${setContentEnd - setContentStart}ms)")
+        Logger.d("AppDialerTime") { "[t=${setContentEnd - appStart}ms] setContent {} finished (took ${setContentEnd - setContentStart}ms)" }
 
         window.decorView.post {
             val frameDrawnTime = System.currentTimeMillis()
-            Log.d("AppDialerTime", "=== [t=${frameDrawnTime - appStart}ms] FIRST FRAME FULLY DRAWN ON SCREEN ===")
+            Logger.d("AppDialerTime") { "=== [t=${frameDrawnTime - appStart}ms] FIRST FRAME FULLY DRAWN ON SCREEN ===" }
         }
 
         findViewById<View>(android.R.id.content)?.selfAndChildren?.forEach { view ->
@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
             overridePendingTransition(0, 0)
         }
         resetSignal++
-        Log.d(TAG, "onNewIntent (resetSignal=$resetSignal)")
+        Logger.d(TAG) { "onNewIntent (resetSignal=$resetSignal)" }
     }
 
     private fun applyTransparentWindow() {
