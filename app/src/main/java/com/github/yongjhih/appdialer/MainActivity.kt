@@ -47,11 +47,6 @@ class MainActivity : ComponentActivity() {
         // Synchronously retrieve disk cache (< 1ms) BEFORE setContent so Frame 1 renders immediately
         AppLoader.loadInstalledAppsSync(applicationContext)
 
-        // Async pre-warm background scan in case of app updates
-        lifecycleScope.launch(Dispatchers.IO) {
-            AppLoader.loadInstalledApps(applicationContext)
-        }
-
         applyTransparentWindow()
 
         enableEdgeToEdge(

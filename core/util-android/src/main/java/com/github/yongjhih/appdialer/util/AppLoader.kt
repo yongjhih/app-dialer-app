@@ -13,8 +13,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -66,8 +66,9 @@ object AppLoader {
         val diskApps = AppDiskCache.loadAppsFromDisk(context)
         if (diskApps != null) {
             cachedApps = diskApps
-            Log.d(TAG, "Sync load hit disk cache with ${diskApps.size} apps. Triggering background scan...")
+            Log.d(TAG, "Sync load hit disk cache with ${diskApps.size} apps. Scheduling background scan in 2s...")
             scope.launch {
+                delay(2000L) // Delay background scan so initial Compose launch has zero CPU contention
                 scanPackageManager(context, transliterator)
             }
             return diskApps
@@ -90,9 +91,10 @@ object AppLoader {
         val diskApps = if (!forceRefresh) AppDiskCache.loadAppsFromDisk(context) else null
         if (diskApps != null) {
             cachedApps = diskApps
-            Log.d(TAG, "Loaded ${diskApps.size} apps instantly from disk cache. Dispatching background PackageManager scan...")
-            // Trigger background scan to sync PackageManager changes asynchronously without delaying UI launch
+            Log.d(TAG, "Loaded ${diskApps.size} apps instantly from disk cache. Scheduling background scan in 2s...")
+            // Trigger background scan asynchronously after 2s without delaying UI launch
             scope.launch {
+                delay(2000L)
                 scanPackageManager(context, transliterator)
             }
             return@withContext diskApps
