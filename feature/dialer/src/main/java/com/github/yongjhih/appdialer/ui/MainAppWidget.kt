@@ -9,11 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.yongjhih.appdialer.model.AppDefaults
 import com.github.yongjhih.appdialer.model.AppModel
-import com.github.yongjhih.appdialer.model.DefaultKeyLayout
-import com.github.yongjhih.appdialer.model.KeyLabelPosition
 import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
+import com.github.yongjhih.appdialer.util.InMemoryRecentAppsManager
+import com.github.yongjhih.appdialer.util.RecentAppsManager
 import com.github.yongjhih.appdialer.util.filterAndScore
 
 object Destinations {
@@ -25,24 +24,7 @@ object Destinations {
 fun MainAppWidget(
     resetSignal: Int = 0,
     loadApps: suspend () -> List<AppModel> = { emptyList() },
-    getRecentApps: () -> List<String> = { emptyList() },
-    addRecentApp: (String) -> Unit = {},
-    isFuzzySearchEnabled: () -> Boolean = { true },
-    setFuzzySearchEnabled: (Boolean) -> Unit = {},
-    isZhuyinModeEnabled: () -> Boolean = { true },
-    setZhuyinModeEnabled: (Boolean) -> Unit = {},
-    isDisablePinyinOnZhuyinEnabled: () -> Boolean = { false },
-    setDisablePinyinOnZhuyinEnabled: (Boolean) -> Unit = {},
-    getSettingsTriggerKey: () -> String = { AppDefaults.SETTINGS_TRIGGER_KEY },
-    setSettingsTriggerKey: (String) -> Unit = {},
-    getLettersPosition: () -> KeyLabelPosition = { DefaultKeyLayout.letters },
-    setLettersPosition: (KeyLabelPosition) -> Unit = {},
-    getNumberPosition: () -> KeyLabelPosition = { DefaultKeyLayout.number },
-    setNumberPosition: (KeyLabelPosition) -> Unit = {},
-    getZhuyinPosition: () -> KeyLabelPosition = { DefaultKeyLayout.zhuyin },
-    setZhuyinPosition: (KeyLabelPosition) -> Unit = {},
-    getFunctionPosition: () -> KeyLabelPosition = { DefaultKeyLayout.function },
-    setFunctionPosition: (KeyLabelPosition) -> Unit = {},
+    recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
     appLauncher: AppLauncher? = null,
     onDismiss: () -> Unit = {}
 ) {
@@ -52,18 +34,18 @@ fun MainAppWidget(
     var filteredApps by remember { mutableStateOf<List<AppModel>>(emptyList()) }
     var searchQuery by remember { mutableStateOf("") }
 
-    var settingsTriggerKey by remember { mutableStateOf(getSettingsTriggerKey()) }
-    var isZhuyinEnabled by remember { mutableStateOf(isZhuyinModeEnabled()) }
-    var isDisablePinyinOnZhuyinEnabledState by remember { mutableStateOf(isDisablePinyinOnZhuyinEnabled()) }
+    var settingsTriggerKey by remember { mutableStateOf(recentAppsManager.getSettingsTriggerKey()) }
+    var isZhuyinEnabled by remember { mutableStateOf(recentAppsManager.isZhuyinModeEnabled()) }
+    var isDisablePinyinOnZhuyinEnabledState by remember { mutableStateOf(recentAppsManager.isDisablePinyinOnZhuyinEnabled()) }
 
-    var lettersPos by remember { mutableStateOf(getLettersPosition()) }
-    var numberPos by remember { mutableStateOf(getNumberPosition()) }
-    var zhuyinPos by remember { mutableStateOf(getZhuyinPosition()) }
-    var functionPos by remember { mutableStateOf(getFunctionPosition()) }
+    var lettersPos by remember { mutableStateOf(recentAppsManager.getLettersPosition()) }
+    var numberPos by remember { mutableStateOf(recentAppsManager.getNumberPosition()) }
+    var zhuyinPos by remember { mutableStateOf(recentAppsManager.getZhuyinPosition()) }
+    var functionPos by remember { mutableStateOf(recentAppsManager.getFunctionPosition()) }
 
     fun filterApps() {
-        val recentPackages = getRecentApps()
-        val isFuzzy = isFuzzySearchEnabled()
+        val recentPackages = recentAppsManager.getRecentApps()
+        val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
         filteredApps = allApps.filterAndScore(
             query = searchQuery,
             recentPackageNames = recentPackages,
@@ -91,7 +73,7 @@ fun MainAppWidget(
     }
 
     fun launchApp(app: AppModel) {
-        addRecentApp(app.packageName)
+        recentAppsManager.addRecentApp(app.packageName)
         appLauncher?.launchApp(app)
     }
 
@@ -141,46 +123,46 @@ fun MainAppWidget(
                 AppDialerSettingsScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onOpenSystemAppSettings = { appLauncher?.openSystemAppSettings() },
-                    isFuzzySearchEnabled = isFuzzySearchEnabled(),
+                    isFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
                     onFuzzySearchToggle = { enabled ->
-                        setFuzzySearchEnabled(enabled)
+                        recentAppsManager.setFuzzySearchEnabled(enabled)
                         filterApps()
                     },
                     isZhuyinModeEnabled = isZhuyinEnabled,
                     onZhuyinModeToggle = { enabled ->
-                        setZhuyinModeEnabled(enabled)
+                        recentAppsManager.setZhuyinModeEnabled(enabled)
                         isZhuyinEnabled = enabled
                         filterApps()
                     },
                     isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
                     onDisablePinyinOnZhuyinToggle = { enabled ->
-                        setDisablePinyinOnZhuyinEnabled(enabled)
+                        recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
                         isDisablePinyinOnZhuyinEnabledState = enabled
                         filterApps()
                     },
                     settingsTriggerKey = settingsTriggerKey,
                     onSettingsTriggerKeyChange = { key ->
-                        setSettingsTriggerKey(key)
+                        recentAppsManager.setSettingsTriggerKey(key)
                         settingsTriggerKey = key
                     },
                     lettersPos = lettersPos,
                     onLettersPosChange = { pos ->
-                        setLettersPosition(pos)
+                        recentAppsManager.setLettersPosition(pos)
                         lettersPos = pos
                     },
                     numberPos = numberPos,
                     onNumberPosChange = { pos ->
-                        setNumberPosition(pos)
+                        recentAppsManager.setNumberPosition(pos)
                         numberPos = pos
                     },
                     zhuyinPos = zhuyinPos,
                     onZhuyinPosChange = { pos ->
-                        setZhuyinPosition(pos)
+                        recentAppsManager.setZhuyinPosition(pos)
                         zhuyinPos = pos
                     },
                     functionPos = functionPos,
                     onFunctionPosChange = { pos ->
-                        setFunctionPosition(pos)
+                        recentAppsManager.setFunctionPosition(pos)
                         functionPos = pos
                     }
                 )
