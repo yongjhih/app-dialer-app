@@ -7,17 +7,19 @@ import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 
-fun Any?.toImageBitmap(): ImageBitmap? {
-    val drawable = this as? Drawable ?: return null
-    if (drawable is BitmapDrawable && drawable.bitmap != null) {
-        return drawable.bitmap.asImageBitmap()
+/**
+ * Converts a non-null Android [Drawable] into a Compose [ImageBitmap].
+ */
+fun Drawable.toImageBitmap(): ImageBitmap {
+    if (this is BitmapDrawable && this.bitmap != null) {
+        return this.bitmap.asImageBitmap()
     }
 
-    val width = drawable.intrinsicWidth.coerceAtLeast(1)
-    val height = drawable.intrinsicHeight.coerceAtLeast(1)
+    val width = intrinsicWidth.coerceAtLeast(1)
+    val height = intrinsicHeight.coerceAtLeast(1)
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
-    drawable.setBounds(0, 0, canvas.width, canvas.height)
-    drawable.draw(canvas)
+    setBounds(0, 0, canvas.width, canvas.height)
+    draw(canvas)
     return bitmap.asImageBitmap()
 }
