@@ -26,8 +26,8 @@
         <!-- Enable immediate system preview to eliminate 0.5s ActivityTaskManager launch delay -->
         <item name="android:windowDisablePreview">false</item>
 
-        <!-- Disable slow activity window transition animations for instant launch -->
-        <item name="android:windowAnimationStyle">@null</item>
+        <!-- Downward Fade Out window animation on exit (no side slide) -->
+        <item name="android:windowAnimationStyle">@style/WindowFadeAnimation</item>
 
         <!-- Soft dim behind the floating card -->
         <item name="android:backgroundDimEnabled">true</item>
@@ -44,5 +44,9 @@
         <item name="android:windowSplashScreenBackground" tools:targetApi="31">#66000000</item>
         <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@android:color/transparent</item>
         <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="31">@android:color/transparent</item>
+    </style>
+
+    <style name="WindowFadeAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityCloseExitAnimation">@anim/slide_down_fade_out</item>
     </style>
 </resources>

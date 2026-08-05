@@ -37,10 +37,10 @@ class MainActivity : ComponentActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_down_fade_out)
         } else {
             @Suppress("DEPRECATION")
-            overridePendingTransition(0, 0)
+            overridePendingTransition(0, R.anim.slide_down_fade_out)
         }
         super.onCreate(savedInstanceState)
         Logger.d(TAG) { "onCreate (resetSignal=$resetSignal)" }
@@ -89,13 +89,23 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_down_fade_out)
         } else {
             @Suppress("DEPRECATION")
-            overridePendingTransition(0, 0)
+            overridePendingTransition(0, R.anim.slide_down_fade_out)
         }
         resetSignal++
         Logger.d(TAG) { "onNewIntent (resetSignal=$resetSignal)" }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_down_fade_out)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, R.anim.slide_down_fade_out)
+        }
     }
 
     private fun applyTransparentWindow() {
