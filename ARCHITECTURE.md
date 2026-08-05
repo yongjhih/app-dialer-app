@@ -1,6 +1,6 @@
 # AppDialer Architecture & Engineering Guidelines
 
-This document serves as the authoritative architectural blueprint for **AppDialer**, outlining multi-module design principles, platform decoupling rules, dependency injection patterns, reactive state management, concurrency control, navigation architecture, and testing standards.
+This document serves as the authoritative architectural blueprint for **AppDialer**, outlining multi-module design principles, platform decoupling rules, dependency injection patterns, reactive state management, concurrency control, navigation architecture, performance optimization caches, and testing standards.
 
 ---
 
@@ -79,20 +79,77 @@ graph TD
 
 ---
 
-## ⚡ 4. Performance & Async UI Architecture
+## ⚡ 2. Performance, Trie Cache & Async Assets Architecture
 
-1. **Dynamic Icon Providers for Disk-Cached Models (`AppDiskCache`)**:
-   When `AppDiskCache` restores `AppModel` instances from disk, it dynamically attaches an `iconProvider = { pm.getApplicationIcon(packageName).toImageBitmap() }`. When rendered in `AppGridItem`, `app.awaitIcon()` evaluates this provider off-thread on `Dispatchers.IO`, ensuring icons render seamlessly for both cached and fresh models.
-2. **T9 Prefix Trie Cache (`T9TrieCache`)**:
-   T9 search queries use `T9TrieCache` for $O(K)$ lookup speed (~0.01ms). `preWarmRecentQueries(allApps, recentQueries)` runs in a background coroutine upon app startup.
-3. **AppModel Non-Bitmap Metadata Disk Cache (`AppDiskCache`)**:
-   `AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk. Cold start reads cached metadata from disk in **< 2ms**.
-4. **`Deferred<T>` & Suspending Methods in `AppModel`**:
-   `AppModel` supports `Deferred<T>` fields and suspending fetcher `awaitIcon()`. Heavy tasks (Canvas bitmap rendering and ICU CJK transliteration) run asynchronously in background jobs on `Dispatchers.IO`.
+### 🌲 2.1 T9 Prefix Trie Cache (`T9TrieCache`) & Background Pre-Warming
+To achieve microsecond-level ($O(K)$) response times when the user taps digits on the T9 keypad, AppDialer utilizes `T9TrieCache` in `:core:util`:
+
+1. **Tree Architecture**:
+   Each node (`TrieNode`) maps digit characters (`'2'..'9'`) to child nodes and maintains a list of matching `AppModel` references.
+2. **Time Complexity**:
+   Searching for a T9 digit sequence (e.g., `"236"`) traverses at most $K$ nodes ($K$ = query length, typically 1 to 5 digits), yielding sub-millisecond (~0.01ms) instant filtering regardless of installed app count.
+3. **Background Pre-Warming Pipeline**:
+   Upon app startup, `T9TrieCache.preWarmRecentQueries(allApps, recentQueries)` runs on `Dispatchers.Default` to populate nodes for recent and frequent search queries:
+   ```kotlin
+   val trieCache = T9TrieCache()
+   
+   // Background pre-warming on Dispatchers.Default
+   suspend fun preWarm(apps: List<AppModel>, recentQueries: List<String>) = withContext(Dispatchers.Default) {
+       trieCache.rebuild(apps)
+       for (query in recentQueries) {
+           trieCache.searchPrefix(query)
+       }
+   }
+   ```
 
 ---
 
-## 🔌 2. Dependency Injection Architecture (Koin DI)
+### 🖼️ 2.2 Async Icon Loading (`awaitIcon()`) & Skeleton Placeholder UI
+Decoding Android `Drawable`s into Compose `ImageBitmap`s involves IPC and Canvas bitmap creation, which causes main-thread jank if performed synchronously during composition.
+
+1. **Deferred / Suspending Asset Contract (`AppModel`)**:
+   `AppModel` encapsulates lazy providers (`iconProvider: (() -> Any?)?`, `iconDeferred: Deferred<Any?>?`) and exposes a non-blocking suspending fetcher `awaitIcon()`:
+   ```kotlin
+   data class AppModel(
+       val label: String,
+       val packageName: String,
+       val iconDeferred: Deferred<Any?>? = null,
+       val iconProvider: (() -> Any?)? = null,
+       private val rawIcon: Any? = null
+   ) {
+       val icon: Any? by lazy { rawIcon }
+       
+       suspend fun awaitIcon(): Any? {
+           return rawIcon ?: iconDeferred?.await() ?: iconProvider?.invoke()
+       }
+   }
+   ```
+2. **Off-Thread Composition in `AppGridItem` (`:feature:dialer`)**:
+   `AppGridItem` executes `app.awaitIcon()` inside `LaunchedEffect(app)` on `Dispatchers.IO`:
+   ```kotlin
+   var imageBitmap by remember(app) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
+   
+   LaunchedEffect(app) {
+       if (imageBitmap == null) {
+           imageBitmap = withContext(Dispatchers.IO) {
+               app.awaitIcon() as? ImageBitmap
+           }
+       }
+   }
+   ```
+3. **Skeleton Loading Placeholder**:
+   While `imageBitmap` is null (loading in background), `AppGridItem` renders a 48.dp rounded square skeleton box with a soft translucent background (`onSurface.copy(alpha = 0.12f)`) displaying the app's first initial letter. Upon resolution, `imageBitmap` updates smoothly.
+4. **Dynamic Icon Providers for Disk-Cached Models (`AppDiskCache`)**:
+   When `AppDiskCache` restores `AppModel` instances from disk on cold start, it dynamically attaches `iconProvider = { pm.getApplicationIcon(packageName).toImageBitmap() }`. When rendered, `awaitIcon()` evaluates this provider off-thread, guaranteeing icons render seamlessly for both disk-cached and fresh models.
+
+---
+
+### 💾 2.3 Non-Bitmap Metadata Disk Cache (`AppDiskCache`)
+`AppDiskCache` persists `AppModel` text & T9/CJK search indices to JSON SharedPreferences on disk. Cold start reads cached metadata from disk in **< 2ms**, providing instant app availability while `PackageManager` scans for package updates in the background.
+
+---
+
+## 🔌 3. Dependency Injection Architecture (Koin DI)
 
 ### Koin DI Integration
 AppDialer adopts **Koin 3.5.3** as the primary Dependency Injection framework across all modules:
@@ -126,7 +183,7 @@ AppDialer adopts **Koin 3.5.3** as the primary Dependency Injection framework ac
 
 ---
 
-## 🔄 3. Reactive State & Concurrency Control
+## 🔄 4. Reactive State & Concurrency Control
 
 1. **Unidirectional Data Flow (UDF) & `StateFlow`**:
    All UI state updates flow through reactive state holders (`StateFlow` / `MutableStateFlow` or Compose `remember` / `derivedStateOf`).
