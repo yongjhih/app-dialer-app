@@ -66,7 +66,7 @@ class T9TrieCache {
 
     private fun insertUnlocked(app: AppModel) {
         val id = appKey(app)
-        root.apps.putIfAbsent(id, app)
+        root.apps.getOrPut(id) { app }
 
         for (key in collectT9Keys(app)) {
             // All suffixes → substring query "528" hits mid-key of "2252852867"
@@ -78,7 +78,7 @@ class T9TrieCache {
                     if (!ch.isDigit()) continue
                     hasDigit = true
                     node = node.children.getOrPut(ch) { TrieNode() }
-                    node.apps.putIfAbsent(id, app)
+                    node.apps.getOrPut(id) { app }
                 }
                 if (!hasDigit) continue
             }
