@@ -6,8 +6,9 @@ This document outlines the architectural principles, module boundaries, navigati
 
 ## 🏛️ 1. Multi-Module Architecture Overview
 
-AppDialer is modularized into single-responsibility Gradle modules separated by layer and framework dependencies.
+AppDialer is modularized into single-responsibility Gradle modules separated by layer, Compose UI design systems, and Android framework dependencies.
 Both **`:core:model`** and **`:core:util`** are **Pure Kotlin (JVM)** modules, allowing non-Android Kotlin projects (CLI tools, Server backends, KMP, Desktop apps) to depend on them seamlessly.
+**`:core:ui`** encapsulates Android-independent Compose UI tokens, themes, and reusable graphics utilities.
 
 ```mermaid
 graph TD
@@ -15,24 +16,29 @@ graph TD
         A[MainActivity]
     end
 
-    subgraph ":feature:dialer (Android Library - Compose)"
+    subgraph ":feature:dialer (Android Library - Feature Composition)"
         B[MainAppWidget / NavHost]
         C[AppDialerScreen]
         D[AppDialerSettingsScreen]
     end
 
+    subgraph ":core:ui (Android / Multiplatform Compose UI)"
+        E[Theme.kt / Color.kt]
+        F[DrawableUtils]
+    end
+
     subgraph ":core:util-android (Android Library)"
-        E[AppLoader / RecentAppsManager]
-        F[ViewUtils / Extensions]
+        G[AppLoader / RecentAppsManager]
+        H[ViewUtils / Extensions]
     end
 
     subgraph ":core:util (Pure Kotlin JVM Library)"
-        G[T9Utils / CjkTransliterator]
+        I[T9Utils / CjkTransliterator]
     end
 
     subgraph ":core:model (Pure Kotlin JVM Library)"
-        H[AppModel / KeyLabelPosition]
-        I[AppDefaults / KeyLayout]
+        J[AppModel / KeyLabelPosition]
+        K[AppDefaults / KeyLayout]
     end
 
     A --> B
@@ -41,13 +47,14 @@ graph TD
     B --> E
     B --> F
     B --> G
-    E --> G
-    F --> G
-    C --> H
-    D --> H
-    E --> H
-    F --> H
-    G --> H
+    B --> H
+    B --> I
+    C --> J
+    D --> J
+    G --> I
+    H --> I
+    I --> J
+    K --> J
 ```
 
 ### Module Responsibilities
@@ -56,8 +63,9 @@ graph TD
 | :--- | :--- | :--- | :---: |
 | **`:core:model`** | **Pure Kotlin (JVM)** | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad value definitions (`KeyLayout`). Zero Android SDK/Compose dependencies (`id("kotlin")`). | ✅ Yes |
 | **`:core:util`** | **Pure Kotlin (JVM)** | Pure Kotlin utilities & search algorithms (`T9Utils`, `CjkTransliterator`). Fully decoupled from Android framework APIs (`id("kotlin")`). | ✅ Yes |
+| **`:core:ui`** | **Compose Library** | Android-independent Compose UI design system tokens (`Color.kt`, `Theme.kt`), vector & graphic converters (`DrawableUtils.kt`), and pure UI composables. | 🟢 Compose Multiplatform |
 | **`:core:util-android`** | Android Library | Android-dependent utility helpers (`AppLoader`, `RecentAppsManager`, `ViewUtils`) requiring `Context`, `SharedPreferences`, `View`, and `PackageManager`. | ❌ Android Only |
-| **`:feature:dialer`** | Android Library (Compose) | All Jetpack Compose UI screens, 3x3 interactive keypad diagrams, Material 3 themes (`Theme.kt`, `Color.kt`), and navigation orchestration (`MainAppWidget`). | ❌ Android Only |
+| **`:feature:dialer`** | Android Library (Compose) | All feature screen compositions, 3x3 interactive keypad diagrams, and navigation orchestration (`MainAppWidget`). | ❌ Android Only |
 | **`:app`** | Android Application | Ultra-thin entrypoint containing `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app configuration. | ❌ Android Only |
 
 ---

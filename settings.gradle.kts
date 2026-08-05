@@ -23,5 +23,6 @@ rootProject.name = "App Dialer"
 include(":app")
 include(":core:model")
 include(":core:util")
+include(":core:ui")
 include(":core:util-android")
 include(":feature:dialer")
