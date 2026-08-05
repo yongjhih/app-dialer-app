@@ -85,6 +85,7 @@ fun AppDialerScreen(
     settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     isZhuyinEnabled: Boolean = false,
     isHapticFeedbackEnabled: Boolean = true,
+    isBackspaceSingleTapClearAllEnabled: Boolean = false,
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
     numberPos: KeyLabelPosition = DefaultKeyLayout.number,
     zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
@@ -198,6 +199,7 @@ fun AppDialerScreen(
                             rowKeys.forEach { key ->
                                 val isSettingsTrigger = KeypadValues.matchesSettingsTrigger(key, settingsTriggerKey)
                                 if (key == KeypadValues.KEY_BACKSPACE) {
+                                    val backspaceOnClick = if (isBackspaceSingleTapClearAllEnabled) onClearAllDigits else onDeleteOneDigit
                                     KeypadButton(
                                         icon = Icons.AutoMirrored.Filled.Backspace,
                                         subtitleIcon = if (isSettingsTrigger) Icons.Default.Settings else null,
@@ -206,7 +208,7 @@ fun AppDialerScreen(
                                         zhuyinPos = zhuyinPos,
                                         functionPos = functionPos,
                                         isHapticFeedbackEnabled = isHapticFeedbackEnabled,
-                                        onClick = onDeleteOneDigit,
+                                        onClick = backspaceOnClick,
                                         onLongClick = if (isSettingsTrigger) onOpenDialerSettings else onClearAllDigits,
                                         modifier = Modifier.weight(1f, fill = true)
                                     )

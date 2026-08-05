@@ -77,6 +77,8 @@ fun AppDialerSettingsScreen(
     onHapticFeedbackToggle: (Boolean) -> Unit = {},
     bgDimAmount: Float = AppDefaults.BACKGROUND_DIM_AMOUNT,
     onBgDimAmountChange: (Float) -> Unit = {},
+    isBackspaceSingleTapClearAllEnabled: Boolean = false,
+    onBackspaceSingleTapClearAllToggle: (Boolean) -> Unit = {},
     settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     onSettingsTriggerKeyChange: (String) -> Unit = {},
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
@@ -95,6 +97,7 @@ fun AppDialerSettingsScreen(
     var fuzzySearch by remember(isFuzzySearchEnabled) { mutableStateOf(isFuzzySearchEnabled) }
     var zhuyinMode by remember(isZhuyinModeEnabled) { mutableStateOf(isZhuyinModeEnabled) }
     var disablePinyinOnZhuyin by remember(isDisablePinyinOnZhuyinEnabled) { mutableStateOf(isDisablePinyinOnZhuyinEnabled) }
+    var backspaceSingleTapClearAllState by remember(isBackspaceSingleTapClearAllEnabled) { mutableStateOf(isBackspaceSingleTapClearAllEnabled) }
     var selectedTriggerKey by remember(settingsTriggerKey) { mutableStateOf(settingsTriggerKey) }
 
     var selectedLettersPos by remember(lettersPos) { mutableStateOf(lettersPos) }
@@ -276,6 +279,16 @@ fun AppDialerSettingsScreen(
                     subtitle = stringResource(R.string.close_after_launch_subtitle),
                     checked = autoCloseOnLaunch,
                     onCheckedChange = { autoCloseOnLaunch = it }
+                )
+
+                SettingsSwitchItem(
+                    title = stringResource(R.string.backspace_single_tap_clear_all_title),
+                    subtitle = stringResource(R.string.backspace_single_tap_clear_all_subtitle),
+                    checked = backspaceSingleTapClearAllState,
+                    onCheckedChange = { enabled ->
+                        backspaceSingleTapClearAllState = enabled
+                        onBackspaceSingleTapClearAllToggle(enabled)
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

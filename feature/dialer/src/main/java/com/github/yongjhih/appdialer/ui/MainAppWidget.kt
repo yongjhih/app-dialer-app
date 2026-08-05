@@ -57,6 +57,7 @@ fun MainAppWidget(
 
     var isHapticFeedbackEnabled by remember { mutableStateOf(recentAppsManager.isHapticFeedbackEnabled()) }
     var bgDimAmount by remember { mutableStateOf(recentAppsManager.getBackgroundDimAmount()) }
+    var isBackspaceSingleTapClearAllEnabled by remember { mutableStateOf(recentAppsManager.isBackspaceSingleTapClearAllEnabled()) }
 
     var lettersPos by remember { mutableStateOf(recentAppsManager.getLettersPosition()) }
     var numberPos by remember { mutableStateOf(recentAppsManager.getNumberPosition()) }
@@ -199,6 +200,7 @@ fun MainAppWidget(
                     settingsTriggerKey = settingsTriggerKey,
                     isZhuyinEnabled = isZhuyinEnabled,
                     isHapticFeedbackEnabled = isHapticFeedbackEnabled,
+                    isBackspaceSingleTapClearAllEnabled = isBackspaceSingleTapClearAllEnabled,
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
@@ -234,6 +236,7 @@ fun MainAppWidget(
                     isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
                     isHapticFeedbackEnabled = isHapticFeedbackEnabled,
                     bgDimAmount = bgDimAmount,
+                    isBackspaceSingleTapClearAllEnabled = isBackspaceSingleTapClearAllEnabled,
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
@@ -258,6 +261,10 @@ fun MainAppWidget(
                         bgDimAmount = dim
                         recentAppsManager.setBackgroundDimAmount(dim)
                         onApplyTransparentWindow(dim)
+                    },
+                    onBackspaceSingleTapClearAllToggle = { enabled ->
+                        isBackspaceSingleTapClearAllEnabled = enabled
+                        recentAppsManager.setBackspaceSingleTapClearAllEnabled(enabled)
                     },
                     onLettersPosChange = { lPos ->
                         lettersPos = lPos

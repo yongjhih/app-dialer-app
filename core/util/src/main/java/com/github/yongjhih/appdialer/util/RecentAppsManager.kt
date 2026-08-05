@@ -40,6 +40,9 @@ interface RecentAppsManager {
 
     fun getBackgroundDimAmount(): Float
     fun setBackgroundDimAmount(amount: Float)
+
+    fun isBackspaceSingleTapClearAllEnabled(): Boolean
+    fun setBackspaceSingleTapClearAllEnabled(enabled: Boolean)
 }
 
 /**
@@ -59,6 +62,7 @@ open class InMemoryRecentAppsManager : RecentAppsManager {
 
     private var hapticFeedbackEnabled: Boolean = true
     private var bgDimAmount: Float = AppDefaults.BACKGROUND_DIM_AMOUNT
+    private var backspaceSingleTapClearAllEnabled: Boolean = false
 
     override fun addRecentApp(packageName: String) {
         recentApps.remove(packageName)
@@ -99,4 +103,7 @@ open class InMemoryRecentAppsManager : RecentAppsManager {
 
     override fun getBackgroundDimAmount(): Float = bgDimAmount
     override fun setBackgroundDimAmount(amount: Float) { bgDimAmount = amount }
+
+    override fun isBackspaceSingleTapClearAllEnabled(): Boolean = backspaceSingleTapClearAllEnabled
+    override fun setBackspaceSingleTapClearAllEnabled(enabled: Boolean) { backspaceSingleTapClearAllEnabled = enabled }
 }

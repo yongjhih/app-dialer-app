@@ -38,5 +38,10 @@ class RecentAppsManagerTest {
         assertEquals(0.4f, manager.getBackgroundDimAmount())
         manager.setBackgroundDimAmount(0.6f)
         assertEquals(0.6f, manager.getBackgroundDimAmount())
+
+        // Test backspace single tap clear all
+        assertFalse(manager.isBackspaceSingleTapClearAllEnabled())
+        manager.setBackspaceSingleTapClearAllEnabled(true)
+        assertTrue(manager.isBackspaceSingleTapClearAllEnabled())
     }
 }

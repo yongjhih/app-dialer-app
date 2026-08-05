@@ -106,6 +106,14 @@ class AndroidRecentAppsManager(private val context: Context) : RecentAppsManager
         getPrefs().edit().putFloat(KEY_BACKGROUND_DIM_AMOUNT, amount).apply()
     }
 
+    override fun isBackspaceSingleTapClearAllEnabled(): Boolean {
+        return getPrefs().getBoolean(KEY_BACKSPACE_SINGLE_TAP_CLEAR_ALL, false)
+    }
+
+    override fun setBackspaceSingleTapClearAllEnabled(enabled: Boolean) {
+        getPrefs().edit().putBoolean(KEY_BACKSPACE_SINGLE_TAP_CLEAR_ALL, enabled).apply()
+    }
+
     private fun getPosition(key: String, default: KeyLabelPosition): KeyLabelPosition =
         KeyLabelPosition.fromPreference(getPrefs().getString(key, default.preferenceValue), default)
 
@@ -122,6 +130,7 @@ class AndroidRecentAppsManager(private val context: Context) : RecentAppsManager
         private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
         private const val KEY_HAPTIC_FEEDBACK = "haptic_feedback"
         private const val KEY_BACKGROUND_DIM_AMOUNT = "background_dim_amount"
+        private const val KEY_BACKSPACE_SINGLE_TAP_CLEAR_ALL = "backspace_single_tap_clear_all"
 
         private const val KEY_POS_LETTERS = "pos_letters"
         private const val KEY_POS_NUMBER = "pos_number"

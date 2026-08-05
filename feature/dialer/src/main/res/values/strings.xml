@@ -56,6 +56,8 @@
     <!-- Behavior -->
     <string name="close_after_launch_title">Close Dialer after Launch</string>
     <string name="close_after_launch_subtitle">Dismiss AppDialer automatically when an app opens</string>
+    <string name="backspace_single_tap_clear_all_title">Single tap backspace clears all</string>
+    <string name="backspace_single_tap_clear_all_subtitle">Tap backspace button once to clear all entered digits</string>
 
     <!-- About -->
     <string name="open_app_details_title">Open App System Details</string>

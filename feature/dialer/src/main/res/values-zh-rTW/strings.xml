@@ -56,6 +56,8 @@
     <!-- Behavior -->
     <string name="close_after_launch_title">啟動 App 後自動關閉</string>
     <string name="close_after_launch_subtitle">開啟應用程式後自動隱藏 App Dialer</string>
+    <string name="backspace_single_tap_clear_all_title">退格鍵單擊刪除全部</string>
+    <string name="backspace_single_tap_clear_all_subtitle">單擊退格鍵即可清空所有輸入數字</string>
 
     <!-- About -->
     <string name="open_app_details_title">開啟系統應用程式資訊</string>
