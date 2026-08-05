@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,12 +18,20 @@ import com.github.yongjhih.appdialer.ui.theme.AppDialerTheme
 import com.github.yongjhih.appdialer.util.InMemoryRecentAppsManager
 import com.github.yongjhih.appdialer.util.RecentAppsManager
 import com.github.yongjhih.appdialer.util.filterAndScore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 object Destinations {
     const val DIALER = "dialer"
     const val SETTINGS = "settings"
 }
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun MainAppWidget(
     resetSignal: Int = 0,
@@ -46,29 +55,38 @@ fun MainAppWidget(
     var zhuyinPos by remember { mutableStateOf(recentAppsManager.getZhuyinPosition()) }
     var functionPos by remember { mutableStateOf(recentAppsManager.getFunctionPosition()) }
 
-    fun filterApps() {
-        val recentPackages = recentAppsManager.getRecentApps()
-        val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
-        filteredApps = allApps.filterAndScore(
-            query = searchQuery,
-            recentPackageNames = recentPackages,
-            isFuzzyEnabled = isFuzzy,
-            isZhuyinEnabled = isZhuyinEnabled,
-            isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
-        )
-    }
-
     // Load installed apps once
     LaunchedEffect(Unit) {
         allApps = loadApps()
-        filterApps()
+    }
+
+    // Reactive State Flow Pipeline with Debounce & Concurrency Protection
+    LaunchedEffect(allApps, isZhuyinEnabled, isDisablePinyinOnZhuyinEnabledState) {
+        snapshotFlow { searchQuery }
+            .debounce(50L) // 50ms debouncing buffer for rapid T9 typing
+            .flatMapLatest { query ->
+                flow {
+                    val recentPackages = recentAppsManager.getRecentApps()
+                    val isFuzzy = recentAppsManager.isFuzzySearchEnabled()
+                    val result = allApps.filterAndScore(
+                        query = query,
+                        recentPackageNames = recentPackages,
+                        isFuzzyEnabled = isFuzzy,
+                        isZhuyinEnabled = isZhuyinEnabled,
+                        isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState
+                    )
+                    emit(result)
+                }.flowOn(Dispatchers.Default)
+            }
+            .collect { filtered ->
+                filteredApps = filtered
+            }
     }
 
     // Reset screen backstack on re-launch (onNewIntent signal)
     LaunchedEffect(resetSignal) {
         if (resetSignal > 0) {
             searchQuery = ""
-            filterApps()
             navController.navigate(Destinations.DIALER) {
                 popUpTo(Destinations.DIALER) { inclusive = true }
             }
@@ -95,82 +113,83 @@ fun MainAppWidget(
         ) {
             composable(Destinations.DIALER) {
                 AppDialerScreen(
-                    apps = filteredApps,
                     searchQuery = searchQuery,
+                    filteredApps = filteredApps,
                     settingsTriggerKey = settingsTriggerKey,
                     isZhuyinEnabled = isZhuyinEnabled,
-                    lettersPos = lettersPos,
-                    numberPos = numberPos,
-                    zhuyinPos = zhuyinPos,
-                    functionPos = functionPos,
-                    onDigitPressed = { digit ->
+                    isDisablePinyinOnZhuyin = isDisablePinyinOnZhuyinEnabledState,
+                    lettersPosition = lettersPos,
+                    numberPosition = numberPos,
+                    zhuyinPosition = zhuyinPos,
+                    functionPosition = functionPos,
+                    onKeyClick = { digit ->
                         searchQuery += digit
-                        filterApps()
                     },
-                    onDeleteOneDigit = {
+                    onBackspaceClick = {
                         if (searchQuery.isNotEmpty()) {
                             searchQuery = searchQuery.dropLast(1)
-                            filterApps()
                         }
                     },
-                    onClearAllDigits = {
-                        if (searchQuery.isNotEmpty()) {
-                            searchQuery = ""
-                            filterApps()
-                        }
+                    onClearClick = {
+                        searchQuery = ""
                     },
-                    onAppClick = { app -> launchApp(app) },
-                    onAppLongClick = { app -> openAppSettings(app) },
-                    onOpenDialerSettings = { navController.navigate(Destinations.SETTINGS) },
+                    onOpenSettings = {
+                        navController.navigate(Destinations.SETTINGS)
+                    },
+                    onAppClick = { app ->
+                        launchApp(app)
+                        onDismiss()
+                    },
+                    onAppLongClick = { app ->
+                        openAppSettings(app)
+                    },
                     onDismiss = onDismiss
                 )
             }
 
             composable(Destinations.SETTINGS) {
                 AppDialerSettingsScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onOpenSystemAppSettings = { appLauncher?.openSystemAppSettings() },
-                    isFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
-                    onFuzzySearchToggle = { enabled ->
-                        recentAppsManager.setFuzzySearchEnabled(enabled)
-                        filterApps()
-                    },
-                    isZhuyinModeEnabled = isZhuyinEnabled,
-                    onZhuyinModeToggle = { enabled ->
-                        recentAppsManager.setZhuyinModeEnabled(enabled)
-                        isZhuyinEnabled = enabled
-                        filterApps()
-                    },
-                    isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
-                    onDisablePinyinOnZhuyinToggle = { enabled ->
-                        recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
-                        isDisablePinyinOnZhuyinEnabledState = enabled
-                        filterApps()
-                    },
-                    settingsTriggerKey = settingsTriggerKey,
+                    initialSettingsTriggerKey = settingsTriggerKey,
+                    initialIsZhuyinEnabled = isZhuyinEnabled,
+                    initialIsDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
+                    initialIsFuzzySearchEnabled = recentAppsManager.isFuzzySearchEnabled(),
+                    initialLettersPosition = lettersPos,
+                    initialNumberPosition = numberPos,
+                    initialZhuyinPosition = zhuyinPos,
+                    initialFunctionPosition = functionPos,
                     onSettingsTriggerKeyChange = { key ->
-                        recentAppsManager.setSettingsTriggerKey(key)
                         settingsTriggerKey = key
+                        recentAppsManager.setSettingsTriggerKey(key)
                     },
-                    lettersPos = lettersPos,
-                    onLettersPosChange = { pos ->
-                        recentAppsManager.setLettersPosition(pos)
+                    onZhuyinEnabledChange = { enabled ->
+                        isZhuyinEnabled = enabled
+                        recentAppsManager.setZhuyinModeEnabled(enabled)
+                    },
+                    onDisablePinyinOnZhuyinEnabledChange = { enabled ->
+                        isDisablePinyinOnZhuyinEnabledState = enabled
+                        recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
+                    },
+                    onFuzzySearchEnabledChange = { enabled ->
+                        recentAppsManager.setFuzzySearchEnabled(enabled)
+                    },
+                    onLettersPositionChange = { pos ->
                         lettersPos = pos
+                        recentAppsManager.setLettersPosition(pos)
                     },
-                    numberPos = numberPos,
-                    onNumberPosChange = { pos ->
-                        recentAppsManager.setNumberPosition(pos)
+                    onNumberPositionChange = { pos ->
                         numberPos = pos
+                        recentAppsManager.setNumberPosition(pos)
                     },
-                    zhuyinPos = zhuyinPos,
-                    onZhuyinPosChange = { pos ->
-                        recentAppsManager.setZhuyinPosition(pos)
+                    onZhuyinPositionChange = { pos ->
                         zhuyinPos = pos
+                        recentAppsManager.setZhuyinPosition(pos)
                     },
-                    functionPos = functionPos,
-                    onFunctionPosChange = { pos ->
-                        recentAppsManager.setFunctionPosition(pos)
+                    onFunctionPositionChange = { pos ->
                         functionPos = pos
+                        recentAppsManager.setFunctionPosition(pos)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
                     }
                 )
             }

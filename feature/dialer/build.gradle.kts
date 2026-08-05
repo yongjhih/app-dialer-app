@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         minSdk = 21
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -43,6 +44,14 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+    // Koin DI
+    implementation(libs.koin.core)
+    implementation(libs.koin.androidx.compose)
+
     testImplementation(libs.kotlin.test)
     testImplementation(libs.junit)
+
+    // Compose UI Testing
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
