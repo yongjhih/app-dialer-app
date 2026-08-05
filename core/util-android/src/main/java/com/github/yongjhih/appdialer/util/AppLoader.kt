@@ -11,8 +11,10 @@ import java.util.Locale
 
 object AppLoader {
 
-    suspend fun loadInstalledApps(context: Context): List<AppModel> = withContext(Dispatchers.IO) {
-        AndroidCjkTransliterator.init()
+    suspend fun loadInstalledApps(
+        context: Context,
+        transliterator: CjkTransliterator = AndroidCjkTransliterator
+    ): List<AppModel> = withContext(Dispatchers.IO) {
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
@@ -43,9 +45,9 @@ object AppLoader {
                     t9Full = label.toT9(),
                     t9Initials = label.toT9Initials(),
                     t9Words = label.toT9Words(),
-                    t9CjkFull = label.toCjkT9Full(),
-                    t9CjkInitials = label.toCjkT9Initials(),
-                    t9ZhuyinInitials = label.toZhuyinT9Initials()
+                    t9CjkFull = label.toCjkT9Full(transliterator),
+                    t9CjkInitials = label.toCjkT9Initials(transliterator),
+                    t9ZhuyinInitials = label.toZhuyinT9Initials(transliterator)
                 )
             }
             .sortedBy { it.label.lowercase(Locale.getDefault()) }

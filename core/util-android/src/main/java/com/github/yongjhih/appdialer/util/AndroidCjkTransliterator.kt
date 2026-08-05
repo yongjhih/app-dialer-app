@@ -39,11 +39,4 @@ object AndroidCjkTransliterator : CjkTransliterator {
             text
         }
     }
-
-    /**
-     * Register this Android ICU implementation as the default [CjkTransliterator].
-     */
-    fun init() {
-        CjkTransliterator.register(this)
-    }
 }

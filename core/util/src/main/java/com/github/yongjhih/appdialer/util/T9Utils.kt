@@ -28,13 +28,13 @@ fun String.toT9Words(): List<String> = split(Regex("[^a-zA-Z0-9]+"))
     .map { word -> word.toT9() }
     .filter { it.isNotEmpty() }
 
-fun String.toCjkT9Full(): String {
-    val latin = CjkTransliterator.toLatin(this)
+fun String.toCjkT9Full(transliterator: CjkTransliterator = DefaultCjkTransliterator): String {
+    val latin = transliterator.toLatin(this)
     return latin.toT9()
 }
 
-fun String.toCjkT9Initials(): String {
-    val latin = CjkTransliterator.toLatin(this)
+fun String.toCjkT9Initials(transliterator: CjkTransliterator = DefaultCjkTransliterator): String {
+    val latin = transliterator.toLatin(this)
     return latin.toT9Initials()
 }
 
@@ -51,8 +51,8 @@ fun Char.pinyinInitialToZhuyinT9(): Char = when (this.lowercaseChar()) {
     else -> ' '
 }
 
-fun String.toZhuyinT9Initials(): String {
-    val latin = CjkTransliterator.toLatin(this)
+fun String.toZhuyinT9Initials(transliterator: CjkTransliterator = DefaultCjkTransliterator): String {
+    val latin = transliterator.toLatin(this)
     val words = latin.split(Regex("[^a-zA-Z0-9]+")).filter { it.isNotEmpty() }
     return words.mapNotNull { word ->
         val lower = word.lowercase(Locale.getDefault())

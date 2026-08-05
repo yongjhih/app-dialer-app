@@ -7,26 +7,30 @@ class CjkTransliteratorTest {
 
     @Test
     fun testDefaultCjkTransliterator() {
-        CjkTransliterator.register(DefaultCjkTransliterator)
-        assertEquals("地圖", CjkTransliterator.toLatin("地圖"))
-        assertEquals("カメラ", CjkTransliterator.toLatin("カメラ"))
+        val transliterator = DefaultCjkTransliterator
+        assertEquals("地圖", transliterator.toLatin("地圖"))
+        assertEquals("カメラ", transliterator.toLatin("カメラ"))
+
+        // Default parameter injection in T9Utils
+        assertEquals("3488", "地圖".toCjkT9Full())
     }
 
     @Test
-    fun testCustomCjkTransliteratorRegistration() {
-        val customTransliterator = object : CjkTransliterator {
-            override fun toLatin(text: String): String = when (text) {
+    fun testCustomCjkTransliteratorParameterInjection() {
+        val customTransliterator = CjkTransliterator { text ->
+            when (text) {
                 "地圖" -> "ditu"
                 "カメラ" -> "kamera"
                 else -> text
             }
         }
 
-        CjkTransliterator.register(customTransliterator)
-        assertEquals("ditu", CjkTransliterator.toLatin("地圖"))
-        assertEquals("kamera", CjkTransliterator.toLatin("カメラ"))
+        assertEquals("ditu", customTransliterator.toLatin("地圖"))
+        assertEquals("kamera", customTransliterator.toLatin("カメラ"))
 
-        // Reset back to default
-        CjkTransliterator.register(DefaultCjkTransliterator)
+        // Parameter injection into T9Utils extension functions
+        assertEquals("3488", "地圖".toCjkT9Full(customTransliterator))
+        assertEquals("38", "地圖".toCjkT9Initials(customTransliterator))
+        assertEquals("33", "地圖".toZhuyinT9Initials(customTransliterator))
     }
 }
