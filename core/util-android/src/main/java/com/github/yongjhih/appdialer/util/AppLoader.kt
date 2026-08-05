@@ -10,7 +10,11 @@ import com.github.yongjhih.appdialer.model.AppModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -94,14 +98,14 @@ object AppLoader {
             return@withContext diskApps
         }
 
-        Log.d(TAG, "Disk cache miss. Performing synchronous PackageManager scan...")
+        Log.d(TAG, "Disk cache miss. Performing concurrent PackageManager scan...")
         scanPackageManager(context, transliterator)
     }
 
-    private fun scanPackageManager(
+    private suspend fun scanPackageManager(
         context: Context,
         transliterator: CjkTransliterator
-    ): List<AppModel> {
+    ): List<AppModel> = coroutineScope {
         val startTime = System.currentTimeMillis()
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
@@ -121,16 +125,25 @@ object AppLoader {
             pm.queryIntentActivities(intent, flags)
         }
 
-        val apps = resolveInfos
-            .filterNot { it.activityInfo.packageName == context.packageName }
-            .map { info -> info.toAppModel(pm, transliterator) }
+        val filteredInfos = resolveInfos.filterNot { it.activityInfo.packageName == context.packageName }
+
+        // Concurrent mapping across coroutine worker pool for sub-50ms label retrieval
+        val apps = filteredInfos
+            .chunked(15)
+            .map { chunk ->
+                async(Dispatchers.IO) {
+                    chunk.map { info -> info.toAppModel(pm, transliterator) }
+                }
+            }
+            .awaitAll()
+            .flatten()
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
 
         val elapsed = System.currentTimeMillis() - startTime
         Log.d(TAG, "Scanned ${apps.size} launcher activities in ${elapsed}ms.")
         cachedApps = apps
         AppDiskCache.saveAppsToDisk(context, apps)
-        return apps
+        apps
     }
 
     fun clearCache() {

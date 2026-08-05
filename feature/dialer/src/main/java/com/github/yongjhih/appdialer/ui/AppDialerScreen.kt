@@ -143,11 +143,15 @@ fun AppDialerScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     if (apps.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.no_matching_apps),
-                            color = colorScheme.onSurfaceVariant,
-                            fontSize = 14.sp
-                        )
+                        if (searchQuery.isEmpty()) {
+                            SkeletonAppGridRow()
+                        } else {
+                            Text(
+                                text = stringResource(R.string.no_matching_apps),
+                                color = colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
                     } else {
                         LazyRow(
                             state = listState,
@@ -450,5 +454,38 @@ fun KeypadButtonPreview() {
             subtitleIcon = Icons.Default.Settings,
             onClick = {}
         )
+    }
+}
+
+@Composable
+fun SkeletonAppGridRow() {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(6) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .width(72.dp)
+                    .padding(vertical = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                )
+            }
+        }
     }
 }
