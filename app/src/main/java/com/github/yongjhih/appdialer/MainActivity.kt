@@ -30,7 +30,8 @@ class MainActivity : ComponentActivity() {
     private var resetSignal by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        disablePendingTransition()
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
         super.onCreate(savedInstanceState)
 
         // Pre-warm AppLoader cache in background thread immediately on activity launch
