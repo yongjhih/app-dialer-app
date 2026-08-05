@@ -22,12 +22,15 @@ import com.github.yongjhih.appdialer.util.AppLoader
 import com.github.yongjhih.appdialer.util.Logger
 import com.github.yongjhih.appdialer.util.selfAndChildren
 
+import org.koin.android.ext.android.inject
+
 class MainActivity : ComponentActivity() {
 
     private companion object {
         private const val TAG = "MainActivity"
     }
 
+    private val recentAppsManager: RecentAppsManager by inject()
     private var resetSignal by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +70,7 @@ class MainActivity : ComponentActivity() {
             AndroidMainAppWidget(
                 resetSignal = resetSignal,
                 onDismiss = { finish() },
-                onApplyTransparentWindow = { applyTransparentWindow() }
+                onApplyTransparentWindow = { dim -> applyTransparentWindow(dim) }
             )
         }
 
@@ -108,19 +111,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun applyTransparentWindow() {
+    private fun applyTransparentWindow(dim: Float? = null) {
+        val targetDim = dim ?: runCatching { recentAppsManager.getBackgroundDimAmount() }.getOrDefault(AppDefaults.BACKGROUND_DIM_AMOUNT)
         window.apply {
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
-            val dimAmount = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                AppDefaults.BACKGROUND_DIM_AMOUNT
-            } else {
-                0.6f
-            }
-            setDimAmount(dimAmount)
+            setDimAmount(targetDim)
             setFormat(PixelFormat.TRANSLUCENT)
         }
     }

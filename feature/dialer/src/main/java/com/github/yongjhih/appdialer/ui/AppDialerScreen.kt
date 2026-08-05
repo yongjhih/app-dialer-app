@@ -83,6 +83,7 @@ fun AppDialerScreen(
     searchQuery: String = "",
     settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     isZhuyinEnabled: Boolean = false,
+    isHapticFeedbackEnabled: Boolean = true,
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
     numberPos: KeyLabelPosition = DefaultKeyLayout.number,
     zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
@@ -166,6 +167,7 @@ fun AppDialerScreen(
                             items(apps, key = { it.packageName + "/" + it.className }) { app ->
                                 AppGridItem(
                                     app = app,
+                                    isHapticFeedbackEnabled = isHapticFeedbackEnabled,
                                     onClick = { onAppClick(app) },
                                     onLongClick = { onAppLongClick(app) }
                                 )
@@ -193,6 +195,7 @@ fun AppDialerScreen(
                                         lettersPos = lettersPos,
                                         zhuyinPos = zhuyinPos,
                                         functionPos = functionPos,
+                                        isHapticFeedbackEnabled = isHapticFeedbackEnabled,
                                         onClick = onDeleteOneDigit,
                                         onLongClick = if (isSettingsTrigger) onOpenDialerSettings else onClearAllDigits,
                                         modifier = Modifier.weight(1f, fill = true)
@@ -208,6 +211,7 @@ fun AppDialerScreen(
                                         lettersPos = lettersPos,
                                         zhuyinPos = zhuyinPos,
                                         functionPos = functionPos,
+                                        isHapticFeedbackEnabled = isHapticFeedbackEnabled,
                                         onClick = { onDigitPressed(config.key) },
                                         onLongClick = if (isSettingsTrigger) onOpenDialerSettings else null,
                                         modifier = Modifier.weight(1f, fill = true)
@@ -226,9 +230,11 @@ fun AppDialerScreen(
 @Composable
 fun AppGridItem(
     app: AppModel,
+    isHapticFeedbackEnabled: Boolean = true,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     var imageBitmap by remember(app.packageName, app.className) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
 
     LaunchedEffect(app.packageName, app.className) {
@@ -264,8 +270,18 @@ fun AppGridItem(
         modifier = Modifier
             .width(64.dp)
             .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
+                onClick = {
+                    if (isHapticFeedbackEnabled) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                    onClick()
+                },
+                onLongClick = {
+                    if (isHapticFeedbackEnabled) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                    onLongClick()
+                }
             ),
         shape = RoundedCornerShape(12.dp),
         color = Color.Transparent
@@ -323,6 +339,7 @@ fun KeypadButton(
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
     zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin,
     functionPos: KeyLabelPosition = DefaultKeyLayout.function,
+    isHapticFeedbackEnabled: Boolean = true,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -335,12 +352,16 @@ fun KeypadButton(
             .height(58.dp)
             .combinedClickable(
                 onClick = {
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (isHapticFeedbackEnabled) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
                     onClick()
                 },
                 onLongClick = if (onLongClick != null) {
                     {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (isHapticFeedbackEnabled) {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
                         onLongClick()
                     }
                 } else null

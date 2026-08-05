@@ -73,6 +73,10 @@ fun AppDialerSettingsScreen(
     onZhuyinModeToggle: (Boolean) -> Unit = {},
     isDisablePinyinOnZhuyinEnabled: Boolean = false,
     onDisablePinyinOnZhuyinToggle: (Boolean) -> Unit = {},
+    isHapticFeedbackEnabled: Boolean = true,
+    onHapticFeedbackToggle: (Boolean) -> Unit = {},
+    bgDimAmount: Float = AppDefaults.BACKGROUND_DIM_AMOUNT,
+    onBgDimAmountChange: (Float) -> Unit = {},
     settingsTriggerKey: String = AppDefaults.SETTINGS_TRIGGER_KEY,
     onSettingsTriggerKeyChange: (String) -> Unit = {},
     lettersPos: KeyLabelPosition = DefaultKeyLayout.letters,
@@ -84,7 +88,7 @@ fun AppDialerSettingsScreen(
     functionPos: KeyLabelPosition = DefaultKeyLayout.function,
     onFunctionPosChange: (KeyLabelPosition) -> Unit = {}
 ) {
-    var hapticFeedbackEnabled by remember { mutableStateOf(true) }
+    var hapticFeedbackState by remember(isHapticFeedbackEnabled) { mutableStateOf(isHapticFeedbackEnabled) }
     var autoCloseOnLaunch by remember { mutableStateOf(true) }
     var includeSystemApps by remember { mutableStateOf(false) }
     var autoLaunchSingleMatch by remember { mutableStateOf(false) }
@@ -98,7 +102,7 @@ fun AppDialerSettingsScreen(
     var selectedZhuyinPos by remember(zhuyinPos) { mutableStateOf(zhuyinPos) }
     var selectedFunctionPos by remember(functionPos) { mutableStateOf(functionPos) }
 
-    var bgDimAmount by remember { mutableFloatStateOf(AppDefaults.BACKGROUND_DIM_AMOUNT) }
+    var bgDimState by remember(bgDimAmount) { mutableFloatStateOf(bgDimAmount) }
 
     val colorScheme = MaterialTheme.colorScheme
 
@@ -188,15 +192,21 @@ fun AppDialerSettingsScreen(
                 SettingsSwitchItem(
                     title = stringResource(R.string.haptic_feedback_title),
                     subtitle = stringResource(R.string.haptic_feedback_subtitle),
-                    checked = hapticFeedbackEnabled,
-                    onCheckedChange = { hapticFeedbackEnabled = it }
+                    checked = hapticFeedbackState,
+                    onCheckedChange = { enabled ->
+                        hapticFeedbackState = enabled
+                        onHapticFeedbackToggle(enabled)
+                    }
                 )
 
                 SettingsSliderItem(
                     title = stringResource(R.string.bg_dim_amount_title),
-                    value = bgDimAmount,
-                    onValueChange = { bgDimAmount = it },
-                    valueDisplay = "${(bgDimAmount * 100).toInt()}%"
+                    value = bgDimState,
+                    onValueChange = { dim ->
+                        bgDimState = dim
+                        onBgDimAmountChange(dim)
+                    },
+                    valueDisplay = "${(bgDimState * 100).toInt()}%"
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

@@ -34,6 +34,12 @@ interface RecentAppsManager {
 
     fun getFunctionPosition(): KeyLabelPosition
     fun setFunctionPosition(pos: KeyLabelPosition)
+
+    fun isHapticFeedbackEnabled(): Boolean
+    fun setHapticFeedbackEnabled(enabled: Boolean)
+
+    fun getBackgroundDimAmount(): Float
+    fun setBackgroundDimAmount(amount: Float)
 }
 
 /**
@@ -50,6 +56,9 @@ open class InMemoryRecentAppsManager : RecentAppsManager {
     private var numberPos: KeyLabelPosition = DefaultKeyLayout.number
     private var zhuyinPos: KeyLabelPosition = DefaultKeyLayout.zhuyin
     private var functionPos: KeyLabelPosition = DefaultKeyLayout.function
+
+    private var hapticFeedbackEnabled: Boolean = true
+    private var bgDimAmount: Float = AppDefaults.BACKGROUND_DIM_AMOUNT
 
     override fun addRecentApp(packageName: String) {
         recentApps.remove(packageName)
@@ -84,4 +93,10 @@ open class InMemoryRecentAppsManager : RecentAppsManager {
 
     override fun getFunctionPosition(): KeyLabelPosition = functionPos
     override fun setFunctionPosition(pos: KeyLabelPosition) { functionPos = pos }
+
+    override fun isHapticFeedbackEnabled(): Boolean = hapticFeedbackEnabled
+    override fun setHapticFeedbackEnabled(enabled: Boolean) { hapticFeedbackEnabled = enabled }
+
+    override fun getBackgroundDimAmount(): Float = bgDimAmount
+    override fun setBackgroundDimAmount(amount: Float) { bgDimAmount = amount }
 }

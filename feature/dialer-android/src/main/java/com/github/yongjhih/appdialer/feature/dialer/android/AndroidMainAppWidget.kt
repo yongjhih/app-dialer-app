@@ -17,7 +17,7 @@ import com.github.yongjhih.appdialer.util.RecentAppsManager
 fun AndroidMainAppWidget(
     resetSignal: Int = 0,
     onDismiss: () -> Unit = {},
-    onApplyTransparentWindow: () -> Unit = {},
+    onApplyTransparentWindow: (Float) -> Unit = {},
     recentAppsManager: RecentAppsManager? = null
 ) {
     val context = LocalContext.current
@@ -40,7 +40,7 @@ fun AndroidMainAppWidget(
         }
         view.setBackgroundColor(AndroidColor.TRANSPARENT)
         view.background = null
-        onApplyTransparentWindow()
+        onApplyTransparentWindow(manager.getBackgroundDimAmount())
         Logger.d("AppDialerTime") { "AndroidMainAppWidget SideEffect executed" }
     }
 
@@ -50,6 +50,7 @@ fun AndroidMainAppWidget(
         loadAppsSync = { AppLoader.loadInstalledAppsSync(context) },
         recentAppsManager = manager,
         appLauncher = androidLauncher,
+        onApplyTransparentWindow = onApplyTransparentWindow,
         onDismiss = onDismiss
     )
 }

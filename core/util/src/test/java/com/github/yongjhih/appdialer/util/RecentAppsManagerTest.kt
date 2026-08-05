@@ -29,5 +29,14 @@ class RecentAppsManagerTest {
         // Test position configuration
         manager.setLettersPosition(KeyLabelPosition.TOP_LEFT)
         assertEquals(KeyLabelPosition.TOP_LEFT, manager.getLettersPosition())
+
+        // Test haptic feedback and background dim amount
+        assertTrue(manager.isHapticFeedbackEnabled())
+        manager.setHapticFeedbackEnabled(false)
+        assertFalse(manager.isHapticFeedbackEnabled())
+
+        assertEquals(0.4f, manager.getBackgroundDimAmount())
+        manager.setBackgroundDimAmount(0.6f)
+        assertEquals(0.6f, manager.getBackgroundDimAmount())
     }
 }

@@ -44,6 +44,7 @@ fun MainAppWidget(
     loadAppsSync: () -> List<AppModel>? = { null },
     recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
     appLauncher: AppLauncher? = null,
+    onApplyTransparentWindow: (Float) -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
     val navController = rememberNavController()
@@ -53,6 +54,9 @@ fun MainAppWidget(
     var settingsTriggerKey by remember { mutableStateOf(recentAppsManager.getSettingsTriggerKey()) }
     var isZhuyinEnabled by remember { mutableStateOf(recentAppsManager.isZhuyinModeEnabled()) }
     var isDisablePinyinOnZhuyinEnabledState by remember { mutableStateOf(recentAppsManager.isDisablePinyinOnZhuyinEnabled()) }
+
+    var isHapticFeedbackEnabled by remember { mutableStateOf(recentAppsManager.isHapticFeedbackEnabled()) }
+    var bgDimAmount by remember { mutableStateOf(recentAppsManager.getBackgroundDimAmount()) }
 
     var lettersPos by remember { mutableStateOf(recentAppsManager.getLettersPosition()) }
     var numberPos by remember { mutableStateOf(recentAppsManager.getNumberPosition()) }
@@ -194,6 +198,7 @@ fun MainAppWidget(
                     searchQuery = searchQuery,
                     settingsTriggerKey = settingsTriggerKey,
                     isZhuyinEnabled = isZhuyinEnabled,
+                    isHapticFeedbackEnabled = isHapticFeedbackEnabled,
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
@@ -227,6 +232,8 @@ fun MainAppWidget(
                     settingsTriggerKey = settingsTriggerKey,
                     isZhuyinModeEnabled = isZhuyinEnabled,
                     isDisablePinyinOnZhuyinEnabled = isDisablePinyinOnZhuyinEnabledState,
+                    isHapticFeedbackEnabled = isHapticFeedbackEnabled,
+                    bgDimAmount = bgDimAmount,
                     lettersPos = lettersPos,
                     numberPos = numberPos,
                     zhuyinPos = zhuyinPos,
@@ -242,6 +249,15 @@ fun MainAppWidget(
                     onDisablePinyinOnZhuyinToggle = { enabled ->
                         isDisablePinyinOnZhuyinEnabledState = enabled
                         recentAppsManager.setDisablePinyinOnZhuyinEnabled(enabled)
+                    },
+                    onHapticFeedbackToggle = { enabled ->
+                        isHapticFeedbackEnabled = enabled
+                        recentAppsManager.setHapticFeedbackEnabled(enabled)
+                    },
+                    onBgDimAmountChange = { dim ->
+                        bgDimAmount = dim
+                        recentAppsManager.setBackgroundDimAmount(dim)
+                        onApplyTransparentWindow(dim)
                     },
                     onLettersPosChange = { lPos ->
                         lettersPos = lPos

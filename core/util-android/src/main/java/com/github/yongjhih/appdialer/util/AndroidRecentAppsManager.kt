@@ -90,6 +90,22 @@ class AndroidRecentAppsManager(private val context: Context) : RecentAppsManager
     override fun setFunctionPosition(pos: KeyLabelPosition) =
         setPosition(KEY_POS_FUNCTION, pos)
 
+    override fun isHapticFeedbackEnabled(): Boolean {
+        return getPrefs().getBoolean(KEY_HAPTIC_FEEDBACK, true)
+    }
+
+    override fun setHapticFeedbackEnabled(enabled: Boolean) {
+        getPrefs().edit().putBoolean(KEY_HAPTIC_FEEDBACK, enabled).apply()
+    }
+
+    override fun getBackgroundDimAmount(): Float {
+        return getPrefs().getFloat(KEY_BACKGROUND_DIM_AMOUNT, AppDefaults.BACKGROUND_DIM_AMOUNT)
+    }
+
+    override fun setBackgroundDimAmount(amount: Float) {
+        getPrefs().edit().putFloat(KEY_BACKGROUND_DIM_AMOUNT, amount).apply()
+    }
+
     private fun getPosition(key: String, default: KeyLabelPosition): KeyLabelPosition =
         KeyLabelPosition.fromPreference(getPrefs().getString(key, default.preferenceValue), default)
 
@@ -104,6 +120,8 @@ class AndroidRecentAppsManager(private val context: Context) : RecentAppsManager
         private const val KEY_ZHUYIN_MODE = "zhuyin_mode"
         private const val KEY_DISABLE_PINYIN_ON_ZHUYIN = "disable_pinyin_on_zhuyin"
         private const val KEY_SETTINGS_TRIGGER_KEY = "settings_trigger_key"
+        private const val KEY_HAPTIC_FEEDBACK = "haptic_feedback"
+        private const val KEY_BACKGROUND_DIM_AMOUNT = "background_dim_amount"
 
         private const val KEY_POS_LETTERS = "pos_letters"
         private const val KEY_POS_NUMBER = "pos_number"
