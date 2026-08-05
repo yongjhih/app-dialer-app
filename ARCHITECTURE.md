@@ -72,7 +72,7 @@ graph TD
 | **`:core:model`** | `id("kotlin")` (JVM) | Pure domain models (`AppModel`), enums (`KeyLabelPosition`), constants (`AppDefaults`), and keypad configurations (`KeyLayout`). Zero Android SDK/Compose dependencies. | ✅ Yes |
 | **`:core:util`** | `id("kotlin")` (JVM) | Pure search algorithms (`T9Utils`), preference contracts (`RecentAppsManager`), in-memory implementations (`InMemoryRecentAppsManager`), and SAM interfaces (`CjkTransliterator`). Zero Android SDK dependencies. | ✅ Yes |
 | **`:core:ui`** | `com.android.library` | Compose UI design tokens (`Color.kt`, `Theme.kt`), atomic UI components, and typography. | 🟢 Compose Multiplatform |
-| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
+| **`:core:util-android`** | `com.android.library` | Android framework helpers (`AppLoader`, `AndroidRecentAppsManager`, `ViewUtils`, `DrawableUtils.toImageBitmap()`, `AndroidCjkTransliterator`) using `Context`, `SharedPreferences`, `PackageManager`, and `android.icu`. | ❌ Android Only |
 | **`:feature:dialer`** | `com.android.library` | Platform-independent Compose UI screens (`AppDialerScreen`, `AppDialerSettingsScreen`), keypad layouts, and navigation (`MainAppWidget`). Decoupled via `AppLauncher` and `RecentAppsManager` interfaces with **0 `android.*` imports and 0 `:core:util-android` dependency**. | 🟢 Compose Multiplatform |
 | **`:feature:dialer-android`** | `com.android.library` | Android feature composition (`AndroidMainAppWidget`, `AndroidAppLauncher`) bridging Android `Context`, `Intent`, `Settings`, `Toast`, `AppLoader`, and `AndroidRecentAppsManager` to `:feature:dialer`. | ❌ Android Only |
 | **`:app`** | `com.android.application` | Ultra-thin entrypoint hosting `MainActivity`, `AndroidManifest.xml`, launcher icons, and top-level app composition. | ❌ Android Only |
@@ -86,29 +86,10 @@ graph TD
 2. **No Global Singletons or Static Mutable State**: Avoid Service Locators or companion object mutable instances (`var currentInstance`). Static state introduces thread race conditions, hidden dependencies, and testing side-effects.
 
 ### ✅ Best Practices Enforced
-1. **Interface Contract & Parameter Injection**:
+1. **Strict Non-Null Receiver Type Safety**:
+   Extension functions MUST use explicit non-null receiver types (e.g. `Drawable.toImageBitmap(): ImageBitmap`) instead of ambiguous nullable types (`Any?.toImageBitmap(): ImageBitmap?`), enforcing compile-time type safety.
+2. **Interface Contract & Parameter Injection**:
    Isolate storage, framework dependencies, and preferences behind pure interfaces (`RecentAppsManager`, `AppLauncher`, `CjkTransliterator`).
-   ```kotlin
-   // In :core:util - Pure Interface Contract
-   interface RecentAppsManager {
-       fun addRecentApp(packageName: String)
-       fun getRecentApps(): List<String>
-       ...
-   }
-
-   // In :feature:dialer - Pure Compose UI Dependency (No :core:util-android dependency!)
-   @Composable
-   fun MainAppWidget(
-       recentAppsManager: RecentAppsManager = InMemoryRecentAppsManager(),
-       appLauncher: AppLauncher? = null,
-       ...
-   )
-
-   // In :feature:dialer-android - Android SharedPreferences Adapter
-   val manager = remember(context) { AndroidRecentAppsManager(context) }
-   ```
-2. **Functional Parameter Injection with Default Arguments**:
-   Pass dependencies explicitly as function or constructor parameters with sensible default values (`DefaultCjkTransliterator`, `InMemoryRecentAppsManager`).
 3. **Pre-converted UI Assets for Platform Independence**:
    Convert platform-specific graphics assets (e.g. Android `Drawable`) to platform-independent UI types (Compose `ImageBitmap`) at the data layer (`AppLoader` in `:core:util-android`). This eliminates platform graphic utility dependencies from feature UI modules.
 
