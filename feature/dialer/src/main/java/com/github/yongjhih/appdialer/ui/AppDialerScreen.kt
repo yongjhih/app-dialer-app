@@ -213,7 +213,7 @@ fun AppDialerScreen(
                                         modifier = Modifier.weight(1f, fill = true)
                                     )
                                 } else {
-                                    val config = KeypadValues.configFor(key)
+                                    val config = KeypadValues.keys[key] ?: return@forEach
                                     KeypadButton(
                                         number = config.number,
                                         letters = config.letters,

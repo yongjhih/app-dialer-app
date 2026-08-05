@@ -49,7 +49,7 @@ object KeypadValues {
         listOf(KEY_7, KEY_8, KEY_9)
     )
 
-    private val keys = mapOf(
+    val keys = mapOf(
         KEY_2 to KeypadKeyConfig(KEY_2, NUMBER_2, LETTER_2, ZHUYIN_2),
         KEY_3 to KeypadKeyConfig(KEY_3, letters = LETTER_3, zhuyin = ZHUYIN_3),
         KEY_4 to KeypadKeyConfig(KEY_4, letters = LETTER_4, zhuyin = ZHUYIN_4),
@@ -59,6 +59,4 @@ object KeypadValues {
         KEY_8 to KeypadKeyConfig(KEY_8, letters = LETTER_8, zhuyin = ZHUYIN_8),
         KEY_9 to KeypadKeyConfig(KEY_9, letters = LETTER_9, zhuyin = ZHUYIN_9)
     )
-
-    fun configFor(key: String): KeypadKeyConfig = requireNotNull(keys[key])
 }
