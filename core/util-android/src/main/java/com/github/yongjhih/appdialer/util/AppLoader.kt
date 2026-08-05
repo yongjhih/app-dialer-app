@@ -45,6 +45,32 @@ object AppLoader {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    /**
+     * Synchronously retrieves cached apps from memory or disk cache (< 1ms)
+     * during [MainActivity.onCreate] so the first Compose frame renders immediately.
+     */
+    fun loadInstalledAppsSync(
+        context: Context,
+        transliterator: CjkTransliterator = AndroidCjkTransliterator
+    ): List<AppModel>? {
+        val currentCache = cachedApps
+        if (currentCache != null) {
+            Log.d(TAG, "Sync load hit memory cache with ${currentCache.size} apps.")
+            return currentCache
+        }
+
+        val diskApps = AppDiskCache.loadAppsFromDisk(context)
+        if (diskApps != null) {
+            cachedApps = diskApps
+            Log.d(TAG, "Sync load hit disk cache with ${diskApps.size} apps. Triggering background scan...")
+            scope.launch {
+                scanPackageManager(context, transliterator)
+            }
+            return diskApps
+        }
+        return null
+    }
+
     suspend fun loadInstalledApps(
         context: Context,
         transliterator: CjkTransliterator = AndroidCjkTransliterator,

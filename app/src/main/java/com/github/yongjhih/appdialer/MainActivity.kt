@@ -39,7 +39,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate (resetSignal=$resetSignal)")
 
-        // Pre-warm AppLoader cache in background thread immediately on activity launch
+        // Synchronously retrieve disk cache (< 1ms) BEFORE setContent so Frame 1 renders immediately
+        AppLoader.loadInstalledAppsSync(applicationContext)
+
+        // Async pre-warm background scan in case of app updates
         lifecycleScope.launch(Dispatchers.IO) {
             AppLoader.loadInstalledApps(applicationContext)
         }
