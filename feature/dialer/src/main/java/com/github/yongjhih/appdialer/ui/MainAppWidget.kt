@@ -1,5 +1,8 @@
 package com.github.yongjhih.appdialer.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -84,7 +87,11 @@ fun MainAppWidget(
     AppDialerTheme {
         NavHost(
             navController = navController,
-            startDestination = Destinations.DIALER
+            startDestination = Destinations.DIALER,
+            enterTransition = { fadeIn(animationSpec = tween(200)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+            popExitTransition = { fadeOut(animationSpec = tween(200)) }
         ) {
             composable(Destinations.DIALER) {
                 AppDialerScreen(
