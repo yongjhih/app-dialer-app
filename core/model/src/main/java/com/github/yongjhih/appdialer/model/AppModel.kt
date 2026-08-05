@@ -17,7 +17,7 @@ data class AppModel(
     private val rawT9CjkFull: String = "",
     private val rawT9CjkInitials: String = "",
     private val rawT9ZhuyinInitials: String = "",
-    private val iconProvider: (() -> Any?)? = null,
+    val iconProvider: (() -> Any?)? = null,
     private val t9CjkFullProvider: (() -> String)? = null,
     private val t9CjkInitialsProvider: (() -> String)? = null,
     private val t9ZhuyinInitialsProvider: (() -> String)? = null

@@ -31,10 +31,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -215,7 +221,16 @@ fun AppGridItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    val imageBitmap = remember(app) { app.icon as? ImageBitmap }
+    var imageBitmap by remember(app) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
+
+    LaunchedEffect(app) {
+        if (imageBitmap == null && app.iconProvider != null) {
+            imageBitmap = withContext(Dispatchers.IO) {
+                app.iconProvider?.invoke() as? ImageBitmap
+            }
+        }
+    }
+
     val colorScheme = MaterialTheme.colorScheme
     val highlightColor = colorScheme.matchedHighlight
     val textColor = colorScheme.onSurface
@@ -251,12 +266,28 @@ fun AppGridItem(
             modifier = Modifier.padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            imageBitmap?.let { bitmap ->
+            val currentBitmap = imageBitmap
+            if (currentBitmap != null) {
                 Image(
-                    bitmap = bitmap,
+                    bitmap = currentBitmap,
                     contentDescription = app.label,
                     modifier = Modifier.size(48.dp)
                 )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(colorScheme.onSurface.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = app.label.take(1).uppercase(),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
