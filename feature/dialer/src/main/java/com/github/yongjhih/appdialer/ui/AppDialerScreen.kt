@@ -221,9 +221,9 @@ fun AppGridItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    var imageBitmap by remember(app) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
+    var imageBitmap by remember(app.packageName, app.className) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
 
-    LaunchedEffect(app) {
+    LaunchedEffect(app.packageName, app.className) {
         if (imageBitmap == null) {
             imageBitmap = withContext(Dispatchers.IO) {
                 app.awaitIcon() as? ImageBitmap
