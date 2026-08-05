@@ -224,9 +224,9 @@ fun AppGridItem(
     var imageBitmap by remember(app) { mutableStateOf<ImageBitmap?>(app.icon as? ImageBitmap) }
 
     LaunchedEffect(app) {
-        if (imageBitmap == null && app.iconProvider != null) {
+        if (imageBitmap == null) {
             imageBitmap = withContext(Dispatchers.IO) {
-                app.iconProvider?.invoke() as? ImageBitmap
+                app.awaitIcon() as? ImageBitmap
             }
         }
     }

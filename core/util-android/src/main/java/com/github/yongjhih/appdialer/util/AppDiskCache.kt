@@ -44,11 +44,14 @@ object AppDiskCache {
         val jsonString = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .getString(KEY_CACHED_APPS_JSON, null) ?: return null
 
+        val pm = context.packageManager
+
         return try {
             val jsonArray = JSONArray(jsonString)
             val apps = mutableListOf<AppModel>()
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
+                val packageName = obj.getString("packageName")
                 val wordsArray = obj.optJSONArray("t9Words")
                 val words = mutableListOf<String>()
                 if (wordsArray != null) {
@@ -60,14 +63,21 @@ object AppDiskCache {
                 apps.add(
                     AppModel(
                         label = obj.getString("label"),
-                        packageName = obj.getString("packageName"),
+                        packageName = packageName,
                         className = obj.getString("className"),
                         t9Full = obj.optString("t9Full", ""),
                         t9Initials = obj.optString("t9Initials", ""),
                         t9Words = words,
                         rawT9CjkFull = obj.optString("t9CjkFull", ""),
                         rawT9CjkInitials = obj.optString("t9CjkInitials", ""),
-                        rawT9ZhuyinInitials = obj.optString("t9ZhuyinInitials", "")
+                        rawT9ZhuyinInitials = obj.optString("t9ZhuyinInitials", ""),
+                        iconProvider = {
+                            try {
+                                pm.getApplicationIcon(packageName).toImageBitmap()
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
                     )
                 )
             }

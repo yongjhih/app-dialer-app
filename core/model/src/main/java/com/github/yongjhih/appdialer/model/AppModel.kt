@@ -66,7 +66,7 @@ data class AppModel(
         t9ZhuyinInitialsProvider = null
     )
 
-    val icon: Any? by lazy { rawIcon ?: iconProvider?.invoke() }
+    val icon: Any? by lazy { rawIcon }
     val t9CjkFull: String by lazy { rawT9CjkFull.ifEmpty { t9CjkFullProvider?.invoke() ?: "" } }
     val t9CjkInitials: String by lazy { rawT9CjkInitials.ifEmpty { t9CjkInitialsProvider?.invoke() ?: "" } }
     val t9ZhuyinInitials: String by lazy { rawT9ZhuyinInitials.ifEmpty { t9ZhuyinInitialsProvider?.invoke() ?: "" } }
