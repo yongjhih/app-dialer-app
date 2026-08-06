@@ -407,10 +407,11 @@ fun KeypadButton(
             // 2. Settings Gear Icon (Positioned at functionPos, or BottomEnd if Center)
             if (subtitleIcon != null) {
                 val align = if (functionPos == KeyLabelPosition.CENTER) Alignment.BottomEnd else functionPos.toAlignment()
+                val isCenter = functionPos == KeyLabelPosition.CENTER
                 Icon(
                     imageVector = subtitleIcon,
                     contentDescription = stringResource(R.string.settings),
-                    tint = colorScheme.primary.copy(alpha = 0.95f),
+                    tint = if (isCenter) colorScheme.onSurface else colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .size(14.dp)
                         .align(align)
