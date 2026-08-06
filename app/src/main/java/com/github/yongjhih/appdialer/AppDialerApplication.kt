@@ -2,6 +2,7 @@ package com.github.yongjhih.appdialer
 
 import android.app.Application
 import android.util.Log
+import com.github.yongjhih.appdialer.feature.dialer.android.di.dialerAndroidModule
 import com.github.yongjhih.appdialer.util.Logger
 import com.github.yongjhih.appdialer.util.di.coreUtilAndroidModule
 import org.koin.android.ext.koin.androidContext
@@ -33,7 +34,7 @@ class AppDialerApplication : Application() {
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@AppDialerApplication)
-            modules(coreUtilAndroidModule)
+            modules(coreUtilAndroidModule, dialerAndroidModule)
         }
         Logger.d("AppDialerTime") { "[t=${System.currentTimeMillis() - appStartTime}ms] Application.onCreate finished (Koin initialized)" }
     }
