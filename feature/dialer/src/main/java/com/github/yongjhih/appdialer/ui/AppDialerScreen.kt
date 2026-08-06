@@ -449,9 +449,9 @@ fun KeypadButton(
                 val isCenter = align == Alignment.Center
                 Text(
                     text = zhuyin,
-                    fontSize = if (isCenter) 14.sp else 8.5.sp,
+                    fontSize = if (isCenter) 16.sp else 10.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCenter) colorScheme.primary else colorScheme.primary.copy(alpha = 0.9f),
+                    color = if (isCenter) colorScheme.onSurface else colorScheme.onSurfaceVariant,
                     modifier = Modifier.align(align)
                 )
             }
