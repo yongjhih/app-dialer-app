@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -127,6 +128,8 @@ fun AppDialerScreen(
             .fillMaxSize()
             .background(Color.Transparent)
             .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
                 onClick = onDismiss,
                 onLongClick = {}
             )
@@ -139,7 +142,9 @@ fun AppDialerScreen(
                 .navigationBarsPadding()
                 .padding(horizontal = 12.dp, vertical = 24.dp)
                 .combinedClickable(
-                    onClick = {}, // Intercept click on card
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {}, // Intercept click on card without ripple
                     onLongClick = {}
                 ),
             shape = RoundedCornerShape(32.dp),
