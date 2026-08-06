@@ -772,7 +772,7 @@ fun SettingsSliderItem(
             Slider(
                 value = value,
                 onValueChange = onValueChange,
-                valueRange = 0.1f..0.9f
+                valueRange = 0.0f..0.9f
             )
         }
     }
