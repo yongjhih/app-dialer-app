@@ -65,7 +65,7 @@ class AppModelTest {
     @Test
     fun testAppDefaultsConstants() {
         assertEquals("9", AppDefaults.SETTINGS_TRIGGER_KEY)
-        assertEquals(0.4f, AppDefaults.BACKGROUND_DIM_AMOUNT)
+        assertEquals(0.0f, AppDefaults.BACKGROUND_DIM_AMOUNT)
         assertEquals("package:", AppDefaults.PACKAGE_URI_SCHEME)
     }
 }

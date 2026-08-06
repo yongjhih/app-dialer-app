@@ -35,7 +35,7 @@ class RecentAppsManagerTest {
         manager.setHapticFeedbackEnabled(false)
         assertFalse(manager.isHapticFeedbackEnabled())
 
-        assertEquals(0.4f, manager.getBackgroundDimAmount())
+        assertEquals(0.0f, manager.getBackgroundDimAmount())
         manager.setBackgroundDimAmount(0.6f)
         assertEquals(0.6f, manager.getBackgroundDimAmount())
         manager.setBackgroundDimAmount(0.0f)
